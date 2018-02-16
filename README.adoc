@@ -4,29 +4,53 @@ Davide Cavestro <davide.cavestro@gmail.com>
 
 POC for a jdbc CLI tool
 
-== How to use
+== Project status
+
+Beware the project is still on an early stage.
+
+
+== Features
+
+The set of available commands will expand. As of now only a subset of 
+the `run` command features are implemented.
+
+
+== Usage
 
 ```
-davide@amico:~/git/jdbcli$ ./gradlew installDist && \
-> ./build/install/jdbcli/bin/jdbcli run \
->  -x "create table contacts (id int primary key, name varchar(100));"\
->  -x "insert into contacts (id, name) values (1, 'Alice');"\
->  -x "insert into contacts (id, name) values (2, 'Bob');"\
->  -x "insert into contacts (id, name) values (3, 'John');"\
->  -x "insert into contacts (id, name) values (4, 'Daisy');"\
->  "jdbc:h2:mem:test" \
->  "SELECT * FROM contacts;"
+Usage: run [-f=<sqlFile>] [-p=<password>] [-u=<username>] [-x=<execute>]... URL
+           QUERY...
+      URL                     The JDBC url.
+      QUERY...                The SQL to run.
+  -f, --file=<sqlFile>        File containing the query to run.
+  -p, --password=<password>   The password
+  -u, --user=<username>       The username
+  -x, --execute=<execute>     Additional SQL commands to be executed before the
+                                specified QUERY
+```
 
-BUILD SUCCESSFUL in 4s
-6 actionable tasks: 3 executed, 3 up-to-date
-SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
-SLF4J: Defaulting to no-operation (NOP) logger implementation
-SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
-url:jdbc:h2:mem:test
-sql:SELECT * FROM contacts;
+== How to build
+
+Build and launch some queries on an in-memory h2 db
+
+```
+./gradlew installDist && \
+./build/install/jdbsee/bin/jdbsee run \
+-x "create table contacts (id int primary key, name varchar(100));" \
+-x "insert into contacts (id, name) values (1, 'Alice');" \
+-x "insert into contacts (id, name) values (2, 'Bob');" \
+-x "insert into contacts (id, name) values (3, 'John');" \
+-x "insert into contacts (id, name) values (4, 'Daisy');" \
+"jdbc:h2:mem:test" \
+"SELECT * FROM contacts;"
+```
+
+you should get
+
+```
 ┌───────────────────────────────────────┬──────────────────────────────────────┐
 │ID                                     │NAME                                  │
-└───────────────────────────────────────┴──────────────────────────────────────┘
+├───────────────────────────────────────┴──────────────────────────────────────┤
 │1                                      │Alice                                 │
 ├───────────────────────────────────────┼──────────────────────────────────────┤
 │2                                      │Bob                                   │
@@ -38,7 +62,10 @@ sql:SELECT * FROM contacts;
 
 ```
 
-== TODO
+== TO-DO
 
+* Support exporting results (json, csv)
 * Support using drivers from local jars
 * Support downloading drivers with grapes
+* Support named drivers (persisting additional driver config)
+* Support named datasoruces (persisting db access config)
