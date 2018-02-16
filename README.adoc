@@ -3,3 +3,42 @@ Davide Cavestro <davide.cavestro@gmail.com>
 :toc:
 
 POC for a jdbc CLI tool
+
+== How to use
+
+```
+davide@amico:~/git/jdbcli$ ./gradlew installDist && \
+> ./build/install/jdbcli/bin/jdbcli run \
+>  -x "create table contacts (id int primary key, name varchar(100));"\
+>  -x "insert into contacts (id, name) values (1, 'Alice');"\
+>  -x "insert into contacts (id, name) values (2, 'Bob');"\
+>  -x "insert into contacts (id, name) values (3, 'John');"\
+>  -x "insert into contacts (id, name) values (4, 'Daisy');"\
+>  "jdbc:h2:mem:test" \
+>  "SELECT * FROM contacts;"
+
+BUILD SUCCESSFUL in 4s
+6 actionable tasks: 3 executed, 3 up-to-date
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+url:jdbc:h2:mem:test
+sql:SELECT * FROM contacts;
+┌───────────────────────────────────────┬──────────────────────────────────────┐
+│ID                                     │NAME                                  │
+└───────────────────────────────────────┴──────────────────────────────────────┘
+│1                                      │Alice                                 │
+├───────────────────────────────────────┼──────────────────────────────────────┤
+│2                                      │Bob                                   │
+├───────────────────────────────────────┼──────────────────────────────────────┤
+│3                                      │John                                  │
+├───────────────────────────────────────┼──────────────────────────────────────┤
+│4                                      │Daisy                                 │
+└───────────────────────────────────────┴──────────────────────────────────────┘
+
+```
+
+== TODO
+
+* Support using drivers from local jars
+* Support downloading drivers with grapes
