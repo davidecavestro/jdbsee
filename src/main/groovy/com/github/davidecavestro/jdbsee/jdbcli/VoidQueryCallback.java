@@ -8,5 +8,5 @@ public abstract class VoidQueryCallback<X extends Exception> implements QueryCal
     return doWithQuery (query);
   }
 
-  protected abstract Void doWithQuery (final Query query);
+  protected abstract Void doWithQuery (final Query query) throws X;
 }

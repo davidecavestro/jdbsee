@@ -52,9 +52,6 @@ public class QueryService {
       final String... sql
       ) throws X {
     jdbi.withHandle (handle -> {
-//      handle.execute ("create table contacts (id int primary key, name varchar(100))");
-//      handle.execute ("insert into contacts (id, name) values (?, ?)", 1, "Alice");
-//      handle.execute ("insert into contacts (id, name) values (?, ?)", 2, "Bob");
       final List<String> queries = Arrays.asList (sql);
       final String last = Iterables.getLast (queries);
       for (final String command : Iterables.filter (queries, it->it!=last)) {
@@ -63,7 +60,5 @@ public class QueryService {
       callback.withQuery (handle.select (last));
       return null;
     });
-//    listStream.forEach (line -> System.out.println (line));
-
   }
 }
