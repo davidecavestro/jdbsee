@@ -1,7 +1,39 @@
 = JDBSEE - CLI
+Davide Cavestro <https://github.com/davidecavestro[@davidecavestro]>
+// Settings:
+:idprefix:
+:idseparator: -
+ifndef::env-github[:icons: font]
+ifdef::env-github,env-browser[]
+:toc: macro
+:toclevels: 1
+endif::[]
+ifdef::env-github[]
+:branch: master
+:status:
+:outfilesuffix: .adoc
+:!toc-title:
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :paperclip:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+endif::[]
+// URIs:
+:uri-repo: https://github.com/davidecavestro/jdbsee
+:uri-issues: {uri-repo}/issues
+:uri-search-issues: {uri-repo}/search?type=Issues
+:uri-ci-travis: https://travis-ci.org/davidecavestro/jdbsee
+:uri-coverage-coveralls: https://coveralls.io/github/davidecavestro/jdbsee?branch=master
+ifdef::status[]
+image:https://img.shields.io/github/license/davidecavestro/jdbsee.svg[Apache License 2.0, link=#copyright-and-license]
+image:https://img.shields.io/travis/davidecavestro/jdbsee/master.svg[Build Status (Travis CI), link={uri-ci-travis}]
+image:https://img.shields.io/coveralls/github/davidecavestro/jdbsee.svg[Coverage Status (Coveralls), link={uri-coverage-coveralls}]
+endif::[]
+
 POC for a jdbc CLI tool
-Davide Cavestro <davide.cavestro@gmail.com>
-:toc:
+
+toc::[]
 
 
 This is a POC for a jdbc CLI tool.
