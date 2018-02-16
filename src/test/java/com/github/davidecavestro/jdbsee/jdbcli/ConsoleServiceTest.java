@@ -17,6 +17,7 @@ public class ConsoleServiceTest {
 
   @Test
   public void renderResultSet () {
+    /*FIXME add tests!!!
     final Jdbi jdbi = Jdbi.create ("jdbc:h2:mem:test");
     final Stream<String> listStream = jdbi.withHandle (handle -> {
       handle.execute ("create table contacts (id int primary key, name varchar(100))");
@@ -25,5 +26,6 @@ public class ConsoleServiceTest {
       return handle.select ("SELECT * FROM contacts").scanResultSet (new AsciiTableResultSetScanner ());
     });
     listStream.forEach (line -> System.out.println (line));
+    */
   }
 }
