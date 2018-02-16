@@ -1,8 +1,10 @@
 = JDBSEE - CLI
+POC for a jdbc CLI tool
 Davide Cavestro <davide.cavestro@gmail.com>
 :toc:
 
-POC for a jdbc CLI tool
+
+This is a POC for a jdbc CLI tool.
 
 == Project status
 
@@ -17,6 +19,12 @@ the `run` command features are implemented.
 
 == Usage
 
+
+Invoke the distributable binary passing appropriate commands and params
+
+
+=== `run` command 
+
 ```
 Usage: run [-f=<sqlFile>] [-p=<password>] [-u=<username>] [-x=<execute>]... URL
            QUERY...
@@ -28,6 +36,7 @@ Usage: run [-f=<sqlFile>] [-p=<password>] [-u=<username>] [-x=<execute>]... URL
   -x, --execute=<execute>     Additional SQL commands to be executed before the
                                 specified QUERY
 ```
+
 
 == How to build
 
