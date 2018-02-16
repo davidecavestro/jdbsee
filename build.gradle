@@ -1,0 +1,82 @@
+plugins {
+//  id "net.ltgt.apt" version "0.10"
+  id "net.ltgt.apt-idea" version "0.13"
+
+  id "application"
+
+  // generates coverage data
+  // see homepage: http://eclemma.org/jacoco/
+  // see plugin: https://docs.gradle.org/current/userguide/jacoco_plugin.html
+  id "jacoco"
+
+  // builds a dashboard for all reports
+  // see plugin: https://docs.gradle.org/current/userguide/buildDashboard_plugin.html
+  id 'build-dashboard'
+}
+
+//apply plugin: 'java'
+//apply plugin: 'application'
+//
+
+group = 'com.github.davidecavestro.jdbsee'
+version = '0.0.1-SNAPSHOT'
+
+mainClassName = 'com.github.davidecavestro.jdbsee.jdbcli.JdbCliApplication'
+
+repositories {
+  mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+
+// Add Dagger dependencies
+dependencies {
+  apt 'com.google.dagger:dagger-compiler:2.14.1'
+  compile 'com.google.dagger:dagger:2.14.1'
+  compile('com.google.guava:guava:24.0-jre')
+
+  runtime 'org.hsqldb:hsqldb:2.4.0'
+  runtime 'com.h2database:h2:1.4.196'
+  runtime 'mysql:mysql-connector-java:8.0.8-dmr'
+  runtime 'org.postgresql:postgresql:42.2.1'
+  runtime 'com.microsoft.sqlserver:mssql-jdbc:6.3.6.jre8-preview'
+
+  compile 'com.github.davidmoten:rxjava2-jdbc:0.1-RC32'
+  compile 'info.picocli:picocli:2.2.1'
+  compile 'de.vandermeer:asciitable:0.3.2'
+  compile 'de.vandermeer:skb-interfaces:0.0.2'
+
+  compile 'org.jdbi:jdbi3-core:3.0.1'
+  compile 'org.jdbi:jdbi3-sqlobject:3.0.1'
+
+  compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.2.0'
+  compile group: 'commons-dbutils', name: 'commons-dbutils', version: '1.7'
+
+  testCompile 'junit:junit:4.12'
+}
+
+def generatedResources = "$buildDir/generated-resources/main"
+
+sourceSets {
+  main {
+    //register an output folder on the main SourceSet:
+    output.dir(generatedResources, builtBy: 'generateVersionTxt')
+    //it is now a part of the 'main' classpath and will be a part of the jar
+  }
+}
+
+//a task that generates the resources:
+task generateVersionTxt {
+  description 'Creates a version.txt file with build info that is added to the root of the jar'
+  doLast {
+    new File(generatedResources).mkdirs()
+    def generated = new File(generatedResources, "version.txt")
+    generated.text = """
+        Version: $rootProject.version
+        Buildtime: ${new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())}
+        Application-name: $rootProject.name $project.name
+        """
+  }
+}
