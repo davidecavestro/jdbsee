@@ -1,4 +1,5 @@
-JDBSEE - CLI
-:author: Davide Cavestro
+= JDBSEE - CLI
+Davide Cavestro <davide.cavestro@gmail.com>
 :toc:
+
 POC for a jdbc CLI tool
