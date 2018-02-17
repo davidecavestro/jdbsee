@@ -58,6 +58,7 @@ dependencies {
   compile 'commons-dbutils:commons-dbutils:1.7'
   compile 'org.apache.tomcat:tomcat-jdbc:9.0.4'
 
+  compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.9.4'
   runtime 'ch.qos.logback:logback-classic:1.2.3'
 
   testCompile "org.spockframework:spock-core:1.1-groovy-2.4"

@@ -43,6 +43,9 @@ public class RunCommand implements Runnable {
   @Option(names = ["-d", "--driver-class"], description = "External driver class name (detected from URL if not specified)")
   String driverClassName;
 
+  @Option(names = ["-t", "--output-type"], paramLabel = "OUTPUT_TYPE", description = "Select output type, between TABLE, CSV, JSON, JSON_PRETTY")
+  OutputType outputType = OutputType.TABLE;
+
   @Inject
   public RunCommand (
 //      final DataSourceService dataSourceService,

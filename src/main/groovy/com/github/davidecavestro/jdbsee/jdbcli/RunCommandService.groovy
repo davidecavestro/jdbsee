@@ -58,7 +58,7 @@ public class RunCommandService {
 
         final QueryCallback<Void, Exception> callback = { Query query ->
           try {
-            consoleService.renderResultSet(query);
+            consoleService.renderResultSet(query, outputType);
           } catch (final SQLException e) {
             throw new RuntimeException(e);
           }
