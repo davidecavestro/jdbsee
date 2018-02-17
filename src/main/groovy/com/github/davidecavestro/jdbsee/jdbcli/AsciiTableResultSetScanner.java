@@ -82,7 +82,9 @@ public class AsciiTableResultSetScanner implements ResultSetScanner<Stream<Strin
         while (counter++ < bufferSize && delegate.hasNext ()) {
           final Collection<Object> row = Arrays.asList (delegate.next ());
           table.addRow (row);
-//          table.addRule ();
+          if (!delegate.hasNext ()) {
+            table.addRule ();
+          }
         }
         return  table;
       }
