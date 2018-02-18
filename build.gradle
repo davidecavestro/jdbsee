@@ -32,13 +32,17 @@ repositories {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+compileGroovy {
+  groovyOptions.optimizationOptions.indy = true
+}
 
 // Add Dagger dependencies
 dependencies {
   apt 'com.google.dagger:dagger-compiler:2.14.1'
   compile 'com.google.dagger:dagger:2.14.1'
   compile('com.google.guava:guava:24.0-jre')
-  compile 'org.codehaus.groovy:groovy-all:2.4.13'
+  compile 'org.codehaus.groovy:groovy-all:2.4.13:indy'
+  compile 'org.apache.ivy:ivy:2.4.0'
 
   runtime 'org.hsqldb:hsqldb:2.4.0'
   runtime 'com.h2database:h2:1.4.196'

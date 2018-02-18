@@ -38,7 +38,7 @@ public class ConsoleService {
     this.ascii = ascii;
   }
 
-  public void renderResultSet (final Query query, final OutputType outputType) throws SQLException {
+  public void renderResultSet (final Query query, final OutputType outputType) {
     switch (outputType) {
       case CSV:
         query.scanResultSet (new CsvResultSetScanner ());

@@ -11,22 +11,22 @@ import static picocli.CommandLine.*;
 public class RunCommand implements Runnable {
 
   @Inject
-  public RunCommandService runCommandService;
+  public RunCommandService runCommandService
 
 //  @Parameters(arity = "0..1", paramLabel = "DRIVER_CLASS_NAME", description = "The JDBC driver class name.")
 //  private String driverClassName;
 
   @Parameters(index = "0", paramLabel = "URL", description = "The JDBC url.")
-  String url;
+  String url
 
   @Parameters(index = "1..*", paramLabel = "QUERY", description = "The SQL to run.")
-  String sqlText;
+  String sqlText
 
   @Option(names = ["-u", "--user"], description = "The username")
-  String username = "";
+  String username = ""
 
   @Option(names = ["-p", "--password"], description = "The password")
-  String password = "";
+  String password = ""
 
 //  @Parameters(arity = "0..1", paramLabel = "DATA_SOURCE", description = "The name of the data source.")
 //  private String dataSourceName;
@@ -35,13 +35,16 @@ public class RunCommand implements Runnable {
 //  File sqlFile;
 
   @Option(names = ["-x", "--execute"], description = "Additional SQL commands to be executed before the specified QUERY")
-  List<String> execute;
+  List<String> execute
 
   @Option(names = ["-j", "--jar"], description = "External jar file to search for the driver classes")
-  List<File> jars;
+  List<File> jars
 
-  @Option(names = ["-d", "--driver-class"], description = "External driver class name (detected from URL if not specified)")
-  String driverClassName;
+  @Option(names = ["-d", "--dependency"], description = "Maven artifact dependency to be resolved for driver class loading")
+  List<String> deps
+
+  @Option(names = ["-c", "--driver-class"], description = "External driver class name (detected from URL if not specified)")
+  String driverClassName
 
   @Option(names = ["-t", "--output-type"], paramLabel = "OUTPUT_TYPE", description = "Select output type, between TABLE, CSV, JSON, JSON_PRETTY")
   OutputType outputType = OutputType.TABLE;

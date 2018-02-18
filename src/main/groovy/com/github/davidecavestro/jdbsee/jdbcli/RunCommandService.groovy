@@ -1,9 +1,11 @@
 package com.github.davidecavestro.jdbsee.jdbcli
 
+import groovy.grape.Grape
 import groovy.transform.CompileStatic
 import org.jdbi.v3.core.statement.Query
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import sun.reflect.Reflection
 
 import javax.inject.Inject
 import javax.sql.DataSource
@@ -13,7 +15,7 @@ import java.sql.SQLException
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 
-@CompileStatic
+//@CompileStatic
 public class RunCommandService {
 
   private final static Logger LOG = LoggerFactory.getLogger (RunCommandService.class)
@@ -58,25 +60,28 @@ public class RunCommandService {
 
         final QueryCallback<Void, Exception> callback = { Query query ->
           try {
-            consoleService.renderResultSet(query, outputType);
+            consoleService.renderResultSet(query, outputType)
           } catch (final SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e)
           }
-          return null;
+          return null
         }
-        if (jars) {
-          withJars(jars) { ClassLoader driversLoader ->
 
-            def createDataSource = {
+
+        if (jars || deps) {
+          withDeps(jars, deps) {
+            ClassLoader driversLoader ->
+              def createDataSource = {
 //              new BasicDataSource(
                 new org.apache.tomcat.jdbc.pool.DataSource(
-                      username: username,
-                      password: password,
+                    username: username,
+                    password: password,
 //                      driverClassLoader: driversLoader,
-                      driverClassName: driverClassName,
-                      url: url
-              )
-            }
+                    driverClassName: driverClassName,
+                    url: url
+                )
+              }
+
             DataSource dataSource = createDataSource()
             try {
               dataSource.getConnection().close()//tries to acquire a connection and release it
@@ -120,15 +125,39 @@ public class RunCommandService {
 //        consoleService.renderResultSet (queryService.execute (dataSource, sqlFile, callback));
   }
 
-  void withJars(final List<File> files, final Closure closure) {
+  void withDeps(final List<File> files, final List<String> deps, final Closure closure) {
     final ClassLoader currThreadClassLoader = Thread.currentThread().getContextClassLoader();
     try {//chain jars classloader with original one
-      final URLClassLoader urlClassLoader = new URLClassLoader(files
-                  .findAll {it.exists()}         // existing file
-                  .collect {it.toURI().toURL()}.toArray(new URL[0]), // pick its URL
-              currThreadClassLoader);
-      closure(urlClassLoader)
-      Thread.currentThread().setContextClassLoader(urlClassLoader);
+      final ClassLoader cl;
+      if (files) {
+        cl = new URLClassLoader(files
+            .findAll { it.exists() }         // existing file
+            .collect { it.toURI().toURL() }.toArray(new URL[0]), // pick its URL
+            currThreadClassLoader);
+      } else {
+        cl = currThreadClassLoader
+      }
+      ClassLoader groovyClassLoader = new groovy.lang.GroovyClassLoader(cl)
+      Map[] grapez = deps.collect {
+        def depParts = it.split('\\:')
+        [groupId: depParts[0], artifactId: depParts[1], version: depParts[2], objectRef: DriverManager]
+        .with{Map map->
+          if (depParts.size()>3) {
+            scope = depParts[3]
+          }
+          map
+        } as Map<String, Object>
+      }
+      LOG.info('Resolving {}', grapez)
+      Grape.enableGrapes = true
+//      Grape.grab([classLoader: groovyClassLoader] as Map<String,Object>, grapez)
+      def grab = Grape.getInstance().grab([classLoader: groovyClassLoader] as Map<String, Object>, grapez)
+      LOG.info('Deps resolved {}', Grape.getInstance().enumerateGrapes())
+//      def driver = Class.forName('org.postgresql.Driver', true, groovyClassLoader)
+//      DriverManager.registerDriver(driver.newInstance())
+
+      Thread.currentThread().setContextClassLoader(groovyClassLoader);
+      closure(groovyClassLoader)
     } finally {//restore original classloader
       Thread.currentThread().setContextClassLoader(currThreadClassLoader);
     }
