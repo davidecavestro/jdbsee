@@ -25,6 +25,7 @@ public class JdbCliApplication implements Runnable {
     DaggerAppComponent.Builder builder = DaggerAppComponent.builder ();
     final AppComponent appComponent = builder.build ();
     final MainCommand mainCommand = appComponent.getMainCommand ();
+    appComponent.getTomcatJuliHack ().install ();
     final IFactory daggerFactory = new AppIFactory (appComponent);
     CommandLine commandLine = new CommandLine (mainCommand, daggerFactory);
     commandLine.parseWithHandler(new RunLast(), System.err, args);
@@ -71,6 +72,7 @@ class AppIFactory implements IFactory {
 @Component(modules = { AppModule.class})
 interface AppComponent {
   MainCommand getMainCommand();
+  TomcatJuliHack getTomcatJuliHack();
   void inject (DriverCommand command);
   void inject (RunCommand command);
 }
@@ -81,4 +83,5 @@ class AppModule {
   MainCommand mainCommand (){
     return new MainCommand ();
   }
+  TomcatJuliHack tomcatJuliHack() {return new TomcatJuliHack();}
 }

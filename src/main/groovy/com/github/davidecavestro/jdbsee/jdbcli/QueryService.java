@@ -1,13 +1,8 @@
 package com.github.davidecavestro.jdbsee.jdbcli;
 
-import com.github.davidmoten.guavamini.Iterators;
-import com.github.davidmoten.guavamini.Lists;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
-import dagger.Component;
 import org.jdbi.v3.core.ConnectionFactory;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.statement.Query;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;

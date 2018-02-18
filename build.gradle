@@ -50,7 +50,9 @@ dependencies {
   runtime 'org.postgresql:postgresql:42.2.1'
   runtime 'com.microsoft.sqlserver:mssql-jdbc:6.3.6.jre8-preview'
 
-  compile 'com.github.davidmoten:rxjava2-jdbc:0.1-RC32'
+  compile 'org.reflections:reflections:0.9.11'
+
+//  compile 'com.github.davidmoten:rxjava2-jdbc:0.1-RC32'
   compile 'info.picocli:picocli:2.2.1'
   compile 'de.vandermeer:asciitable:0.3.2'
   compile 'de.vandermeer:skb-interfaces:0.0.2'
@@ -63,6 +65,9 @@ dependencies {
   compile 'org.apache.tomcat:tomcat-jdbc:9.0.4'
 
   compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.9.4'
+  compile 'org.slf4j:jul-to-slf4j:1.7.25'
+  runtime 'org.slf4j:slf4j-api:1.7.25'
+  compile "org.slf4j:log4j-over-slf4j:1.7.25"
   runtime 'ch.qos.logback:logback-classic:1.2.3'
 
   testCompile "org.spockframework:spock-core:1.1-groovy-2.4"
@@ -75,6 +80,10 @@ dependencies {
   testCompile 'junit:junit:4.12'
 }
 
+configurations.all {
+  exclude group: "org.slf4j", module: "slf4j-log4j12"
+  exclude group: "log4j", module: "log4j"
+}
 def generatedResources = "$buildDir/generated-resources/main"
 
 sourceSets {
