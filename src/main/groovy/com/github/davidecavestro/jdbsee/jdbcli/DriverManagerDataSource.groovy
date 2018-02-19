@@ -20,16 +20,7 @@ class DriverManagerDataSource implements DataSource{
 
     Properties connectionProperties
 
-//    void setDriverClassName(String driverClassName) {
-//        final String driverFQN = driverClassName.trim()
-//        try {
-//            Class.forName(driverFQN, true, getDefaultClassLoader())
-//        }
-//        catch (final ClassNotFoundException ex) {
-//            throw new IllegalStateException("Could not load JDBC driver class [${driverFQN}]", ex)
-//        }
-//        LOG.info("Loaded JDBC driver: " + driverFQN)
-//    }
+    DriverManagerFacade driverManagerFacade
 
     protected ClassLoader getDefaultClassLoader() {
         ClassLoader cl = null;
@@ -95,7 +86,7 @@ class DriverManagerDataSource implements DataSource{
     }
 
     protected Connection getDrivermanagerConnection(String url, Properties props) throws SQLException {
-        return DriverManager.getConnection(url, props)
+        return driverManagerFacade.getConnection(url, props)
     }
 
 

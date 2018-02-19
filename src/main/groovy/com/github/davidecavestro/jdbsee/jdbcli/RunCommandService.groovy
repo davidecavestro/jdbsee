@@ -21,19 +21,26 @@ public class RunCommandService {
 
   private final static Logger LOG = LoggerFactory.getLogger (RunCommandService.class)
 
-  ConfigService configService
-  ConsoleService consoleService;
-  QueryService queryService
+  @Inject
+  public ConfigService configService
+  @Inject
+  public ConsoleService consoleService
+  @Inject
+  public QueryService queryService
+  @Inject
+  public DriverManagerFacade driverManagerFacade
 
   @Inject
   public RunCommandService (
-      final ConfigService configService,
-      final ConsoleService consoleService,
-      final QueryService queryService
+//      final ConfigService configService,
+//      final ConsoleService consoleService,
+//      final QueryService queryService,
+//      final DriverManagerFacade driverManagerFacade
   ){
-    this.configService = configService
-    this.consoleService = consoleService;
-    this.queryService = queryService
+//    this.configService = configService
+//    this.consoleService = consoleService;
+//    this.queryService = queryService
+//    this.driverManagerFacade = driverManagerFacade
   }
 
   public void run (final RunCommand runCommand) {
@@ -64,7 +71,8 @@ public class RunCommandService {
               password: password,
 //                      driverClassLoader: driversLoader,
               driverClassName: driverClassName,
-              url: url
+              url: url,
+              driverManagerFacade: driverManagerFacade
           )
         }
 

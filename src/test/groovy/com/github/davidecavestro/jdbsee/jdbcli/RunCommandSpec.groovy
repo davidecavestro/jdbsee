@@ -7,26 +7,27 @@ class RunCommandSpec extends Specification {
         given: "a run command initialized with args and opts"
 
         RunCommand runCommand = new RunCommand(
-                url: 'jdbc:h2:memory:test',
+                url: 'jdbc:h2:mem:test',
                 username: 'testuser',
                 password: 'testpass',
                 execute: ['cmd1...', 'cmd2...'],
                 sqlText: 'SELECT * FROM foo'
         )
 
-        QueryService queryService = Mock(QueryService.class)
-        ConfigService configService = Mock(ConfigService.class)
-        ConsoleService consoleService = Mock(ConsoleService.class)
+        QueryService queryService = Mock(QueryService)
 
-        RunCommandService runCmdService = new RunCommandService(configService, consoleService, queryService)
-        runCommand.runCommandService = runCmdService
+        runCommand.runCommandService = new RunCommandService(
+                configService: Stub(ConfigService),
+                consoleService: Stub(ConsoleService),
+                queryService: queryService,
+                driverManagerFacade: Stub(DriverManagerFacade))
 
         when: "the command is run"
         runCommand.run()
 
         then: "the queryService is indeed called with the respective args and opts"
         1 * queryService.execute(
-                'jdbc:h2:memory:test',
+                'jdbc:h2:mem:test',
                 'testuser',
                 'testpass',
                 _ as QueryCallback,
