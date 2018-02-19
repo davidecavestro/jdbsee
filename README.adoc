@@ -69,6 +69,28 @@ Usage: run [-f=<sqlFile>] [-p=<password>] [-u=<username>] [-x=<execute>]... URL
                                 specified QUERY
 ```
 
+=== Automatically download drivers
+
+Use the `-d` switch to automatically download drivers
+```
+./bin/jdbsee run -u postgres -p postgres \
+  -d "org.postgresql:postgresql:42.2.1" \
+  "jdbc:postgresql://localhost:5432/test" \
+  "SELECT * FROM contacts;"
+```
+
+
+
+=== Load drivers from external jars
+
+Use the `-j` switch to load drivers from filesystem
+```
+./bin/jdbsee run -u postgres -p postgres \
+  -j "/path/to/postgresql.jar" \
+  "jdbc:postgresql://localhost:5432/test" \
+  "SELECT * FROM contacts;"
+```
+
 
 == How to build
 
@@ -91,7 +113,7 @@ you should get
 ```
 ┌───────────────────────────────────────┬──────────────────────────────────────┐
 │ID                                     │NAME                                  │
-├───────────────────────────────────────┴──────────────────────────────────────┤
+├───────────────────────────────────────┼──────────────────────────────────────┤
 │1                                      │Alice                                 │
 ├───────────────────────────────────────┼──────────────────────────────────────┤
 │2                                      │Bob                                   │
