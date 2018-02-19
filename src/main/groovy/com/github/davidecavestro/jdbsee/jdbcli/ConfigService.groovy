@@ -12,6 +12,6 @@ class ConfigService {
     }
 
     File getHomeDir () {
-        new File (System.getenv('APP_HOME')?:System.getProperty('app.home', System.getProperty('user.dir')))
+        new File (System.getenv('JDBSEE_HOME')?:System.getProperty('jdbsee.home', System.getProperty('user.dir')))
     }
 }

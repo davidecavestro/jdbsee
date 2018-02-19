@@ -1,6 +1,7 @@
 package com.github.davidecavestro.jdbsee.jdbcli
 
 import groovy.grape.Grape
+import groovy.io.FileType
 import groovy.transform.CompileStatic
 import org.jdbi.v3.core.statement.Query
 import org.slf4j.Logger
@@ -20,19 +21,19 @@ public class RunCommandService {
 
   private final static Logger LOG = LoggerFactory.getLogger (RunCommandService.class)
 
-  ConsoleService consoleService;
   ConfigService configService
-  private final QueryService queryService
+  ConsoleService consoleService;
+  QueryService queryService
 
   @Inject
   public RunCommandService (
       final ConfigService configService,
-      final QueryService queryService,
-      final ConsoleService consoleService
+      final ConsoleService consoleService,
+      final QueryService queryService
   ){
-    this.queryService = queryService
     this.configService = configService
     this.consoleService = consoleService;
+    this.queryService = queryService
   }
 
   public void run (final RunCommand runCommand) {
@@ -57,7 +58,8 @@ public class RunCommandService {
 
         Closure<DataSource> createDataSource = {
 //              new BasicDataSource(
-          (DataSource)new org.apache.tomcat.jdbc.pool.DataSource(
+//          (DataSource)new org.apache.tomcat.jdbc.pool.DataSource(
+          new DriverManagerDataSource (
               username: username,
               password: password,
 //                      driverClassLoader: driversLoader,
@@ -66,8 +68,18 @@ public class RunCommandService {
           )
         }
 
-        if (jars || deps) {
-          withDynamicDataSource (jars, deps, createDataSource) {dataSource->
+        def alljars = []
+        if (jars) {
+          alljars.addAll (jars)
+        }
+        def dropinsDir = configService.getDropinsDir()
+        LOG.debug('Looking for dropins at {}', dropinsDir)
+        if (dropinsDir && dropinsDir.exists()) {
+          alljars.addAll (dropinsDir.listFiles ({dir, name -> name.toLowerCase().endsWith('.jar')} as FilenameFilter))
+        }
+        alljars.flatten()
+        if (alljars || deps) {
+          withDynamicDataSource (alljars, deps, createDataSource) {dataSource->
             queryService.execute(dataSource, callback, sqlArray);
           }
         } else {
@@ -87,9 +99,9 @@ public class RunCommandService {
     Closure<DataSource> testDataSource = {recover->
       def tmpDataSource = createDataSource()
       try {
-              tmpDataSource.getConnection().close()//tries to acquire a connection and release it
+        tmpDataSource.getConnection().close()//tries to acquire a connection and release it
         return tmpDataSource
-      } catch (SQLException e) {
+      } catch (Exception e) {
         return recover?recover:null
       }
     }

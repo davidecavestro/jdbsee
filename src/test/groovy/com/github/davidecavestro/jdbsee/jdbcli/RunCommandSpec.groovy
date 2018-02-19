@@ -15,7 +15,10 @@ class RunCommandSpec extends Specification {
         )
 
         QueryService queryService = Mock(QueryService.class)
-        RunCommandService runCmdService = new RunCommandService(null, null, queryService)
+        ConfigService configService = Mock(ConfigService.class)
+        ConsoleService consoleService = Mock(ConsoleService.class)
+
+        RunCommandService runCmdService = new RunCommandService(configService, consoleService, queryService)
         runCommand.runCommandService = runCmdService
 
         when: "the command is run"

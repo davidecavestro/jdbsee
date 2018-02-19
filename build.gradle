@@ -60,7 +60,7 @@ dependencies {
   compile 'org.jdbi:jdbi3-core:3.0.1'
   compile 'org.jdbi:jdbi3-sqlobject:3.0.1'
 
-  compile 'org.apache.tomcat:tomcat-jdbc:9.0.4'
+//  compile 'org.apache.tomcat:tomcat-jdbc:9.0.4'
 
   compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.9.4'
   compile 'org.slf4j:jul-to-slf4j:1.7.25'
@@ -91,6 +91,18 @@ sourceSets {
     //it is now a part of the 'main' classpath and will be a part of the jar
   }
 }
+
+
+CreateStartScripts startScripts = project.startScripts
+startScripts.with {
+  doLast {
+    unixScript.text = unixScript.text.replaceFirst('DEFAULT_JVM_OPTS=""',
+            'DEFAULT_JVM_OPTS="-D\\$\\{APP_NAME}.home=\\$\\{APP_HOME}"')
+    windowsScript.text = windowsScript.text.replaceFirst('(?<=DEFAULT_JVM_OPTS=)(.*)(?=\r\n)',
+            '$1 "-Dtcproxy.config.url=file:%~dp0../conf/proxy.properties"')
+  }
+}
+
 
 //a task that generates the resources:
 task generateVersionTxt {
