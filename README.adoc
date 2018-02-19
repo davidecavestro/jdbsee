@@ -165,7 +165,7 @@ Use the `-j` switch to load drivers from filesystem
   "SELECT * FROM contacts;"
 ```
 
-====== Loading drivers from the `dropins` subfolder
+##### Loading drivers from the `dropins` subfolder
 
 Copy your jdbc driver jars into the app distribution under the `dropins` folder, and they will be scanned for jdbc
 drivers
@@ -177,7 +177,7 @@ drivers
 ```
 
 
-= How to build
+# How to build
 
 Build and launch some queries on an in-memory h2 db
 
@@ -210,7 +210,7 @@ you should get
 
 ```
 
-== TO-DO
+# TO-DO
 
 * Support named drivers (persisting additional driver config)
 * Support named datasources (persisting db access config)
