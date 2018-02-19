@@ -79,7 +79,8 @@ public class RunCommandService {
         }
         alljars.flatten()
         if (alljars || deps) {
-          withDynamicDataSource (alljars, deps, createDataSource) {dataSource->
+          LOG.debug('Loading jars {} and deps {}', alljars, deps)
+          withDynamicDataSource (driverClassName, driverClassMatches, alljars, deps, createDataSource) {dataSource->
             queryService.execute(dataSource, callback, sqlArray);
           }
         } else {
@@ -92,6 +93,8 @@ public class RunCommandService {
   }
 
   def withDynamicDataSource(
+      final String driverClassName,
+      final String driverClassMatches,
       final List<File> jars,
       final List<String> deps,
       final Closure<DataSource> createDataSource,
@@ -102,7 +105,7 @@ public class RunCommandService {
         tmpDataSource.getConnection().close()//tries to acquire a connection and release it
         return tmpDataSource
       } catch (Exception e) {
-        return recover?recover:null
+        return recover?recover():null
       }
     }
 
@@ -115,25 +118,30 @@ public class RunCommandService {
             for (JarEntry jarEntry : Collections.list(jarFile.entries())) {
               String name = jarEntry.getName();
               if (name.endsWith(".class")) {
-                try {
-                  LOG.trace ('Analyzing jar class {}', name)
-                  final Class<?> clazz = Class.forName(name.replace("/", ".").replaceAll('\\.class$', ''), true, driversLoader);
-                  if (Driver.class.isAssignableFrom(clazz)) {
-                    //found a driver
-                    LOG.info ('Trying to activate driver class {}', clazz.name)
-                    def tmpDataSource = createDataSource()
-                    tmpDataSource.getConnection().close()//tries to acquire a connection and release it
+                String classFQN = name.replace("/", ".").replaceAll('\\.class$', '')
+                if ((driverClassName && classFQN == driverClassName) ||
+                        (!driverClassName && driverClassMatches && classFQN.matches(driverClassMatches))) {
+                  try {
+                    LOG.trace('Analyzing jar class {}', name)
+                    final Class<?> clazz = Class.forName(classFQN, true, driversLoader);
+                    if (Driver.class.isAssignableFrom(clazz)) {
+                      //found a driver
+                      LOG.debug('Trying to activate driver class {}', clazz.name)
+                      def tmpDataSource = createDataSource()
+                      tmpDataSource.getConnection().close()//tries to acquire a connection and release it
 
-                    //returning the first configured datasource
-                    return tmpDataSource
+                      //returning the first configured datasource
+                      return tmpDataSource
+                    }
+                  } catch (NoClassDefFoundError | Exception ignore) {
+                    // Safe to ignore, as this is a hack to force loading naive drivers
+                    LOG.trace('Cannot load class', ignore)
                   }
-                } catch (Exception ignore) {
-                  // Safe to ignore, as this is a hack to force loading naive drivers
-                  LOG.trace ('Cannot load class', ignore)
                 }
               }
             }
           }
+          null
         }
         callback(dataSource)
     }
