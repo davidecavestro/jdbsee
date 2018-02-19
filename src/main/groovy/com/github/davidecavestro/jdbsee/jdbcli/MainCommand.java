@@ -5,7 +5,7 @@ import picocli.CommandLine.*;
 
 import javax.inject.Inject;
 
-@Command(subcommands = {DriverCommand.class, RunCommand.class})
+@Command(subcommands = {RunCommand.class})
 public class MainCommand implements Runnable {
   @Option(names = {"-V", "--version"}, versionHelp = true, description = "Print version info")
   boolean versionRequested;

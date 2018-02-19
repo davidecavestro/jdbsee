@@ -10,11 +10,11 @@ import static picocli.CommandLine.*;
 @Command(name = "run")
 public class RunCommand implements Runnable {
 
-  @Inject
+  @Inject//public for dagger
   public RunCommandService runCommandService
 
-//  @Parameters(arity = "0..1", paramLabel = "DRIVER_CLASS_NAME", description = "The JDBC driver class name.")
-//  private String driverClassName;
+  @Option(names = ["-h", "--help"], usageHelp = true, description = "display this help message")
+  boolean help
 
   @Parameters(index = "0", paramLabel = "URL", description = "The JDBC url.")
   String url
@@ -49,16 +49,8 @@ public class RunCommand implements Runnable {
   @Option(names = ["-t", "--output-type"], paramLabel = "OUTPUT_TYPE", description = "Select output type, between TABLE, CSV, JSON, JSON_PRETTY")
   OutputType outputType = OutputType.TABLE;
 
-  @Inject
-  public RunCommand (
-//      final DataSourceService dataSourceService,
-//      final ConsoleService consoleService,
-//      final QueryService queryService
-  ){
-//    this.dataSourceService = dataSourceService;
-//    this.consoleService = consoleService;
-//    this.queryService = queryService;
-  }
+  @Inject//needed for dagger
+  public RunCommand (){}
 
   @Override
   public void run () {

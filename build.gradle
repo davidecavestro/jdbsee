@@ -60,8 +60,6 @@ dependencies {
   compile 'org.jdbi:jdbi3-core:3.0.1'
   compile 'org.jdbi:jdbi3-sqlobject:3.0.1'
 
-//  compile 'org.apache.commons:commons-dbcp2:2.2.0'
-  compile 'commons-dbutils:commons-dbutils:1.7'
   compile 'org.apache.tomcat:tomcat-jdbc:9.0.4'
 
   compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.9.4'

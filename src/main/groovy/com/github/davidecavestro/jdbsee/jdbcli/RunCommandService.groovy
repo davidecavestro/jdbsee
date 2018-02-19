@@ -20,36 +20,24 @@ public class RunCommandService {
 
   private final static Logger LOG = LoggerFactory.getLogger (RunCommandService.class)
 
-  DataSourceService dataSourceService;
   ConsoleService consoleService;
-  QueryService queryService;
+  ConfigService configService
+  private final QueryService queryService
 
   @Inject
   public RunCommandService (
-      final DataSourceService dataSourceService,
-      final ConsoleService consoleService,
-      final QueryService queryService
+      final ConfigService configService,
+      final QueryService queryService,
+      final ConsoleService consoleService
   ){
-    this.dataSourceService = dataSourceService;
+    this.queryService = queryService
+    this.configService = configService
     this.consoleService = consoleService;
-    this.queryService = queryService;
   }
 
   public void run (final RunCommand runCommand) {
-
-//    final ConnectionFactory connectionFactory;
-//    final DataSource dataSource;
-//
-//    if (dataSourceName!=null) {
-//      dataSource = dataSourceService.getDataSource (dataSourceName, username, password);
-//    } else if (url!=null) {
-//      queryService.execute (driverClassName, url, username, password, sqlText);
-//    } else {
-//      throw new IllegalArgumentException ("One between DATA_SOURCE_NAME and URL args must be passed");
-//    }
-
     runCommand.with {
-      if (sqlText != null) {
+      if (sqlText != null) {//use the passed query
         final List<String> sql = new ArrayList<>();
         if (execute) {
           sql.addAll(execute);
@@ -67,9 +55,9 @@ public class RunCommandService {
           return null
         }
 
-        def createDataSource = {
+        Closure<DataSource> createDataSource = {
 //              new BasicDataSource(
-          new org.apache.tomcat.jdbc.pool.DataSource(
+          (DataSource)new org.apache.tomcat.jdbc.pool.DataSource(
               username: username,
               password: password,
 //                      driverClassLoader: driversLoader,
@@ -85,12 +73,10 @@ public class RunCommandService {
         } else {
           queryService.execute(url, username, password, callback, sqlArray);
         }
-      } else {
-        //FIXME
+      } else {//FIXME
+//        consoleService.renderResultSet (queryService.execute (dataSource, sqlFile, callback));
       }
     }
-//      } else {//FIXME
-//        consoleService.renderResultSet (queryService.execute (dataSource, sqlFile, callback));
   }
 
   def withDynamicDataSource(
@@ -98,20 +84,17 @@ public class RunCommandService {
       final List<String> deps,
       final Closure<DataSource> createDataSource,
       final Closure<Void> callback) {
-    def testDataSource = {recover->
+    Closure<DataSource> testDataSource = {recover->
       def tmpDataSource = createDataSource()
       try {
-//              tmpDataSource.getConnection().close()//tries to acquire a connection and release it
+              tmpDataSource.getConnection().close()//tries to acquire a connection and release it
         return tmpDataSource
       } catch (SQLException e) {
-        if (recover) {
-          recover()
-        }
+        return recover?recover:null
       }
     }
 
-    withDeps(jars, deps, testDataSource) {
-      ClassLoader driversLoader ->
+    withDeps(jars, deps, testDataSource) {ClassLoader driversLoader ->
 
         DataSource dataSource = testDataSource {
           //retries forcing class loading
@@ -129,6 +112,7 @@ public class RunCommandService {
                     def tmpDataSource = createDataSource()
                     tmpDataSource.getConnection().close()//tries to acquire a connection and release it
 
+                    //returning the first configured datasource
                     return tmpDataSource
                   }
                 } catch (Exception ignore) {
@@ -143,7 +127,7 @@ public class RunCommandService {
     }
   }
 
-  void withDeps(final List<File> files, final List<String> deps, def testDataSource, final Closure closure) {
+  void withDeps(final List<File> files, final List<String> deps, Closure<DataSource> testDataSource, final Closure callback) {
     final ClassLoader currThreadClassLoader = Thread.currentThread().getContextClassLoader();
     try {//chain jars classloader with original one
       final ClassLoader cl;
@@ -158,6 +142,9 @@ public class RunCommandService {
       ClassLoader groovyClassLoader = new groovy.lang.GroovyClassLoader(cl)
       Map[] grapez = deps.collect {
         def depParts = it.split('\\:')
+        if (!depParts || depParts.length<3) {
+          throw new IllegalArgumentException("Invalid dependency reference: $it")
+        }
         [groupId: depParts[0], artifactId: depParts[1], version: depParts[2], objectRef: DriverManager]
         .with{Map map->
           if (depParts.size()>3) {
@@ -203,13 +190,13 @@ public class RunCommandService {
       }
 
       Thread.currentThread().setContextClassLoader(groovyClassLoader);
-      closure(groovyClassLoader)
+      callback(groovyClassLoader)
     } finally {//restore original classloader
       Thread.currentThread().setContextClassLoader(currThreadClassLoader);
     }
   }
 
-  protected DataSource registerDriver (final File jar, ClassLoader driversLoader, def testDataSource) {
+  protected DataSource registerDriver (final File jar, ClassLoader driversLoader, Closure<DataSource> testDataSource) {
     final JarFile jarFile = new JarFile(jar)
     for (JarEntry jarEntry : Collections.list(jarFile.entries())) {
       String name = jarEntry.getName();
@@ -231,8 +218,8 @@ public class RunCommandService {
     }
   }
 
-  protected void testDataSource (def createDataSource) {
-    def tmpDataSource = createDataSource()
+  protected void testDataSource (Closure<DataSource> createDataSource) {
+    DataSource tmpDataSource = createDataSource()
     tmpDataSource.getConnection().close()//tries to acquire a connection and release it
   }
 }

@@ -29,13 +29,6 @@ public class JdbCliApplication implements Runnable {
     final IFactory daggerFactory = new AppIFactory (appComponent);
     CommandLine commandLine = new CommandLine (mainCommand, daggerFactory);
     commandLine.parseWithHandler(new RunLast(), System.err, args);
-//    CommandLine.run(mainCommand, System.err, args);
-
-    // Invoke the parse method to parse the arguments
-//    List<CommandLine> parsed = commandLine.parse (args);
-//    for (CommandLine line : parsed) {
-//
-//    }
   }
 
 }

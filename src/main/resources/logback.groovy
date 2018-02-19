@@ -8,6 +8,7 @@ appender("Console-Appender", ConsoleAppender) {
   encoder(PatternLayoutEncoder) {
     pattern = "%date{ISO8601} - %logger{15}- %level: %msg%n"
   }
+  target = 'System.err'
 }
 //appender("File-Appender", FileAppender) {
 //  file = "${LOG_PATH}/logfile.log"
@@ -17,6 +18,6 @@ appender("Console-Appender", ConsoleAppender) {
 //  }
 //}
 
-logger("org.apache.tomcat.jdbc.pool", ERROR, ["Console-Appender"], false)
+logger("org.apache.tomcat.jdbc.pool", WARN, ["Console-Appender"], false)
 //logger("org.apache.tomcat.jdbc.pool", ERROR, ["Console-Appender", "File-Appender"], false)
 root(WARN, ["Console-Appender"])

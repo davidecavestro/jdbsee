@@ -1,20 +1,19 @@
 package com.github.davidecavestro.jdbsee.jdbcli;
 
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SequenceWriter;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvParser;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import com.google.common.base.Function;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Streams;
-import de.vandermeer.asciitable.AsciiTable;
+import org.jdbi.v3.core.result.NoResultsException;
 import org.jdbi.v3.core.result.ResultSetScanner;
 import org.jdbi.v3.core.statement.Query;
 import org.jdbi.v3.core.statement.StatementContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -22,14 +21,11 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
-
-import static com.google.common.collect.Iterators.concat;
-import static com.google.common.collect.Iterators.transform;
 
 public class ConsoleService {
+
+  private final static Logger LOG = LoggerFactory.getLogger (ConsoleService.class);
 
   private AsciiTableResultSetScanner ascii;
 
@@ -49,34 +45,45 @@ public class ConsoleService {
           @Override
           public Void scanResultSet (final Supplier<ResultSet> resultSetSupplier, final StatementContext ctx) throws SQLException {
             final ObjectMapper mapper = new ObjectMapper ();
-            final ResultSet resultSet = resultSetSupplier.get ();
-
-            final ResultSetMetaData metaData = resultSet.getMetaData ();
-            final int columnCount = metaData.getColumnCount ();
-
-            final Map<Integer,String> colNames=new LinkedHashMap<> ();
-            for (int colPos = 1; colPos <= columnCount; colPos++) {
-              final String colName = metaData.getColumnLabel (colPos);
-              colNames.put (colPos, colName);
-            }
-
             try {
-              try (final SequenceWriter writer = mapper.writerWithDefaultPrettyPrinter ().writeValuesAsArray (System.out)) {
+              final ResultSet resultSet = resultSetSupplier.get ();
 
-                final Map row = new LinkedHashMap<> (columnCount);
-                while (resultSet.next ()) {
-                  row.clear ();
-                  for (int colPos = 1; colPos <= columnCount; colPos++) {
-                    row.put (colNames.get (colPos), resultSet.getObject (colPos));
-                  }
-                  writer.write (row);
-                  writer.flush ();
-                }
+              final ResultSetMetaData metaData = resultSet.getMetaData ();
+              final int columnCount = metaData.getColumnCount ();
+
+              final Map<Integer, String> colNames = new LinkedHashMap<> ();
+              for (int colPos = 1; colPos <= columnCount; colPos++) {
+                final String colName = metaData.getColumnLabel (colPos);
+                colNames.put (colPos, colName);
               }
-            } catch (IOException e) {
-              throw new RuntimeException (e);
-            }
 
+              try {
+                try (final SequenceWriter writer = mapper
+                        .writer (outputType==OutputType.JSON?null:new DefaultPrettyPrinter ())
+                        .writeValuesAsArray (System.out)) {
+
+                  final Map row = new LinkedHashMap<> (columnCount);
+                  while (resultSet.next ()) {
+                    row.clear ();
+                    for (int colPos = 1; colPos <= columnCount; colPos++) {
+                      row.put (colNames.get (colPos), resultSet.getObject (colPos));
+                    }
+                    writer.write (row);
+                    writer.flush ();
+                  }
+                }
+              } catch (IOException e) {
+                throw new RuntimeException (e);
+              }
+
+            } catch (final NoResultsException e) {
+              if (ctx.getStatement ().getUpdateCount ()>=0) {
+                //it was some DML/DDL
+                LOG.warn ("No results");
+              } else {
+                throw e;
+              }
+            }
             return null;
           }
         });
