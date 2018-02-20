@@ -2,7 +2,6 @@ package com.github.davidecavestro.jdbsee.jdbcli;
 
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SequenceWriter;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvParser;
@@ -15,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.io.IOException;
+import java.io.*;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -34,10 +33,12 @@ public class ConsoleService {
     this.ascii = ascii;
   }
 
-  public void renderResultSet (final Query query, final OutputType outputType) {
+  public void renderResultSet (final Query query, final OutputType outputType, final File outputFile) throws IOException {
+    final PrintWriter outWriter = new PrintWriter (outputFile!=null?new FileWriter (outputFile):new OutputStreamWriter (System.out));
+
     switch (outputType) {
       case CSV:
-        query.scanResultSet (new CsvResultSetScanner ());
+        query.scanResultSet (new CsvResultSetScanner (outWriter));
         break;
       case JSON:
       case JSON_PRETTY:
@@ -60,7 +61,7 @@ public class ConsoleService {
               try {
                 try (final SequenceWriter writer = mapper
                         .writer (outputType==OutputType.JSON?null:new DefaultPrettyPrinter ())
-                        .writeValuesAsArray (System.out)) {
+                        .writeValuesAsArray (outWriter)) {
 
                   final Map row = new LinkedHashMap<> (columnCount);
                   while (resultSet.next ()) {
@@ -89,12 +90,18 @@ public class ConsoleService {
         });
         break;
       default:
-        query.scanResultSet (ascii).forEach (line -> System.out.println (line));
+        query.scanResultSet (ascii).forEach (line -> outWriter.println (line));
         break;
     }
   }
 
   private static class CsvResultSetScanner implements ResultSetScanner<Void> {
+    private final PrintWriter outWriter;
+
+    public CsvResultSetScanner (final PrintWriter outWriter) {
+      this.outWriter = outWriter;
+    }
+
     @Override
     public Void scanResultSet (final Supplier<ResultSet> supplier, final StatementContext ctx) throws SQLException {
       final CsvMapper mapper = new CsvMapper();
@@ -144,7 +151,7 @@ public class ConsoleService {
                 .withoutHeader()
                 .withEscapeChar ('"')
                 .withColumnSeparator (';')
-        ).writeValues (System.out).write (headers);
+        ).writeValues (outWriter).write (headers);
 
         final Map row = new LinkedHashMap<> (columnCount);
         while (resultSet.next ()) {

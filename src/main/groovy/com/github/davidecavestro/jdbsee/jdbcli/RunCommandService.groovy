@@ -56,7 +56,7 @@ public class RunCommandService {
 
         final QueryCallback<Void, Exception> callback = { Query query ->
           try {
-            consoleService.renderResultSet(query, outputType)
+            consoleService.renderResultSet(query, outputType, outputFile)
           } catch (final SQLException e) {
             throw new RuntimeException(e)
           }
@@ -116,9 +116,7 @@ public class RunCommandService {
         if (recover) {
             return recover()
         }
-          throw new IllegalStateException (
-                  'Cannot initialize a dataSource for driverClassName: {}, driverClassMatches: {}, jars: {}, deps: {}',
-                  driverClassName, driverClassMatches, jars, deps)
+        throw new IllegalStateException ("Cannot initialize a dataSource for driverClassName: $driverClassName, driverClassMatches: $driverClassMatches, jars: $jars, deps: $deps")
       }
     }
 

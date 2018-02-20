@@ -46,11 +46,14 @@ public class RunCommand implements Runnable {
   @Option(names = ["-c", "--driver-class"], description = "External driver class name (detected from URL if not specified)")
   String driverClassName
 
-  @Option(names = ["-m", "--driver-class-match"], description = "Regex used to detect driver class by name. Defaults to (.*)Driver(.*)")
+  @Option(names = ["-m", "--driver-class-match"], description = "Regex used to detect driver class by name. Defaults to '(.*)Driver(.*)'")
   String driverClassMatches = '(.*)Driver(.*)'
 
-  @Option(names = ["-t", "--output-type"], paramLabel = "OUTPUT_TYPE", description = "Select output type, between TABLE, CSV, JSON, JSON_PRETTY")
+  @Option(names = ["-t", "--output-format"], paramLabel = "OUTPUT_FORMAT", description = "Select output format. One between TABLE, CSV, JSON, JSON_PRETTY")
   OutputType outputType = OutputType.TABLE;
+
+  @Option(names = ["-o", "--output-file"], paramLabel = "OUTPUT_FILE", description = "File to use for saving output")
+  File outputFile;
 
   @Inject//needed for dagger
   public RunCommand (){}
