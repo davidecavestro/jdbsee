@@ -142,6 +142,24 @@ from explicitly referenced jar files::
 
 passing the `-j` switch along with the path of a jar in the local filesystem it will be scanned for jdbc drivers
 
+
+### Output types
+
+The application supports multiple output formats:
+
+TABLE::
+rows formatted as a plain text table
+
+CSV::
+values separated by semicolons
+
+JSON, JSON_PRETTY::
+json in a raw or pretty printed flavor
+
+The data is written to the standard output, while informational messages are sent to the
+standard error, so that output data can be redirected to an output file.
+
+
 # Examples
 
 ## Automatic downloading drivers
