@@ -31,7 +31,7 @@ image:https://img.shields.io/travis/davidecavestro/jdbsee/master.svg[Build Statu
 image:https://img.shields.io/coveralls/github/davidecavestro/jdbsee.svg[Coverage Status (Coveralls), link={uri-coverage-coveralls}]
 endif::[]
 
-POC for a jdbc CLI tool
+A simple jdbc CLI tool
 
 toc::[]
 
@@ -142,8 +142,9 @@ from explicitly referenced jar files::
 
 passing the `-j` switch along with the path of a jar in the local filesystem it will be scanned for jdbc drivers
 
+# Examples
 
-##### Automatic downloading drivers
+## Automatic downloading drivers
 
 Use the `-d` switch to automatically download drivers
 ```
@@ -155,7 +156,7 @@ Use the `-d` switch to automatically download drivers
 
 
 
-##### Loading drivers from external jars
+## Loading drivers from external jars
 
 Use the `-j` switch to load drivers from filesystem
 ```
@@ -165,7 +166,7 @@ Use the `-j` switch to load drivers from filesystem
   "SELECT * FROM contacts;"
 ```
 
-##### Loading drivers from the `dropins` subfolder
+## Loading drivers from the `dropins` subfolder
 
 Copy your jdbc driver jars into the app distribution under the `dropins` folder, and they will be scanned for jdbc
 drivers

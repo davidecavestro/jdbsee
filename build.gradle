@@ -36,6 +36,9 @@ compileGroovy {
   groovyOptions.optimizationOptions.indy = true
 }
 
+configurations{
+  drivers
+}
 // Add Dagger dependencies
 dependencies {
   apt 'com.google.dagger:dagger-compiler:2.14.1'
@@ -44,11 +47,13 @@ dependencies {
   compile 'org.codehaus.groovy:groovy-all:2.4.13:indy'
   compile 'org.apache.ivy:ivy:2.4.0'
 
-  runtime 'org.hsqldb:hsqldb:2.4.0'
-  runtime 'com.h2database:h2:1.4.196'
-  runtime 'mysql:mysql-connector-java:8.0.8-dmr'
-  runtime 'org.postgresql:postgresql:42.2.1'
-  runtime 'com.microsoft.sqlserver:mssql-jdbc:6.3.6.jre8-preview'
+  drivers 'org.hsqldb:hsqldb:2.4.0'
+  drivers 'com.h2database:h2:1.4.196'
+  drivers 'mysql:mysql-connector-java:8.0.8-dmr'
+  drivers 'org.postgresql:postgresql:42.2.1'
+  drivers 'com.microsoft.sqlserver:mssql-jdbc:6.3.6.jre8-preview'
+
+
 
   compile 'org.reflections:reflections:0.9.11'
 
@@ -76,12 +81,30 @@ dependencies {
   testRuntime "org.objenesis:objenesis:2.5.1"    // allows mocking of classes without default constructor (together with CGLIB)
 
   testCompile 'junit:junit:4.12'
+  testRuntime 'com.h2database:h2:1.4.196'
+
 }
 
 configurations.all {
   exclude group: "org.slf4j", module: "slf4j-log4j12"
   exclude group: "log4j", module: "log4j"
 }
+
+
+distributions {
+  full {
+    contents {
+      with project.distributions.main.getContents()
+
+      into ('dropins') {
+        from {
+          configurations.drivers
+        }
+      }
+    }
+  }
+}
+
 def generatedResources = "$buildDir/generated-resources/main"
 
 sourceSets {
