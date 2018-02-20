@@ -64,8 +64,8 @@ Invoke the distributable binary passing appropriate commands and params
 
 ```
 Usage: run [-h] [-c=<driverClassName>] [-m=<driverClassMatches>]
-           [-p=<password>] [-t=OUTPUT_TYPE] [-u=<username>] [-d=<deps>]...
-           [-j=<jars>]... [-x=<execute>]... URL QUERY
+           [-o=OUTPUT_FILE] [-p=<password>] [-t=OUTPUT_FORMAT] [-u=<username>]
+           [-d=<deps>]... [-j=<jars>]... [-x=<execute>]... URL QUERY
       URL                     The JDBC url.
       QUERY                   The SQL to run.
   -c, --driver-class=<driverClassName>
@@ -77,11 +77,13 @@ Usage: run [-h] [-c=<driverClassName>] [-m=<driverClassMatches>]
   -j, --jar=<jars>            External jar file to search for the driver classes
   -m, --driver-class-match=<driverClassMatches>
                               Regex used to detect driver class by name.
-                                Defaults to (.*)Driver(.*)
+                                Defaults to '(.*)Driver(.*)'
+  -o, --output-file=OUTPUT_FILE
+                              File to use for saving output
   -p, --password=<password>   The password
-  -t, --output-type=OUTPUT_TYPE
-                              Select output type, between TABLE, CSV, JSON,
-                                JSON_PRETTY
+  -t, --output-format=OUTPUT_FORMAT
+                              Select output format. One between TABLE, CSV,
+                                JSON, JSON_PRETTY
   -u, --user=<username>       The username
   -x, --execute=<execute>     Additional SQL commands to be executed before the
                                 specified QUERY
