@@ -113,7 +113,12 @@ public class RunCommandService {
         tmpDataSource.getConnection().close()//tries to acquire a connection and release it
         return tmpDataSource
       } catch (Exception e) {
-        return recover?recover():null
+        if (recover) {
+            return recover()
+        }
+          throw new IllegalStateException (
+                  'Cannot initialize a dataSource for driverClassName: {}, driverClassMatches: {}, jars: {}, deps: {}',
+                  driverClassName, driverClassMatches, jars, deps)
       }
     }
 
