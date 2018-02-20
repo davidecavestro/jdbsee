@@ -198,11 +198,34 @@ drivers
 
 # How to build
 
-Build and launch some queries on an in-memory h2 db
+The build system supports producing the distribution of the application both with or
+without drivers.
+
+The _main_ distribution comes without drivers, while the _full_ provides
+drivers within the `dropins` folder.
+
+The following command generates both _main_ and _full_ distribution archives
 
 ```
-./gradlew installDist && \
-./build/install/jdbsee/bin/jdbsee run \
+./gradlew fullDistTar fullDistZip distTar distZip
+```
+
+the generated archives are located into the `build/distributions` subfolder
+
+```
+build/distributions/
+├── jdbsee-0.0.1-SNAPSHOT.tar
+├── jdbsee-0.0.1-SNAPSHOT.zip
+├── jdbsee-full-0.0.1-SNAPSHOT.tar
+└── jdbsee-full-0.0.1-SNAPSHOT.zip
+
+```
+
+Follows an example on how to build with drivers (full distribution) and launch some queries on an in-memory h2 db
+
+```
+./gradlew installFullDist && \
+./build/install/jdbsee-full/bin/jdbsee run \
 -x "create table contacts (id int primary key, name varchar(100));" \
 -x "insert into contacts (id, name) values (1, 'Alice');" \
 -x "insert into contacts (id, name) values (2, 'Bob');" \
