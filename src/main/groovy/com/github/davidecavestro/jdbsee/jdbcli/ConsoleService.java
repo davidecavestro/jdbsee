@@ -34,64 +34,65 @@ public class ConsoleService {
   }
 
   public void renderResultSet (final Query query, final OutputType outputType, final File outputFile) throws IOException {
-    final PrintWriter outWriter = new PrintWriter (outputFile!=null?new FileWriter (outputFile):new OutputStreamWriter (System.out));
+    try (final PrintWriter outWriter = new PrintWriter (outputFile!=null?new FileWriter (outputFile):new OutputStreamWriter (System.out))) {
 
-    switch (outputType) {
-      case CSV:
-        query.scanResultSet (new CsvResultSetScanner (outWriter));
-        break;
-      case JSON:
-      case JSON_PRETTY:
-        query.scanResultSet (new ResultSetScanner<Void> () {
-          @Override
-          public Void scanResultSet (final Supplier<ResultSet> resultSetSupplier, final StatementContext ctx) throws SQLException {
-            final ObjectMapper mapper = new ObjectMapper ();
-            try {
-              final ResultSet resultSet = resultSetSupplier.get ();
-
-              final ResultSetMetaData metaData = resultSet.getMetaData ();
-              final int columnCount = metaData.getColumnCount ();
-
-              final Map<Integer, String> colNames = new LinkedHashMap<> ();
-              for (int colPos = 1; colPos <= columnCount; colPos++) {
-                final String colName = metaData.getColumnLabel (colPos);
-                colNames.put (colPos, colName);
-              }
-
+      switch (outputType) {
+        case CSV:
+          query.scanResultSet (new CsvResultSetScanner (outWriter));
+          break;
+        case JSON:
+        case JSON_PRETTY:
+          query.scanResultSet (new ResultSetScanner<Void> () {
+            @Override
+            public Void scanResultSet (final Supplier<ResultSet> resultSetSupplier, final StatementContext ctx) throws SQLException {
+              final ObjectMapper mapper = new ObjectMapper ();
               try {
-                try (final SequenceWriter writer = mapper
-                        .writer (outputType==OutputType.JSON?null:new DefaultPrettyPrinter ())
-                        .writeValuesAsArray (outWriter)) {
+                final ResultSet resultSet = resultSetSupplier.get ();
 
-                  final Map row = new LinkedHashMap<> (columnCount);
-                  while (resultSet.next ()) {
-                    row.clear ();
-                    for (int colPos = 1; colPos <= columnCount; colPos++) {
-                      row.put (colNames.get (colPos), resultSet.getObject (colPos));
-                    }
-                    writer.write (row);
-                    writer.flush ();
-                  }
+                final ResultSetMetaData metaData = resultSet.getMetaData ();
+                final int columnCount = metaData.getColumnCount ();
+
+                final Map<Integer, String> colNames = new LinkedHashMap<> ();
+                for (int colPos = 1; colPos <= columnCount; colPos++) {
+                  final String colName = metaData.getColumnLabel (colPos);
+                  colNames.put (colPos, colName);
                 }
-              } catch (IOException e) {
-                throw new RuntimeException (e);
-              }
 
-            } catch (final NoResultsException e) {
-              if (ctx.getStatement ().getUpdateCount ()>=0) {
-                //it was some DML/DDL
-                LOG.warn ("No results");
-              } else {
-                throw e;
+                try {
+                  try (final SequenceWriter writer = mapper
+                          .writer (outputType == OutputType.JSON ? null : new DefaultPrettyPrinter ())
+                          .writeValuesAsArray (outWriter)) {
+
+                    final Map row = new LinkedHashMap<> (columnCount);
+                    while (resultSet.next ()) {
+                      row.clear ();
+                      for (int colPos = 1; colPos <= columnCount; colPos++) {
+                        row.put (colNames.get (colPos), resultSet.getObject (colPos));
+                      }
+                      writer.write (row);
+                      writer.flush ();
+                    }
+                  }
+                } catch (IOException e) {
+                  throw new RuntimeException (e);
+                }
+
+              } catch (final NoResultsException e) {
+                if (ctx.getStatement ().getUpdateCount () >= 0) {
+                  //it was some DML/DDL
+                  LOG.warn ("No results");
+                } else {
+                  throw e;
+                }
               }
+              return null;
             }
-            return null;
-          }
-        });
-        break;
-      default:
-        query.scanResultSet (ascii).forEach (line -> outWriter.println (line));
-        break;
+          });
+          break;
+        default:
+          query.scanResultSet (ascii).forEach (line -> outWriter.println (line));
+          break;
+      }
     }
   }
 

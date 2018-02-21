@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 @Command(versionProvider = PropertiesVersionProvider.class)
-public class JdbCliApplication implements Runnable {
+public class CliApplication implements Runnable {
 
   @Option(names = {"-V", "--version"}, versionHelp = true, description = "Print version info and exit")
   boolean versionRequested;

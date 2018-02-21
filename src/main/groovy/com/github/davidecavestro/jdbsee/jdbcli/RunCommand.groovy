@@ -28,6 +28,9 @@ public class RunCommand implements Runnable {
   @Option(names = ["-p", "--password"], description = "The password")
   String password = ""
 
+  @Option(names = ["-P", "--ask-for-password"], description = "Ask for database password before connecting")
+  boolean askForPassword
+
 //  @Parameters(arity = "0..1", paramLabel = "DATA_SOURCE", description = "The name of the data source.")
 //  private String dataSourceName;
 

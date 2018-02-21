@@ -63,12 +63,14 @@ public class RunCommandService {
           return null
         }
 
-        Closure<DataSource> createDataSource = {
+          String actualpass = askForPassword?System.console().readPassword():password
+
+          Closure<DataSource> createDataSource = {
 //              new BasicDataSource(
 //          (DataSource)new org.apache.tomcat.jdbc.pool.DataSource(
           new DriverManagerDataSource (
               username: username,
-              password: password,
+              password: actualpass,
 //                      driverClassLoader: driversLoader,
               driverClassName: driverClassName,
               url: url,
@@ -91,8 +93,8 @@ public class RunCommandService {
           withDynamicDataSource (driverClassName, driverClassMatches, alljars, deps, createDataSource) {dataSource->
             queryService.execute(dataSource, callback, sqlArray);
           }
-        } else {
-          queryService.execute(url, username, password, callback, sqlArray);
+        } else {//no additional jars or deps... assume the driver manager is able to find the driver
+          queryService.execute(url, username, actualpass, callback, sqlArray);
         }
       } else {//FIXME
 //        consoleService.renderResultSet (queryService.execute (dataSource, sqlFile, callback));
@@ -107,6 +109,7 @@ public class RunCommandService {
       final List<String> deps,
       final Closure<DataSource> createDataSource,
       final Closure<Void> callback) {
+    //creates and test a new datasource opening  a connection
     Closure<DataSource> testDataSource = {recover->
       def tmpDataSource = createDataSource()
       try {
@@ -116,61 +119,37 @@ public class RunCommandService {
         if (recover) {
             return recover()
         }
-        throw new IllegalStateException ("Cannot initialize a dataSource for driverClassName: $driverClassName, driverClassMatches: $driverClassMatches, jars: $jars, deps: $deps")
+        throw new IllegalStateException ("Cannot initialize a dataSource for driverClassName: $driverClassName, driverClassMatches: $driverClassMatches, jars: $jars, deps: $deps", e)
       }
     }
 
-    withDeps(jars, deps, testDataSource) {ClassLoader driversLoader ->
-
-        DataSource dataSource = testDataSource {
-          //retries forcing class loading
-          for (final File jar : jars) {
-            JarFile jarFile = new JarFile(jar)
-            for (JarEntry jarEntry : Collections.list(jarFile.entries())) {
-              String name = jarEntry.getName();
-              if (name.endsWith(".class")) {
-                String classFQN = name.replace("/", ".").replaceAll('\\.class$', '')
-                if ((driverClassName && classFQN == driverClassName) ||
-                        (!driverClassName && driverClassMatches && classFQN.matches(driverClassMatches))) {
-                  try {
-                    LOG.trace('Analyzing jar class {}', name)
-                    final Class<?> clazz = Class.forName(classFQN, true, driversLoader);
-                    if (Driver.class.isAssignableFrom(clazz)) {
-                      //found a driver
-                      LOG.debug('Trying to activate driver class {}', clazz.name)
-                      def tmpDataSource = createDataSource()
-                      tmpDataSource.getConnection().close()//tries to acquire a connection and release it
-
-                      //returning the first configured datasource
-                      return tmpDataSource
-                    }
-                  } catch (NoClassDefFoundError | Exception ignore) {
-                    // Safe to ignore, as this is a hack to force loading naive drivers
-                    LOG.trace('Cannot load class', ignore)
-                  }
-                }
-              }
-            }
-          }
-          null
-        }
-        callback(dataSource)
+    withDeps(driverClassName, driverClassMatches, jars, deps, testDataSource) {ClassLoader driversLoader ->
+        callback(testDataSource ())
     }
   }
 
-  void withDeps(final List<File> files, final List<String> deps, Closure<DataSource> testDataSource, final Closure callback) {
+  void withDeps(
+          final String driverClassName,
+          final String driverClassMatches,
+          final List<File> jars,
+          final List<String> deps,
+          final Closure<DataSource> testDataSource,
+          final Closure callback) {
     final ClassLoader currThreadClassLoader = Thread.currentThread().getContextClassLoader();
-    try {//chain jars classloader with original one
+    try {
+      //chain jars classloader with original one
+      final URL[] jarUrls = jars
+              .findAll { it.exists() }         // existing file
+              .collect { it.toURI().toURL() }.toArray(new URL[0])
       final ClassLoader cl;
-      if (files) {
-        cl = new URLClassLoader(files
-            .findAll { it.exists() }         // existing file
-            .collect { it.toURI().toURL() }.toArray(new URL[0]), // pick its URL
-            currThreadClassLoader);
+      if (jars) {
+        cl = new URLClassLoader(jarUrls, currThreadClassLoader);
       } else {
         cl = currThreadClassLoader
       }
       ClassLoader groovyClassLoader = new groovy.lang.GroovyClassLoader(cl)
+
+      //resolve deps
       Map[] grapez = deps.collect {
         def depParts = it.split('\\:')
         if (!depParts || depParts.length<3) {
@@ -186,16 +165,14 @@ public class RunCommandService {
       }
       LOG.info('Resolving {}', grapez)
       Grape.enableGrapes = true
-//      Grape.grab([classLoader: groovyClassLoader] as Map<String,Object>, grapez)
-      def grab = Grape.getInstance().grab([classLoader: groovyClassLoader] as Map<String, Object>, grapez)
-      LOG.info('Deps resolved {}', Grape.getInstance().enumerateGrapes())
-//      def driver = Class.forName('org.postgresql.Driver', true, groovyClassLoader)
-//      DriverManager.registerDriver(driver.newInstance())
 
-      //using org.reflections.util.ClasspathHelper to get the relevant URLs
+      Grape.getInstance().grab([classLoader: groovyClassLoader] as Map<String, Object>, grapez)
+      LOG.info('Deps resolved {}', Grape.getInstance().enumerateGrapes())
+
+      //collect dependency urls
       def urls = (ClasspathHelper.forClassLoader(groovyClassLoader) - ClasspathHelper.forClassLoader(currThreadClassLoader)).toArray() as URL[]
 
-      //and finally adding the URLs to the SystemClassLoader with ClassPathHacker
+      //add the URLs to the SystemClassLoader
       LOG.debug ('Determined deps urls {}', urls)
       urls.each { URL url ->
         if (url.file.endsWith('jar')) {
@@ -208,11 +185,15 @@ public class RunCommandService {
             Method method = sysclass.getDeclaredMethod("addURL", [URL] as Class[]);
             method.setAccessible(true);
             method.invoke(sysloader, url);
-
-            testDataSource()
-          } else {//java >= 9
+//
+//            try {
+//              testDataSource()
+//            } catch (Throwable e) {// seems safe to ignore here :-/
+//              LOG.trace('Caught exception {}', e)
+//            }
+        } else {//java >= 9
             try {
-              registerDriver(new File(url.file), new URLClassLoader([url] as URL[], sysloader), testDataSource);
+              registerDriverClass(driverClassName, driverClassMatches, new File(url.file), new URLClassLoader([url] as URL[], sysloader), testDataSource);
             } catch (Throwable e) {// seems safe to ignore here :-/
               LOG.trace('Caught exception {}', e)
             }
@@ -227,30 +208,35 @@ public class RunCommandService {
     }
   }
 
-  protected DataSource registerDriver (final File jar, ClassLoader driversLoader, Closure<DataSource> testDataSource) {
+  protected DataSource registerDriverClass (
+          final String driverClassName,
+          final String driverClassMatches,
+          final File jar,
+          final ClassLoader driversLoader,
+          final Closure<DataSource> testDataSource) {
     final JarFile jarFile = new JarFile(jar)
     for (JarEntry jarEntry : Collections.list(jarFile.entries())) {
-      String name = jarEntry.getName();
+      final String name = jarEntry.getName();
       if (name.endsWith(".class")) {
-        try {
-          LOG.trace ('Analyzing jar class {}', name)
-          final Class<?> clazz = Class.forName(name.replace("/", ".").replaceAll('\\.class$', ''), true, driversLoader);
-          if (Driver.class.isAssignableFrom(clazz)) {
-            //found a driver
-            LOG.trace ('Trying to activate driver class {}', clazz.name)
-
-            testDataSource()
+        String classFQN = name.replace("/", ".").replaceAll('\\.class$', '')
+        if ((driverClassName && classFQN == driverClassName) ||
+                (!driverClassName && driverClassMatches && classFQN.matches(driverClassMatches))) {
+          try {
+            LOG.trace('Analyzing jar class {}', name)
+            final Class<?> clazz = Class.forName(classFQN, true, driversLoader);
+            if (Driver.class.isAssignableFrom(clazz)) {
+              //found a driver
+              clazz.getDeclaredConstructor().newInstance()
+              LOG.debug('Trying to activate driver class {}', clazz.name)
+              //returning the first configured datasource
+              return testDataSource()
+            }
+          } catch (NoClassDefFoundError | Exception ignore) {
+            // Safe to ignore, as this is a hack to force loading naive drivers
+            LOG.trace('Cannot load class', ignore)
           }
-        } catch (Exception ignore) {
-          // Safe to ignore, as this is a hack to force loading naive drivers
-          LOG.trace ('Cannot load class', ignore)
         }
       }
     }
-  }
-
-  protected void testDataSource (Closure<DataSource> createDataSource) {
-    DataSource tmpDataSource = createDataSource()
-    tmpDataSource.getConnection().close()//tries to acquire a connection and release it
   }
 }

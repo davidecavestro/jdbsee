@@ -23,10 +23,11 @@ plugins {
 group = 'com.github.davidecavestro.jdbsee'
 version = '0.0.1-SNAPSHOT'
 
-mainClassName = 'com.github.davidecavestro.jdbsee.jdbcli.JdbCliApplication'
+mainClassName = 'com.github.davidecavestro.jdbsee.jdbcli.CliApplication'
 
 repositories {
   mavenCentral()
+  maven {url = 'https://repo.adobe.com/nexus/content/repositories/public'}
 }
 
 sourceCompatibility = 1.8
@@ -46,14 +47,6 @@ dependencies {
   compile('com.google.guava:guava:24.0-jre')
   compile 'org.codehaus.groovy:groovy-all:2.4.13:indy'
   compile 'org.apache.ivy:ivy:2.4.0'
-
-  drivers 'org.hsqldb:hsqldb:2.4.0'
-  drivers 'com.h2database:h2:1.4.196'
-  drivers 'mysql:mysql-connector-java:8.0.8-dmr'
-  drivers 'org.postgresql:postgresql:42.2.1'
-  drivers 'com.microsoft.sqlserver:mssql-jdbc:6.3.6.jre8-preview'
-
-
 
   compile 'org.reflections:reflections:0.9.11'
 
@@ -82,6 +75,17 @@ dependencies {
 
   testCompile 'junit:junit:4.12'
   testRuntime 'com.h2database:h2:1.4.196'
+  testCompile 'commons-io:commons-io:2.6'
+
+
+  //drivers distribution
+  drivers 'org.hsqldb:hsqldb:2.4.0'
+  drivers 'com.h2database:h2:1.4.196'
+  drivers 'mysql:mysql-connector-java:8.0.8-dmr'
+  drivers 'org.postgresql:postgresql:42.2.1'
+  drivers 'com.microsoft.sqlserver:mssql-jdbc:6.3.6.jre8-preview'
+  drivers 'net.sf.jt400:jt400:9.4'
+  drivers 'oracle:ojdbc:1.4'
 
 }
 
