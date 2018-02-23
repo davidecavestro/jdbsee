@@ -1,11 +1,8 @@
 package com.github.davidecavestro.jdbsee.jdbcli
 
-import com.google.common.collect.Iterables
-import com.google.common.collect.Streams
 import org.apache.commons.io.output.WriterOutputStream
-import org.jdbi.v3.core.result.ResultIterable
-import org.jdbi.v3.core.statement.Query
 import org.junit.Test
+
 
 public class CliApplicationITest {
 
