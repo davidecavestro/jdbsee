@@ -41,8 +41,8 @@ This is the POC for a command line tool providing access to relational databases
 
 # Project status
 
-Beware the project is still on an early stage.
-
+The project has no official releases yet, though it is stable enough to run queries
+using drivers from local jars.
 
 # Features
 
@@ -253,8 +253,3 @@ you should get
 └───────────────────────────────────────┴──────────────────────────────────────┘
 
 ```
-
-# TO-DO
-
-* Support named drivers (persisting additional driver config)
-* Support named datasources (persisting db access config)
