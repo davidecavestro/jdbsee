@@ -1,5 +1,7 @@
 package com.github.davidecavestro.jdbsee.jdbcli;
 
+import com.github.davidecavestro.jdbsee.jdbcli.config.JdbsDriverDao;
+
 import javax.inject.Inject;
 import java.io.File;
 
@@ -11,7 +13,7 @@ public class DriverCommand implements Runnable {
   private MainCommand mainCommand;
 
   @Inject
-  DriverService driverService;
+  JdbsDriverDao driverService;
 
   DriverCommand (){}
 
@@ -26,7 +28,7 @@ public class DriverCommand implements Runnable {
     @ParentCommand
     private DriverCommand driverCommand;
 
-    private final DriverService driverService;
+    private final JdbsDriverDao driverService;
 
     @Parameters(arity = "1", paramLabel = "NAME", description = "The name of the driver.")
     private String name;
@@ -41,7 +43,7 @@ public class DriverCommand implements Runnable {
     private String uri;
 
     @Inject
-    public AddCommand (final DriverService driverService){
+    public AddCommand (final JdbsDriverDao driverService){
       this.driverService = driverService;
     }
 
@@ -58,7 +60,7 @@ public class DriverCommand implements Runnable {
     private DriverCommand driverCommand;
 
     @Inject
-    DriverService driverService;
+    JdbsDriverDao driverService;
 
     @Parameters(arity = "1..*", paramLabel = "NAME", description = "The name of the driver.")
     private String[] names;
