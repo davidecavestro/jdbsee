@@ -7,7 +7,7 @@ class ConfigService {
     ConfigService() {
     }
 
-    String getUserFodlerPath() {
+    String getUserFolderPath() {
         new File ( System.getProperty ( 'user.dir' ), '.jdbsee' ).absolutePath
     }
 

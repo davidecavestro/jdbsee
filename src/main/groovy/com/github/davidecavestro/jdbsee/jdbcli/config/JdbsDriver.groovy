@@ -1,7 +1,8 @@
 package com.github.davidecavestro.jdbsee.jdbcli.config;
 
-public class JdbsDriver {
-    Integer id
+
+class JdbsDriver {
+    Long id
     String name
     String clazz
     String clazzExpr

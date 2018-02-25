@@ -6,17 +6,19 @@ import groovy.transform.CompileStatic
 import javax.inject.Inject
 
 @CompileStatic
-class SqlService {
+class SettingsService {
 
   ConfigService configService
 
   String dbFileName = 'hsql.csv'
   String dbUser = 'sa'
   String dbPassword = ''
-  String dbDriver = 'org.hsqldb.jdbcDriver'
+  String dbDriver = 'org.hsqldb.jdbc.JDBCDriver'
+
+  SettingsService(){}
 
   @Inject
-  SqlService(ConfigService configService){
+  SettingsService(ConfigService configService){
     this.configService = configService
   }
 
