@@ -37,7 +37,8 @@ class JdbsDriverDaoSpec extends Specification {
         SettingsService settingsService = new SettingsService(configService: configService)
         JdbsDriverDao driverDao = new JdbsDriverDao(
             settingsService: settingsService,
-            configService: configService
+            configService: configService,
+            csvBacked: false
         )
 
         when: "listing all drivers"
@@ -55,7 +56,8 @@ class JdbsDriverDaoSpec extends Specification {
         SettingsService settingsService = new SettingsService(configService: configService)
         JdbsDriverDao driverDao = new JdbsDriverDao(
             settingsService: settingsService,
-            configService: configService
+            configService: configService,
+            csvBacked: false
         )
 
         when: "inserting two drivers and listing all drivers"

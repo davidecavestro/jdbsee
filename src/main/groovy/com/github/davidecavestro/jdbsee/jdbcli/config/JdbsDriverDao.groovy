@@ -44,7 +44,7 @@ class JdbsDriverDao {
 //  }
 
   protected void initTables (final Sql sql) {
-    String tableAttr = 'TEXT'//csvBacked ? 'TEXT' : ''
+    String tableAttr = csvBacked ? 'TEXT' : ''
 
     sql.with {
       executeUpdate """
