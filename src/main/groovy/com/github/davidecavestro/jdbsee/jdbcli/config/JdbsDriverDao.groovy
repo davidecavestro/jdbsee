@@ -20,6 +20,8 @@ class JdbsDriverDao {
 
   boolean csvBacked = true
 
+  boolean initCompleted
+
   JdbsDriverDao(){}
 
   @Inject
@@ -44,10 +46,13 @@ class JdbsDriverDao {
 //  }
 
   protected void initTables (final Sql sql) {
+    if (initCompleted) {
+      return;//FIXME avoid keeping internal state enad switch to liquibase or flyway
+    }
     String tableAttr = csvBacked ? 'TEXT' : ''
 
     sql.with {
-      executeUpdate """
+      def drvTbl = executeUpdate """
             CREATE $tableAttr TABLE IF NOT EXISTS jdbs_drivers (
               id BIGINT IDENTITY PRIMARY KEY, 
               name VARCHAR(100) NOT NULL, 
@@ -56,7 +61,7 @@ class JdbsDriverDao {
             )
           """ as String
 
-    execute """
+      def jarsTbl = executeUpdate """
             CREATE ${tableAttr} TABLE IF NOT EXISTS jdbs_jars (
               id BIGINT IDENTITY PRIMARY KEY,
               driver_id BIGINT NOT NULL, 
@@ -64,7 +69,7 @@ class JdbsDriverDao {
             )
           """ as String
 
-    execute """
+      execute """
             ALTER TABLE jdbs_jars 
             ADD CONSTRAINT fk_jdbs_jars_driver 
             FOREIGN KEY (driver_id)
@@ -72,7 +77,7 @@ class JdbsDriverDao {
             ON DELETE CASCADE
           """ as String
 
-    execute """
+      execute """
             CREATE ${tableAttr} TABLE IF NOT EXISTS jdbs_deps (
               id BIGINT IDENTITY PRIMARY KEY, 
               driver_id BIGINT NOT NULL, 
@@ -80,7 +85,7 @@ class JdbsDriverDao {
             )
           """ as String
 
-    execute """
+      execute """
               ALTER TABLE jdbs_deps 
               ADD CONSTRAINT fk_jdbs_deps_driver 
               FOREIGN KEY (driver_id)
@@ -88,13 +93,14 @@ class JdbsDriverDao {
               ON DELETE CASCADE
             """ as String
 
-    if (csvBacked) {
-      executeUpdate "SET TABLE jdbs_drivers SOURCE '$driversFileName'" as String
-      executeUpdate "SET TABLE jdbs_jars SOURCE '$jarsFileName'" as String
-      executeUpdate "SET TABLE jdbs_deps SOURCE '$depsFileName'" as String
-    }
+      if (csvBacked) {
+        executeUpdate "SET TABLE jdbs_drivers SOURCE '$driversFileName'" as String
+        executeUpdate "SET TABLE jdbs_jars SOURCE '$jarsFileName'" as String
+        executeUpdate "SET TABLE jdbs_deps SOURCE '$depsFileName'" as String
+      }
 
     }
+    initCompleted = true;
 
   }
 
