@@ -2,6 +2,7 @@ package com.github.davidecavestro.jdbsee.jdbcli
 
 import javax.inject.Inject
 
+//FIXME extract interface
 class ConfigService {
     @Inject
     ConfigService() {

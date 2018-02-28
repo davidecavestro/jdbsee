@@ -1,9 +1,12 @@
-package com.github.davidecavestro.jdbsee.jdbcli.config;
+package com.github.davidecavestro.jdbsee.jdbcli.config
+
+import groovy.transform.EqualsAndHashCode;
 
 
+@EqualsAndHashCode
 class JdbsDriver {
     Long id
     String name
-    String clazz
-    String clazzExpr
+    String driverClass
+    String driverClassExpr
 }

@@ -14,13 +14,6 @@ class JdbsDriverDao {
 
   SettingsService settingsService
   ConfigService configService
-  String driversFileName = 'drivers.csv'
-  String jarsFileName = 'jars.csv'
-  String depsFileName = 'deps.csv'
-
-  boolean csvBacked = true
-
-  boolean initCompleted
 
   JdbsDriverDao(){}
 
@@ -31,77 +24,6 @@ class JdbsDriverDao {
   ){
     this.configService = configService
     this.settingsService = settingsService
-  }
-
-//  protected File getDriversDataFile () {
-//    new File (configService.getDataDir(), driversFileName)
-//  }
-//
-//  protected File getJarsDataFile () {
-//    new File (configService.getDataDir(), jarsFileName)
-//  }
-//
-//  protected File getDepsDataFile () {
-//    new File (configService.getDataDir(), depsFileName)
-//  }
-
-  protected void initTables (final Sql sql) {
-    if (initCompleted) {
-      return;//FIXME avoid keeping internal state enad switch to liquibase or flyway
-    }
-    String tableAttr = csvBacked ? 'TEXT' : ''
-
-    sql.with {
-      def drvTbl = executeUpdate """
-            CREATE $tableAttr TABLE IF NOT EXISTS jdbs_drivers (
-              id BIGINT IDENTITY PRIMARY KEY, 
-              name VARCHAR(100) NOT NULL, 
-              clazz VARCHAR(500), 
-              clazz_expr VARCHAR(500)
-            )
-          """ as String
-
-      def jarsTbl = executeUpdate """
-            CREATE ${tableAttr} TABLE IF NOT EXISTS jdbs_jars (
-              id BIGINT IDENTITY PRIMARY KEY,
-              driver_id BIGINT NOT NULL, 
-              path VARCHAR(1000) NOT NULL
-            )
-          """ as String
-
-      execute """
-            ALTER TABLE jdbs_jars 
-            ADD CONSTRAINT fk_jdbs_jars_driver 
-            FOREIGN KEY (driver_id)
-            REFERENCES jdbs_drivers (id)
-            ON DELETE CASCADE
-          """ as String
-
-      execute """
-            CREATE ${tableAttr} TABLE IF NOT EXISTS jdbs_deps (
-              id BIGINT IDENTITY PRIMARY KEY, 
-              driver_id BIGINT NOT NULL, 
-              gav VARCHAR(200) NOT NULL
-            )
-          """ as String
-
-      execute """
-              ALTER TABLE jdbs_deps 
-              ADD CONSTRAINT fk_jdbs_deps_driver 
-              FOREIGN KEY (driver_id)
-              REFERENCES jdbs_drivers (id)
-              ON DELETE CASCADE
-            """ as String
-
-      if (csvBacked) {
-        executeUpdate "SET TABLE jdbs_drivers SOURCE '$driversFileName'" as String
-        executeUpdate "SET TABLE jdbs_jars SOURCE '$jarsFileName'" as String
-        executeUpdate "SET TABLE jdbs_deps SOURCE '$depsFileName'" as String
-      }
-
-    }
-    initCompleted = true;
-
   }
 
   void insert (
@@ -165,7 +87,7 @@ class JdbsDriverDao {
 
   List<JdbsDriver> listDrivers () {
     withSql { Sql sql ->
-      sql.rows('SELECT * FROM jdbs_drivers').collect {row->
+      sql.rows('SELECT * FROM jdbs_drivers ORDER BY name ASC').collect {row->
         rowToBean(row)
       }
     }
@@ -185,7 +107,6 @@ class JdbsDriverDao {
 
   public <T> T withSql (final Closure<T> closure) {
     settingsService.withSql { Sql sql ->
-      initTables (sql)//grant tables exist
       closure (sql)
     }
   }
@@ -196,8 +117,8 @@ class JdbsDriverDao {
         new JdbsDriver(
             id: row.id as Long,
             name: row.name as String,
-            clazz: row.clazz as String,
-            clazzExpr: row.clazz_expr as String
+            driverClass: row.clazz as String,
+            driverClassExpr: row.clazz_expr as String
     )
   }
 }

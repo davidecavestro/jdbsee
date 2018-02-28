@@ -1,32 +1,34 @@
 package com.github.davidecavestro.jdbsee.jdbcli
 
+import com.github.davidecavestro.jdbsee.jdbcli.config.JdbsDriver
 import com.github.davidecavestro.jdbsee.jdbcli.config.JdbsDriverDao
 import spock.lang.Specification
 
 class JdbsDriverDaoSpec extends Specification {
 
-    protected File getConfigDir () {
+    ConfigService configService
+    File tmpDataDir
+
+    def setup() {
         def ghost = File.createTempFile('jdbsee', '.ghost')
         ghost.delete()
 
-        def configDir = new File (ghost.absolutePath - '.ghost')
-        configDir.with {
+        tmpDataDir = new File (ghost.absolutePath - '.ghost')
+        tmpDataDir.with {
             mkdirs()
             deleteOnExit()
         }
 
-        configDir
-    }
-
-    protected ConfigService getConfigService () {
-        File configDir = configDir
-
-        new ConfigService(){
+        configService = new ConfigService(){
             @Override
             File getConfigDir() {
-                return configDir
+                return tmpDataDir
             }
         }
+    }
+
+    def cleanup() {
+        tmpDataDir.deleteDir()
     }
 
     def "listDrivers when db is empty"() {
@@ -37,8 +39,7 @@ class JdbsDriverDaoSpec extends Specification {
         SettingsService settingsService = new SettingsService(configService: configService)
         JdbsDriverDao driverDao = new JdbsDriverDao(
             settingsService: settingsService,
-            configService: configService,
-            csvBacked: false
+            configService: configService
         )
 
         when: "listing all drivers"
@@ -56,16 +57,25 @@ class JdbsDriverDaoSpec extends Specification {
         SettingsService settingsService = new SettingsService(configService: configService)
         JdbsDriverDao driverDao = new JdbsDriverDao(
             settingsService: settingsService,
-            configService: configService,
-            csvBacked: false
+            configService: configService
         )
 
         when: "inserting two drivers and listing all drivers"
         driverDao.insert('h2', 'org.h2.Driver', null, null, ['com.h2database:h2:1.4.196'] as String[])
         driverDao.insert('postgres', 'org.postgresql.Driver', null, [new File ('/fake/path/to/driver.jar')] as File[], [] as String[])
-        List drivers = driverDao.listDrivers()
+        List<JdbsDriver> drivers = driverDao.listDrivers()
 
-        then: "no rows are found"
+        then: "two rows are found with relevant data"
         drivers.size() == 2
+        with (drivers[0]) {
+            name == 'h2'
+            driverClass == 'org.h2.Driver'
+            driverClassExpr == null
+        }
+        with (drivers[1]) {
+            name == 'postgres'
+            driverClass == 'org.postgresql.Driver'
+            driverClassExpr == null
+        }
     }
 }
