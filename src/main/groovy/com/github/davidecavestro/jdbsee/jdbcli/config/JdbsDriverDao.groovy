@@ -93,15 +93,52 @@ class JdbsDriverDao {
     }
   }
 
-  Optional<JdbsDriver> findDriver (final String name) {
+  Optional<JdbsDriverDetails> findDriverByName (final String name) {
     withSql { Sql sql ->
-      Optional.ofNullable(
-          rowToBean(
-              sql.firstRow(name: name,
-                  'SELECT * FROM jdbs_drivers WHERE name LIKE :name'
+              List<GroovyRowResult> rows = sql.rows(name: name,
+                  '''
+                      SELECT 
+                        drv.id AS drv_id, drv.name AS drv_name, drv.clazz AS drv_clazz, drv.clazz_expr AS drv_clazz_expr,
+                        jar.id AS jar_id, jar.driver_id as jar_driver_id, jar.path AS jar_path,
+                        dep.id AS dep_id, dep.driver_id as dep_driver_id, dep.gav AS dep_gav
+                      FROM 
+                        jdbs_drivers drv LEFT OUTER JOIN 
+                        jdbs_jars jar ON (drv.id=jar.driver_id) LEFT OUTER JOIN
+                        jdbs_deps dep ON (drv.id=dep.driver_id)
+                      WHERE 
+                        drv.name LIKE :name
+                      '''
               )
-          )
-      )
+      JdbsDriverDetails result
+      if (rows) {
+        result = new JdbsDriverDetails(jars: [], deps: [])
+        rows.each {row->
+          if (row.drv_id!=null) {
+            result.id = row.drv_id as Long
+            result.name = row.drv_name as String
+            result.driverClass = row.drv_clazz as String
+            result.driverClassExpr = row.drv_clazz_expr as String
+          }
+          if (row.jar_id!=null) {
+            result.jars << new JdbsJar(
+                id: row.jar_id as Long,
+                driverId: row.jar_driver_id as Long,
+                file: new File (row.jar_path as String)
+            )
+          }
+          if (row.dep_id!=null) {
+            result.deps << new JdbsDep(
+                id: row.dep_id as Long,
+                driverId: row.dep_driver_id as Long,
+                gav: row.dep_gav as String
+            )
+          }
+        }
+      } else {
+        result = null
+      }
+
+      return Optional.ofNullable(result)
     }
   }
 
