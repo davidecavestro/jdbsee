@@ -9,7 +9,6 @@ import dagger.*;
 import javax.inject.Singleton;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.List;
 
 @Command(versionProvider = PropertiesVersionProvider.class)
 public class CliApplication implements Runnable {
@@ -25,7 +24,6 @@ public class CliApplication implements Runnable {
     DaggerAppComponent.Builder builder = DaggerAppComponent.builder ();
     final AppComponent appComponent = builder.build ();
     final MainCommand mainCommand = appComponent.getMainCommand ();
-    appComponent.getTomcatJuliHack ().install ();
     final IFactory daggerFactory = new AppIFactory (appComponent);
     CommandLine commandLine = new CommandLine (mainCommand, daggerFactory);
     commandLine.parseWithHandler(new RunLast(), System.err, args);
@@ -65,8 +63,13 @@ class AppIFactory implements IFactory {
 @Component(modules = { AppModule.class})
 interface AppComponent {
   MainCommand getMainCommand();
-  TomcatJuliHack getTomcatJuliHack();
   void inject (DriverCommand command);
+  void inject (DriverCommand.DriverCreateCommand command);
+  void inject (DriverCommand.DriverDeleteCommand command);
+  void inject (DriverCommand.JarAddCommand command);
+  void inject (DriverCommand.JarRemoveCommand command);
+  void inject (DriverCommand.DependencyAddCommand command);
+  void inject (DriverCommand.DependencyRemoveCommand command);
   void inject (RunCommand command);
 }
 
@@ -76,5 +79,4 @@ class AppModule {
   MainCommand mainCommand (){
     return new MainCommand ();
   }
-  TomcatJuliHack tomcatJuliHack() {return new TomcatJuliHack();}
 }

@@ -3,6 +3,7 @@ package com.github.davidecavestro.jdbsee.jdbcli.config
 import com.github.davidecavestro.jdbsee.jdbcli.ConfigService
 import com.github.davidecavestro.jdbsee.jdbcli.SettingsService
 import groovy.sql.BatchingPreparedStatementWrapper
+import groovy.sql.GroovyResultSet
 import groovy.sql.GroovyRowResult
 import groovy.sql.Sql
 import groovy.transform.CompileStatic;
@@ -26,52 +27,53 @@ class JdbsDriverDao {
     this.settingsService = settingsService
   }
 
-  void insert (
+  long insert (
       final String name,
       final String driverClass,
       final String driverClassExpr,
-      final File[] jars,
-      final String[] deps) {
+      final List<File> jars,
+      final List<String> deps) {
+    Long driverId
     withSql { Sql sql->
-      sql.withTransaction {
-        //persist driver info
-        def keys = sql.executeInsert(
-                """\
-                      INSERT INTO jdbs_drivers 
-                        (name, clazz, clazz_expr) 
-                      VALUES 
-                        (:name, :clazz, :clazz_expr)
-                    """, name: name, clazz: driverClass, clazzExpr: driverClassExpr)
+      sql.cacheConnection {
+        sql.withTransaction {
+          //persist driver info
+          driverId = sql.executeInsert(
+              """\
+                        INSERT INTO jdbs_drivers 
+                          (name, clazz, clazz_expr) 
+                        VALUES 
+                          (:name, :clazz, :clazz_expr)
+                      """, name: name, clazz: driverClass, clazzExpr: driverClassExpr).flatten().first() as Long
 
-        def driverId = keys[0][0]
+          //persist jar paths
+  //        sql.withBatch (10,
+  //            'INSERT INTO jdbs_jars (driver_id, path) VALUES (?, ?)'
+  //          ) { BatchingPreparedStatementWrapper stmt ->
+  //          jars.each { File jarFile ->
+  //            stmt.addBatch(driverId, jarFile.absolutePath)
+  //          }
+  //        }
+          jars?.each { File jarFile ->
+            addJar sql, driverId, jarFile
+          }
 
-        //persist jar paths
-//        sql.withBatch (10,
-//            'INSERT INTO jdbs_jars (driver_id, path) VALUES (?, ?)'
-//          ) { BatchingPreparedStatementWrapper stmt ->
-//          jars.each { File jarFile ->
-//            stmt.addBatch(driverId, jarFile.absolutePath)
-//          }
-//        }
-        jars.each { File jarFile ->
-          sql.executeInsert(driver_id: driverId, path: jarFile.absolutePath, 'INSERT INTO jdbs_jars (driver_id, path) VALUES (:driver_id, :path)')
+          //persist deps
+  //        sql.withBatch (10,
+  //              'INSERT INTO jdbs_deps (driver_id, gav) VALUES (?, ?)'
+  //        ) { BatchingPreparedStatementWrapper stmt ->
+  //          deps.each { String dependency ->
+  //            stmt.addBatch (driverId, dependency)
+  //          }
+  //        }
+          deps?.each { String dependency ->
+            addDependency sql, driverId, dependency
+          }
         }
-
-        //persist deps
-//        sql.withBatch (10,
-//              'INSERT INTO jdbs_deps (driver_id, gav) VALUES (?, ?)'
-//        ) { BatchingPreparedStatementWrapper stmt ->
-//          deps.each { String dependency ->
-//            stmt.addBatch (driverId, dependency)
-//          }
-//        }
-        deps.each { String dependency ->
-          sql.executeInsert(driver_id: driverId, gav: dependency, 'INSERT INTO jdbs_deps (driver_id, gav) VALUES (:driver_id, :gav)')
-        }
-
-        return keys
       }
     }
+
+    return driverId
   }
 
   int delete (final String... names) {
@@ -81,6 +83,17 @@ class JdbsDriverDao {
                     DELETE FROM jdbs_drivers 
                     WHERE 
                       name IN (:names)
+                  """)
+    }
+  }
+
+  int delete (final Long... ids) {
+    withSql { Sql sql ->
+      sql.executeUpdate(ids: ids,
+          """\
+                    DELETE FROM jdbs_drivers 
+                    WHERE 
+                      id IN (:ids)
                   """)
     }
   }
@@ -95,50 +108,110 @@ class JdbsDriverDao {
 
   Optional<JdbsDriverDetails> findDriverByName (final String name) {
     withSql { Sql sql ->
-              List<GroovyRowResult> rows = sql.rows(name: name,
+              GroovyRowResult driverRow = sql.firstRow(name: name,
                   '''
                       SELECT 
                         drv.id AS drv_id, drv.name AS drv_name, drv.clazz AS drv_clazz, drv.clazz_expr AS drv_clazz_expr,
-                        jar.id AS jar_id, jar.driver_id as jar_driver_id, jar.path AS jar_path,
-                        dep.id AS dep_id, dep.driver_id as dep_driver_id, dep.gav AS dep_gav
+                        jar.id AS jar_id, jar.driver_id AS jar_driver_id, jar.path AS jar_path,
+                        NULL AS dep_id, NULL AS dep_driver_id, NULL AS dep_gav
                       FROM 
                         jdbs_drivers drv LEFT OUTER JOIN 
-                        jdbs_jars jar ON (drv.id=jar.driver_id) LEFT OUTER JOIN
-                        jdbs_deps dep ON (drv.id=dep.driver_id)
+                        jdbs_jars jar ON (drv.id=jar.driver_id)
                       WHERE 
-                        drv.name LIKE :name
-                      '''
-              )
-      JdbsDriverDetails result
-      if (rows) {
-        result = new JdbsDriverDetails(jars: [], deps: [])
-        rows.each {row->
-          if (row.drv_id!=null) {
-            result.id = row.drv_id as Long
-            result.name = row.drv_name as String
-            result.driverClass = row.drv_clazz as String
-            result.driverClassExpr = row.drv_clazz_expr as String
-          }
-          if (row.jar_id!=null) {
-            result.jars << new JdbsJar(
-                id: row.jar_id as Long,
-                driverId: row.jar_driver_id as Long,
-                file: new File (row.jar_path as String)
-            )
-          }
-          if (row.dep_id!=null) {
-            result.deps << new JdbsDep(
-                id: row.dep_id as Long,
-                driverId: row.dep_driver_id as Long,
-                gav: row.dep_gav as String
-            )
-          }
-        }
-      } else {
-        result = null
-      }
+                        drv.name = :name
+                  ''')
+
+              JdbsDriverDetails result
+              if (driverRow) {
+                Long driverId = driverRow.drv_id as Long
+
+                result = new JdbsDriverDetails(
+                    id: driverId,
+                    name: driverRow.drv_name as String,
+                    driverClass: driverRow.drv_clazz as String,
+                    driverClassExpr: driverRow.drv_clazz_expr as String,
+                    jars: [], deps: []
+                )
+
+                result.with {
+                  sql.eachRow(driverId: driverId, '''
+                        SELECT 
+                          id, driver_id, path
+                        FROM 
+                          jdbs_jars
+                        WHERE 
+                          driver_id = :driverId
+                        ORDER BY id
+                        '''
+                  ) { GroovyResultSet row ->
+                    jars << new JdbsJar(
+                        id: row['id'] as Long,
+                        driverId: row['driver_id'] as Long,
+                        file: new File(row['path'] as String)
+                    )
+                  }
+
+                  sql.eachRow(driverId: driverId, '''
+                        SELECT 
+                          id, driver_id, gav
+                        FROM 
+                          jdbs_deps
+                        WHERE 
+                          driver_id = :driverId
+                        ORDER BY id
+                        '''
+                  ) { GroovyResultSet row ->
+                      deps << new JdbsDep(
+                          id: row['id'] as Long,
+                          driverId: row['driver_id'] as Long,
+                          gav: row['gav'] as String
+                      )
+                  }
+                }
+              } else {
+                result = null
+              }
+
 
       return Optional.ofNullable(result)
+    }
+  }
+
+  long addJar (final Sql sql, final Long driverId, final File jarFile) {
+    sql.executeInsert(driver_id: driverId, path: jarFile.absolutePath, 'INSERT INTO jdbs_jars (driver_id, path) VALUES (:driver_id, :path)').flatten().first() as Long
+  }
+
+  List<Long> addJar (final Long driverId, final File... jarFiles) {
+    withSql {Sql sql->
+      //FIXME switch to batches
+      jarFiles.collect {File jarFile->
+        addJar sql, driverId, jarFile
+      }
+    }
+  }
+
+  int removeJar (final Long... jarIds) {
+    withSql {Sql sql->
+      sql.executeUpdate(jarIds: jarIds, 'DELETE FROM jdbs_jars WHERE id IN (:jarIds)')
+    }
+  }
+
+  long addDependency (final Sql sql, final Long driverId, final String dependency) {
+    sql.executeInsert(driver_id: driverId, gav: dependency, 'INSERT INTO jdbs_deps (driver_id, gav) VALUES (:driver_id, :gav)').flatten().first() as Long
+  }
+
+  List<Long> addDependency (final Long driverId, final String... dependencies) {
+    withSql {Sql sql->
+      //FIXME switch to batches
+      dependencies.collect { String dependency ->
+        addDependency sql, driverId, dependency
+      }
+    }
+  }
+
+  int removeDependency (final Long... dependencyIds) {
+    withSql {Sql sql->
+      sql.executeUpdate(dependencyIds: dependencyIds, 'DELETE FROM jdbs_deps WHERE id IN (:dependencyIds)')
     }
   }
 

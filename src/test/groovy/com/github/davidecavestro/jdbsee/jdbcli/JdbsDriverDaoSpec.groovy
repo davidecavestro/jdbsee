@@ -62,8 +62,8 @@ class JdbsDriverDaoSpec extends Specification {
         )
 
         when: "inserting two drivers and listing all drivers"
-        driverDao.insert('h2', 'org.h2.Driver', null, null, ['com.h2database:h2:1.4.196'] as String[])
-        driverDao.insert('postgres', 'org.postgresql.Driver', null, [new File ('/fake/path/to/driver.jar')] as File[], [] as String[])
+        driverDao.insert('h2', 'org.h2.Driver', null, [], ['com.h2database:h2:1.4.196'])
+        driverDao.insert('postgres', 'org.postgresql.Driver', null, [new File ('/fake/path/to/driver.jar')], [])
         List<JdbsDriver> drivers = driverDao.listDrivers()
 
         then: "two rows are found with relevant data"
@@ -92,8 +92,8 @@ class JdbsDriverDaoSpec extends Specification {
         )
 
         when: "inserting two drivers and finding single drivers by name"
-        driverDao.insert('h2', 'org.h2.Driver', null, null, ['com.h2database:h2:1.4.196'] as String[])
-        driverDao.insert('postgres', 'org.postgresql.Driver', null, [new File ('/fake/path/to/driver.jar')] as File[], [] as String[])
+        driverDao.insert('h2', 'org.h2.Driver', null, [], ['com.h2database:h2:1.4.196'])
+        driverDao.insert('postgres', 'org.postgresql.Driver', null, [new File ('/fake/path/to/driver.jar')], [])
         Optional<JdbsDriverDetails> driverH2Opt = driverDao.findDriverByName('h2')
         Optional<JdbsDriverDetails> driverPsqlOpt = driverDao.findDriverByName('postgres')
 
@@ -128,4 +128,65 @@ class JdbsDriverDaoSpec extends Specification {
             }
         }
     }
+
+    def "add jars and deps on drivers added to a previously empty db and find them"() {
+        given: "an empty db"
+
+        ConfigService configService = configService
+
+        SettingsService settingsService = new SettingsService(configService: configService)
+        JdbsDriverDao driverDao = new JdbsDriverDao(
+            settingsService: settingsService,
+            configService: configService
+        )
+
+        when: "creating a driver, adding jars and deps and finding the driver by id"
+        Long driverId  = driverDao.insert('h2', 'org.h2.Driver', null, [new File ('/fake/path/to/driver.jar')], ['com.h2database:h2:1.4.196'])
+
+        driverDao.addJar(driverId, new File ('/fake/path/to/driver2.jar'), new File ('/fake/path/to/driver3.jar'))
+        driverDao.addDependency(driverId, 'com.acme:foo:1.0.0', 'com.acme:bar:3.0.0')
+
+        Optional<JdbsDriverDetails> driverH2Opt = driverDao.findDriverByName('h2')
+
+        then: "the driver is found with relevant details"
+        driverH2Opt.present == true
+        def driverH2 = driverH2Opt.get()
+        with (driverH2) {
+            name == 'h2'
+            driverClass == 'org.h2.Driver'
+            driverClassExpr == null
+            deps != null
+            deps.size == 3
+
+            with (deps[0]) {
+                driverId == driverH2.id
+                gav == 'com.h2database:h2:1.4.196'
+            }
+            with (deps[1]) {
+                driverId == driverH2.id
+                gav == 'com.acme:foo:1.0.0'
+            }
+            with (deps[2]) {
+                driverId == driverH2.id
+                gav == 'com.acme:bar:3.0.0'
+            }
+
+            jars != null
+            jars.size == 3
+            with (jars[0]) {
+                driverId == driverH2.id
+                file == new File ('/fake/path/to/driver.jar')
+            }
+            with (jars[1]) {
+                driverId == driverH2.id
+                file == new File ('/fake/path/to/driver2.jar')
+            }
+            with (jars[2]) {
+                driverId == driverH2.id
+                file == new File ('/fake/path/to/driver3.jar')
+            }
+        }
+
+    }
+
 }

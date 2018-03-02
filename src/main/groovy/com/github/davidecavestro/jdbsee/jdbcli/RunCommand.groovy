@@ -8,7 +8,7 @@ import static picocli.CommandLine.*;
 
 @CompileStatic
 @Command(name = "run")
-public class RunCommand implements Runnable {
+class RunCommand implements Runnable {
 
   @Inject//public for dagger
   public RunCommandService runCommandService
@@ -62,7 +62,7 @@ public class RunCommand implements Runnable {
   public RunCommand (){}
 
   @Override
-  public void run () {
+  void run () {
     runCommandService.run (this);
   }
 }

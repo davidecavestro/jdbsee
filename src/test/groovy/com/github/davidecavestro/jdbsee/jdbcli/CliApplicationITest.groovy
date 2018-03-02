@@ -4,11 +4,11 @@ import org.apache.commons.io.output.WriterOutputStream
 import org.junit.Test
 
 
-public class CliApplicationITest {
+class CliApplicationITest {
 
 
     @Test
-    public void testTable() throws Exception {
+    void testTable() throws Exception {
         checkOutput (
                 '''\
 ┌───────────────────────────────────────┬──────────────────────────────────────┐
@@ -31,7 +31,7 @@ public class CliApplicationITest {
     }
 
     @Test
-    public void testCSV() throws Exception {
+    void testCSV() throws Exception {
         checkOutput (
     '''\
                 ID;NAME
@@ -60,7 +60,7 @@ public class CliApplicationITest {
     }
 
     @Test
-    public void testJSONPretty() throws Exception {
+    void testJSONPretty() throws Exception {
         checkOutput (
                 '''\
                    [ {
