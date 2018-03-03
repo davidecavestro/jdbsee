@@ -20,6 +20,6 @@ class JarAddCommandSpec extends Specification {
         jarAddCommand.run()
 
         then: "the dao is indeed called with the respective args and opts"
-        1 * jdbsDriverDao.addJar(1, 'path/rp/jar1.jar', '/path/to/jar2.jar')
+        1 * jdbsDriverDao.addJar(1, new File ('path/rp/jar1.jar'), new File ('/path/to/jar2.jar'))
     }
 }
