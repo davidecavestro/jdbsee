@@ -67,6 +67,7 @@ dependencies {
   runtime 'ch.qos.logback:logback-classic:1.2.3'
 
   compile "org.flywaydb:flyway-core:5.0.7"
+  runtime 'org.hsqldb:hsqldb:2.4.0'
 
   testCompile "org.spockframework:spock-core:1.1-groovy-2.4"
 

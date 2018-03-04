@@ -1,21 +1,24 @@
 package com.github.davidecavestro.jdbsee.jdbcli
 
 import com.github.davidecavestro.jdbsee.jdbcli.config.JdbsDriverDao
+import com.github.davidecavestro.jdbsee.jdbcli.config.JdbsDriverDetails
 import de.vandermeer.asciitable.AsciiTable
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
 
-class DriverCommandService {
+class DriverService {
 
-  private final static Logger LOG = LoggerFactory.getLogger (DriverCommandService.class)
+  private final static Logger LOG = LoggerFactory.getLogger (DriverService.class)
+
+  PrintStream printStream = System.out
 
   @Inject//dagger
   public JdbsDriverDao driverDao
 
   @Inject//dagger
-  public DriverCommandService (){}
+  public DriverService(){}
 
   void listDrivers () {
     final AsciiTable asciiTable = new AsciiTable ();
@@ -31,14 +34,22 @@ class DriverCommandService {
     }
     asciiTable.renderAsCollection()//FIXME autodetect screen width
     .each {
-      System.out.println it
+      printStream.println it
     }
+    printStream.flush()
   }
 
   void showDriver (final long driverId) {
-    final AsciiTable asciiTable = new AsciiTable ();
+    printDriverDetails driverDao.findDriverById(driverId), {"No entries for id #$driverId"}
+  }
 
-    def driverDetails = driverDao.findDriverById(driverId)
+  void showDriver (final String name) {
+    printDriverDetails driverDao.findDriverByName(name), {"No entries for name '$name'"}
+  }
+
+  protected void printDriverDetails (final Optional<JdbsDriverDetails> driverDetails, final Closure<String> noEntriesMsg) {
+    final AsciiTable asciiTable = new AsciiTable()
+
     if (driverDetails.isPresent()) {
       driverDetails.get().with {
         asciiTable.addRule ()
@@ -68,15 +79,16 @@ class DriverCommandService {
       }
     } else {
       asciiTable.addRule ()
-      addRow asciiTable, "No entries for id #$driverId"
+      addRow asciiTable, noEntriesMsg()
       asciiTable.addRule ()
     }
 
 
     asciiTable.renderAsCollection()//FIXME autodetect screen width
     .each {
-      System.out.println it
+      printStream.println it
     }
+    printStream.flush()
   }
 
   //see https://github.com/vdmeer/asciitable/issues/14

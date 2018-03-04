@@ -84,7 +84,7 @@ class DriverCommand implements Runnable {
     DriverCommand driverCommand
 
     @Inject
-    public DriverCommandService driverCommandService
+    public DriverService driverCommandService
 
     @Inject//dagger
     DriverListCommand () {}
@@ -101,7 +101,7 @@ class DriverCommand implements Runnable {
     private DriverCommand driverCommand
 
     @Inject
-    public DriverCommandService driverCommandService
+    public DriverService driverCommandService
 
     @Parameters(index = "0", arity = "1", paramLabel = "DRIVER_ID", description = "The ID of the driver.")
     Long driverId
