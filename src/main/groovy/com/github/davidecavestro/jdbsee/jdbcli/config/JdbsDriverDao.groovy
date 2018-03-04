@@ -83,18 +83,18 @@ class JdbsDriverDao {
                     DELETE FROM jdbs_drivers 
                     WHERE 
                       name IN (:names)
-                  """)
+                  """ as String)
     }
   }
 
   int delete (final Long... ids) {
     withSql { Sql sql ->
-      sql.executeUpdate(ids: ids,
+      sql.executeUpdate(
           """\
                     DELETE FROM jdbs_drivers 
                     WHERE 
-                      id IN (:ids)
-                  """)
+                      id IN (${ids.join ', '})
+                  """ as String)
     }
   }
 
@@ -107,29 +107,44 @@ class JdbsDriverDao {
   }
 
   Optional<JdbsDriverDetails> findDriverByName (final String name) {
+    getDriverDetails {Sql sql-> sql.firstRow(name: name,
+        '''
+                SELECT 
+                  id, name, clazz, clazz_expr
+                FROM 
+                  jdbs_drivers
+                WHERE 
+                  name = :name
+            ''')
+    }
+  }
+
+  Optional<JdbsDriverDetails> findDriverById (final Long driverId) {
+    getDriverDetails {Sql sql-> sql.firstRow(driverId: driverId,
+        '''
+                SELECT 
+                  id, name, clazz, clazz_expr
+                FROM 
+                  jdbs_drivers
+                WHERE 
+                  id = :driverId
+            ''')
+    }
+  }
+
+  Optional<JdbsDriverDetails> getDriverDetails (final Closure<GroovyRowResult> drvRowClosure) {
     withSql { Sql sql ->
-              GroovyRowResult driverRow = sql.firstRow(name: name,
-                  '''
-                      SELECT 
-                        drv.id AS drv_id, drv.name AS drv_name, drv.clazz AS drv_clazz, drv.clazz_expr AS drv_clazz_expr,
-                        jar.id AS jar_id, jar.driver_id AS jar_driver_id, jar.path AS jar_path,
-                        NULL AS dep_id, NULL AS dep_driver_id, NULL AS dep_gav
-                      FROM 
-                        jdbs_drivers drv LEFT OUTER JOIN 
-                        jdbs_jars jar ON (drv.id=jar.driver_id)
-                      WHERE 
-                        drv.name = :name
-                  ''')
+              GroovyRowResult driverRow = drvRowClosure(sql)
 
               JdbsDriverDetails result
               if (driverRow) {
-                Long driverId = driverRow.drv_id as Long
+                Long driverId = driverRow.id as Long
 
                 result = new JdbsDriverDetails(
                     id: driverId,
-                    name: driverRow.drv_name as String,
-                    driverClass: driverRow.drv_clazz as String,
-                    driverClassExpr: driverRow.drv_clazz_expr as String,
+                    name: driverRow.name as String,
+                    driverClass: driverRow.clazz as String,
+                    driverClassExpr: driverRow.clazz_expr as String,
                     jars: [], deps: []
                 )
 
@@ -192,7 +207,7 @@ class JdbsDriverDao {
 
   int removeJar (final Long... jarIds) {
     withSql {Sql sql->
-      sql.executeUpdate(jarIds: jarIds, 'DELETE FROM jdbs_jars WHERE id IN (:jarIds)')
+      sql.executeUpdate("""DELETE FROM jdbs_jars WHERE id IN (${jarIds.join ', '})""" as String)
     }
   }
 
@@ -211,7 +226,7 @@ class JdbsDriverDao {
 
   int removeDependency (final Long... dependencyIds) {
     withSql {Sql sql->
-      sql.executeUpdate(dependencyIds: dependencyIds, 'DELETE FROM jdbs_deps WHERE id IN (:dependencyIds)')
+      sql.executeUpdate("""DELETE FROM jdbs_deps WHERE id IN (${dependencyIds.join ', '})""" as String)
     }
   }
 

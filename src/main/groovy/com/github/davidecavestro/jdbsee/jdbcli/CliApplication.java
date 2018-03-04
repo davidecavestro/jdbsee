@@ -66,6 +66,8 @@ interface AppComponent {
   void inject (DriverCommand command);
   void inject (DriverCommand.DriverCreateCommand command);
   void inject (DriverCommand.DriverDeleteCommand command);
+  void inject (DriverCommand.DriverListCommand command);
+  void inject (DriverCommand.DriverShowCommand command);
   void inject (DriverCommand.JarAddCommand command);
   void inject (DriverCommand.JarRemoveCommand command);
   void inject (DriverCommand.DependencyAddCommand command);

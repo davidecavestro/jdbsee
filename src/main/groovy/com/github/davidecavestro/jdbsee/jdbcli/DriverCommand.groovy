@@ -9,6 +9,7 @@ import static picocli.CommandLine.*
 @Command(name = "driver", 
     subcommands = [
         DriverCreateCommand, DriverDeleteCommand,
+        DriverListCommand, DriverShowCommand,
         JarAddCommand, JarRemoveCommand,
         DependencyAddCommand, DependencyRemoveCommand
     ]
@@ -30,9 +31,9 @@ class DriverCommand implements Runnable {
   static class DriverCreateCommand implements Runnable {
 
     @ParentCommand
-    DriverCommand driverCommand
+    private DriverCommand driverCommand
 
-    @Parameters(arity = "1", paramLabel = "NAME", description = "The name of the driver.")
+    @Parameters(index = "0", arity = "1", paramLabel = "NAME", description = "The name of the driver.")
     String name
 
     @Option(names = ["-c", "--driver-class"], description = "Fully qualified name of the driver class")
@@ -63,10 +64,10 @@ class DriverCommand implements Runnable {
   @Command(name = "delete")
   static class DriverDeleteCommand implements Runnable {
     @ParentCommand
-    private DriverCommand driverCommand
+    DriverCommand driverCommand
 
-    @Parameters(arity = "1", paramLabel = "DRIVER_ID", description = "The ID of the driver.")
-    private List<Long> driverIds
+    @Parameters(index = "0..*", arity = "1", paramLabel = "DRIVER_ID", description = "The ID of the driver.")
+    List<Long> driverIds
 
     @Inject//dagger
     DriverDeleteCommand () {}
@@ -77,16 +78,53 @@ class DriverCommand implements Runnable {
     }
   }
 
+  @Command(name = "list")
+  static class DriverListCommand implements Runnable {
+    @ParentCommand
+    DriverCommand driverCommand
+
+    @Inject
+    public DriverCommandService driverCommandService
+
+    @Inject//dagger
+    DriverListCommand () {}
+
+    @Override
+    void run () {
+      driverCommandService.listDrivers()
+    }
+  }
+
+  @Command(name = "show")
+  static class DriverShowCommand implements Runnable {
+    @ParentCommand
+    private DriverCommand driverCommand
+
+    @Inject
+    public DriverCommandService driverCommandService
+
+    @Parameters(index = "0", arity = "1", paramLabel = "DRIVER_ID", description = "The ID of the driver.")
+    Long driverId
+
+    @Inject//dagger
+    DriverShowCommand () {}
+
+    @Override
+    void run () {
+      driverCommandService.showDriver(driverId)
+    }
+  }
+
   @Command(name = "jar-add")
   static class JarAddCommand implements Runnable {
 
     @ParentCommand
     DriverCommand driverCommand
 
-    @Parameters(arity = "1", paramLabel = "DRIVER_ID", description = "The ID of the driver.")
+    @Parameters(index = "0", arity = "1", paramLabel = "DRIVER_ID", description = "The ID of the driver.")
     Long driverId
 
-    @Parameters(arity = "0..*", paramLabel = "JAR", description = "Jars(s) to add.")
+    @Parameters(index = "1..*", arity = "0..*", paramLabel = "JAR", description = "Jars(s) to add.")
     List<File> jars
 
     @Inject//dagger
@@ -102,9 +140,9 @@ class DriverCommand implements Runnable {
   @Command(name = "jar-remove")
   static class JarRemoveCommand implements Runnable {
     @ParentCommand
-    private DriverCommand driverCommand
+    DriverCommand driverCommand
 
-    @Parameters(arity = "1..*", paramLabel = "JAR_ID", description = "The ID of the jar to remove.")
+    @Parameters(index = "0..*", arity = "1..*", paramLabel = "JAR_ID", description = "The ID of the jar to remove.")
     private List<Long> ids
 
     @Inject//dagger
@@ -122,10 +160,10 @@ class DriverCommand implements Runnable {
     @ParentCommand
     private DriverCommand driverCommand
 
-    @Parameters(arity = "1", paramLabel = "DRIVER_ID", description = "The ID of the driver.")
+    @Parameters(index = "0", arity = "1", paramLabel = "DRIVER_ID", description = "The ID of the driver.")
     private Long driverId
 
-    @Parameters(arity = "0..*", paramLabel = "DEPENDENCY", description = "Dependency to add.")
+    @Parameters(index = "1..*", arity = "0..*", paramLabel = "DEPENDENCY", description = "Dependency to add.")
     private List<String> deps
 
     @Inject//dagger
@@ -143,7 +181,7 @@ class DriverCommand implements Runnable {
     @ParentCommand
     private DriverCommand driverCommand
 
-    @Parameters(arity = "1..*", paramLabel = "DEPENDENCY_ID", description = "The ID of the dependency to remove.")
+    @Parameters(index = "0..*", arity = "1..*", paramLabel = "DEPENDENCY_ID", description = "The ID of the dependency to remove.")
     private List<Long> ids
 
     @Inject//dagger
