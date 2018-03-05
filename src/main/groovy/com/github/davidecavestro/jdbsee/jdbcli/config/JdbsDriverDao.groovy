@@ -82,7 +82,7 @@ class JdbsDriverDao {
               """\
                     DELETE FROM jdbs_drivers 
                     WHERE 
-                      name IN (:names)
+                      name IN (${names.collect{"'$it'"}.join(',')})
                   """ as String)
     }
   }
