@@ -20,7 +20,7 @@ class AliasService {
   @Inject//dagger
   public AliasService(){}
 
-  void listAlias () {
+  void listAliases () {
     final AsciiTable asciiTable = new AsciiTable ();
 
     asciiTable.addRule ();// above header
@@ -64,6 +64,7 @@ class AliasService {
         addRow asciiTable, 'USERNAME', it.username
         asciiTable.addRule ()
         addRow asciiTable, 'PASSWORD', it.password//TODO mask it
+        asciiTable.addRule ()
       }
     } else {
       asciiTable.addRule ()
