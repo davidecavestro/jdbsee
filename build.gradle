@@ -127,17 +127,6 @@ sourceSets {
 }
 
 
-CreateStartScripts startScripts = project.startScripts
-startScripts.with {
-  doLast {
-    unixScript.text = unixScript.text.replaceFirst('DEFAULT_JVM_OPTS=""',
-            'DEFAULT_JVM_OPTS="-D\\$\\{APP_NAME}.home=\\$\\{APP_HOME}"')
-    windowsScript.text = windowsScript.text.replaceFirst('(?<=DEFAULT_JVM_OPTS=)(.*)(?=\r\n)',
-            '$1 "-Dtcproxy.config.url=file:%~dp0../conf/proxy.properties"')
-  }
-}
-
-
 //a task that generates the resources:
 task generateVersionTxt {
   description 'Creates a version.txt file with build info that is added to the root of the jar'
@@ -149,6 +138,16 @@ task generateVersionTxt {
         Buildtime: ${new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())}
         Application-name: $rootProject.name $project.name
         """
+  }
+}
+
+CreateStartScripts startScripts = project.startScripts
+startScripts.with {
+  doLast {
+    unixScript.text = unixScript.text.replaceFirst('DEFAULT_JVM_OPTS=""',
+        'DEFAULT_JVM_OPTS="-D\\$\\{APP_NAME}.home=\\$\\{APP_HOME}"')
+    windowsScript.text = windowsScript.text.replaceFirst('(?<=DEFAULT_JVM_OPTS=)(.*)(?=\r\n)',
+        '$1 "-Dtcproxy.config.url=file:%~dp0../conf/proxy.properties"')
   }
 }
 
