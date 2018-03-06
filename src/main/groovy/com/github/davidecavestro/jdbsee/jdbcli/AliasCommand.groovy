@@ -1,12 +1,13 @@
 package com.github.davidecavestro.jdbsee.jdbcli
 
 import com.github.davidecavestro.jdbsee.jdbcli.config.JdbsAliasDao
+import picocli.CommandLine
 
 import javax.inject.Inject
 
 import static picocli.CommandLine.*
 
-@Command(name = "alias", 
+@Command(name = "alias", description = "Provides persistent settings db configuration",
     subcommands = [
         AliasCreateCommand, AliasDeleteCommand,
         AliasListCommand, AliasShowCommand
@@ -23,9 +24,9 @@ class AliasCommand implements Runnable {
   AliasCommand(){}
 
   @Override
-  void run () {}
+  void run () {CommandLine.usage(this, System.out)}
 
-  @Command(name = "create")
+  @Command(name = "create", description = "Create a new persistent alias")
   static class AliasCreateCommand implements Runnable {
 
     @ParentCommand
@@ -46,6 +47,12 @@ class AliasCommand implements Runnable {
     @Option(names = ["-p", "--password"], description = "The password")
     String password = ""
 
+    @Option(names = ["-V", "--version"], versionHelp = true, description = "display version info")
+    boolean versionInfoRequested;
+
+    @Option(names = ["-h", "--help"], usageHelp = true, description = "display this help message")
+    boolean usageHelpRequested;
+
     @Inject//dagger
     AliasCreateCommand (){}
 
@@ -56,13 +63,19 @@ class AliasCommand implements Runnable {
   }
 
 
-  @Command(name = "delete")
+  @Command(name = "delete", description = "Delete aliases")
   static class AliasDeleteCommand implements Runnable {
     @ParentCommand
     AliasCommand aliasCommand
 
     @Parameters(index = "0..*", arity = "1", paramLabel = "ALIAS_ID", description = "The ID of the alias.")
     List<Long> aliasIds
+
+    @Option(names = ["-V", "--version"], versionHelp = true, description = "display version info")
+    boolean versionInfoRequested;
+
+    @Option(names = ["-h", "--help"], usageHelp = true, description = "display this help message")
+    boolean usageHelpRequested;
 
     @Inject//dagger
     AliasDeleteCommand () {}
@@ -73,13 +86,19 @@ class AliasCommand implements Runnable {
     }
   }
 
-  @Command(name = "list")
+  @Command(name = "list", description = "List registered aliases")
   static class AliasListCommand implements Runnable {
     @ParentCommand
     AliasCommand aliasCommand
 
     @Inject
     public AliasService aliasCommandService
+
+    @Option(names = ["-V", "--version"], versionHelp = true, description = "display version info")
+    boolean versionInfoRequested;
+
+    @Option(names = ["-h", "--help"], usageHelp = true, description = "display this help message")
+    boolean usageHelpRequested;
 
     @Inject//dagger
     AliasListCommand () {}
@@ -90,7 +109,7 @@ class AliasCommand implements Runnable {
     }
   }
 
-  @Command(name = "show")
+  @Command(name = "show", description = "Show details about alias settings")
   static class AliasShowCommand implements Runnable {
     @ParentCommand
     private AliasCommand aliasCommand
@@ -100,6 +119,12 @@ class AliasCommand implements Runnable {
 
     @Parameters(index = "0", arity = "1", paramLabel = "ALIAS_ID", description = "The ID of the alias.")
     Long aliasId
+
+    @Option(names = ["-V", "--version"], versionHelp = true, description = "display version info")
+    boolean versionInfoRequested;
+
+    @Option(names = ["-h", "--help"], usageHelp = true, description = "display this help message")
+    boolean usageHelpRequested;
 
     @Inject//dagger
     AliasShowCommand () {}

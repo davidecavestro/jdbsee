@@ -1,12 +1,13 @@
 package com.github.davidecavestro.jdbsee.jdbcli
 
 import com.github.davidecavestro.jdbsee.jdbcli.config.JdbsDriverDao
+import picocli.CommandLine
 
 import javax.inject.Inject
 
 import static picocli.CommandLine.*
 
-@Command(name = "driver", 
+@Command(name = "driver", description = "Provides persistent ettings for drivers",
     subcommands = [
         DriverCreateCommand, DriverDeleteCommand,
         DriverListCommand, DriverShowCommand,
@@ -25,7 +26,7 @@ class DriverCommand implements Runnable {
   DriverCommand (){}
 
   @Override
-  void run () {}
+  void run () {CommandLine.usage(this, System.out)}
 
   @Command(name = "create")
   static class DriverCreateCommand implements Runnable {

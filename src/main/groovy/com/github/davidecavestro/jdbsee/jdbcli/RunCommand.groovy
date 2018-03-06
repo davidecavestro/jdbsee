@@ -7,7 +7,7 @@ import javax.inject.Inject;
 import static picocli.CommandLine.*;
 
 @CompileStatic
-@Command(name = "run")
+@Command(name = "run", description = "Executes queries passing on-the-fly the db settings (driver, username)")
 class RunCommand implements Runnable {
 
   @Inject//public for dagger
