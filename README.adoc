@@ -25,10 +25,14 @@ endif::[]
 :uri-search-issues: {uri-repo}/search?type=Issues
 :uri-ci-travis: https://travis-ci.org/davidecavestro/jdbsee
 :uri-coverage-coveralls: https://coveralls.io/github/davidecavestro/jdbsee?branch=master
+:uri-twitter-jdbsee: https://twitter.com/intent/follow?screen_name=jdbsee
+:uri-twitter-davide: https://twitter.com/intent/follow?screen_name=davide_cavestro
 ifdef::status[]
 image:https://img.shields.io/github/license/davidecavestro/jdbsee.svg[Apache License 2.0, link=#copyright-and-license]
 image:https://img.shields.io/travis/davidecavestro/jdbsee/master.svg[Build Status (Travis CI), link={uri-ci-travis}]
 image:https://img.shields.io/coveralls/github/davidecavestro/jdbsee.svg[Coverage Status (Coveralls), link={uri-coverage-coveralls}]
+image:https://img.shields.io/twitter/follow/davide_cavestro.svg?style=social[Follow @davide_cavestro], link={uri-twitter-jdbsee}]
+image:https://img.shields.io/twitter/follow/jdbsee.svg?style=social[Follow @jdbsee], link={uri-twitter-jdbsee}]
 endif::[]
 
 A simple jdbc CLI tool
