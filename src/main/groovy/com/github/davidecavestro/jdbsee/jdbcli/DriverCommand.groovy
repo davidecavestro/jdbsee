@@ -7,12 +7,13 @@ import javax.inject.Inject
 
 import static picocli.CommandLine.*
 
-@Command(name = "driver", description = "Provides persistent ettings for drivers",
+@Command(name = "driver", description = "Provides persistent settings for drivers",
     subcommands = [
         DriverCreateCommand, DriverDeleteCommand,
         DriverListCommand, DriverShowCommand,
         JarAddCommand, JarRemoveCommand,
-        DependencyAddCommand, DependencyRemoveCommand
+        DependencyAddCommand, DependencyRemoveCommand,
+        HelpCommand
     ]
 )
 class DriverCommand implements Runnable {
@@ -192,5 +193,17 @@ class DriverCommand implements Runnable {
     void run () {
       driverCommand.jdbsDriverDao.removeDependency(ids as Long[])
     }
+  }
+
+  @Command(name = "help")
+  static class HelpCommand implements Runnable {
+    @ParentCommand
+    private DriverCommand driverCommand
+
+    @Inject//dagger
+    HelpCommand (){}
+
+    @Override
+    void run () {CommandLine.usage(driverCommand, System.out)}
   }
 }

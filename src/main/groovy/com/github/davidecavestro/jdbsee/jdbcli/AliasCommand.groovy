@@ -135,4 +135,16 @@ class AliasCommand implements Runnable {
     }
   }
 
+  @Command(name = "help")
+  static class HelpCommand implements Runnable {
+    @ParentCommand
+    private DriverCommand driverCommand
+
+    @Inject//dagger
+    HelpCommand (){}
+
+    @Override
+    void run () {CommandLine.usage(driverCommand, System.out)}
+  }
+
 }

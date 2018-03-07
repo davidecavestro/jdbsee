@@ -72,12 +72,14 @@ interface AppComponent {
   void inject (DriverCommand.JarRemoveCommand command);
   void inject (DriverCommand.DependencyAddCommand command);
   void inject (DriverCommand.DependencyRemoveCommand command);
+  void inject (DriverCommand.HelpCommand command);
 
   void inject (AliasCommand command);
   void inject (AliasCommand.AliasCreateCommand command);
   void inject (AliasCommand.AliasDeleteCommand command);
   void inject (AliasCommand.AliasListCommand command);
   void inject (AliasCommand.AliasShowCommand command);
+  void inject (AliasCommand.HelpCommand command);
 
   void inject (RunCommand command);
 }

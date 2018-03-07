@@ -60,6 +60,8 @@ The JDBC drivers can be automatically downloaded or loaded local jars.
 Invoke the distributable binary passing appropriate commands and params
 
 
+docs/images/jdbsee.Demo.png?raw=true[Jdbsee help message]
+
 ## `run` command
 
 ```
