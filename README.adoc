@@ -35,6 +35,7 @@ A simple jdbc CLI tool
 
 toc::[]
 
+:imagesdir: docs/images
 
 This is the POC for a command line tool providing access to relational databases.
 
@@ -59,8 +60,7 @@ The JDBC drivers can be automatically downloaded or loaded local jars.
 
 Invoke the distributable binary passing appropriate commands and params
 
-
-docs/images/jdbsee.Demo.png?raw=true[Jdbsee help message]
+image::jdbsee.Demo.png[Jdbsee help message]
 
 ## `run` command
 
