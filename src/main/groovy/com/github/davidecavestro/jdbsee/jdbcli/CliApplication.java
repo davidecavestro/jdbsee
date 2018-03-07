@@ -82,6 +82,7 @@ interface AppComponent {
   void inject (AliasCommand.HelpCommand command);
 
   void inject (RunCommand command);
+  void inject (RunCommand.HelpCommand command);
 }
 
 @Module
