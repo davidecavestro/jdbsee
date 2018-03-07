@@ -10,7 +10,8 @@ import static picocli.CommandLine.*
 @Command(name = "alias", description = "Provides persistent settings db configuration",
     subcommands = [
         AliasCreateCommand, AliasDeleteCommand,
-        AliasListCommand, AliasShowCommand
+        AliasListCommand, AliasShowCommand,
+        HelpCommand
     ]
 )
 class AliasCommand implements Runnable {
@@ -135,16 +136,16 @@ class AliasCommand implements Runnable {
     }
   }
 
-  @Command(name = "help")
+  @Command(name = "help", description = "Print this help")
   static class HelpCommand implements Runnable {
     @ParentCommand
-    private DriverCommand driverCommand
+    private AliasCommand aliasCommand
 
     @Inject//dagger
     HelpCommand (){}
 
     @Override
-    void run () {CommandLine.usage(driverCommand, System.out)}
+    void run () {CommandLine.usage(aliasCommand, System.out)}
   }
 
 }

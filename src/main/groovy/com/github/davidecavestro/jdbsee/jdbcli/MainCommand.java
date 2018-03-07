@@ -9,7 +9,7 @@ import javax.inject.Inject;
 //    header = "@|bold NAME|@",
 //    name = "@|bold jdbsee|@",
     synopsisHeading = "@|bold NAME|@",
-    customSynopsis = {"\n","jdbsee - the SQL JDBC tool"},
+    customSynopsis = {"\n","jdbsee - the SQL JDBC tool", "\n"},
 //    abbreviateSynopsis = true,
 
     descriptionHeading = "@|bold DESCRIPTION|@",

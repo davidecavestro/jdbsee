@@ -29,7 +29,7 @@ class DriverCommand implements Runnable {
   @Override
   void run () {CommandLine.usage(this, System.out)}
 
-  @Command(name = "create")
+  @Command(name = "create", description = "Register a new driver")
   static class DriverCreateCommand implements Runnable {
 
     @ParentCommand
@@ -63,7 +63,7 @@ class DriverCommand implements Runnable {
   }
 
 
-  @Command(name = "delete")
+  @Command(name = "delete", description = "Delete a driver")
   static class DriverDeleteCommand implements Runnable {
     @ParentCommand
     DriverCommand driverCommand
@@ -80,7 +80,7 @@ class DriverCommand implements Runnable {
     }
   }
 
-  @Command(name = "list")
+  @Command(name = "list", description = "List registered drivers")
   static class DriverListCommand implements Runnable {
     @ParentCommand
     DriverCommand driverCommand
@@ -97,7 +97,7 @@ class DriverCommand implements Runnable {
     }
   }
 
-  @Command(name = "show")
+  @Command(name = "show", description = "Show details about driver settings")
   static class DriverShowCommand implements Runnable {
     @ParentCommand
     private DriverCommand driverCommand
@@ -117,7 +117,7 @@ class DriverCommand implements Runnable {
     }
   }
 
-  @Command(name = "jar-add")
+  @Command(name = "jar-add", description = "Add jars to an existing driver")
   static class JarAddCommand implements Runnable {
 
     @ParentCommand
@@ -139,7 +139,7 @@ class DriverCommand implements Runnable {
   }
 
 
-  @Command(name = "jar-remove")
+  @Command(name = "jar-remove", description = "Remove jars from driver")
   static class JarRemoveCommand implements Runnable {
     @ParentCommand
     DriverCommand driverCommand
@@ -156,7 +156,7 @@ class DriverCommand implements Runnable {
     }
   }
 
-  @Command(name = "dependency-add")
+  @Command(name = "dependency-add", description = "Add automatically resolved dependencies to a registered driver")
   static class DependencyAddCommand implements Runnable {
 
     @ParentCommand
@@ -178,7 +178,7 @@ class DriverCommand implements Runnable {
   }
 
 
-  @Command(name = "dependency-remove")
+  @Command(name = "dependency-remove", description = "Remove dependencies from a driver")
   static class DependencyRemoveCommand implements Runnable {
     @ParentCommand
     private DriverCommand driverCommand
@@ -195,7 +195,7 @@ class DriverCommand implements Runnable {
     }
   }
 
-  @Command(name = "help")
+  @Command(name = "help", description = "Print this help")
   static class HelpCommand implements Runnable {
     @ParentCommand
     private DriverCommand driverCommand

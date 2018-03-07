@@ -1,6 +1,7 @@
 package com.github.davidecavestro.jdbsee.jdbcli
 
-import groovy.transform.CompileStatic;
+import groovy.transform.CompileStatic
+import picocli.CommandLine;
 
 import javax.inject.Inject;
 
@@ -9,7 +10,8 @@ import static picocli.CommandLine.*;
 @CompileStatic
 @Command(name = "run",
     description = "Executes queries passing on-the-fly the db settings (driver, username)",
-    showDefaultValues = true
+    showDefaultValues = true,
+    subcommands = [HelpCommand]
 )
 class RunCommand implements Runnable {
 
@@ -68,4 +70,16 @@ class RunCommand implements Runnable {
   void run () {
     runCommandService.run (this);
   }
+  @Command(name = "help", description = "Print this help")
+  static class HelpCommand implements Runnable {
+    @ParentCommand
+    private RunCommand runCommand
+
+    @Inject//dagger
+    HelpCommand (){}
+
+    @Override
+    void run () {CommandLine.usage(runCommand, System.out)}
+  }
+
 }
