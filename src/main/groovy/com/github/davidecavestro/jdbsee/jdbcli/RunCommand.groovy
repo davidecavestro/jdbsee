@@ -21,16 +21,19 @@ class RunCommand implements Runnable {
   @Option(names = ["-h", "--help"], usageHelp = true, description = "display this help message")
   boolean help
 
-  @Parameters(index = "0", paramLabel = "URL", description = "The JDBC url.")
-  String url
-
-  @Parameters(index = "1..*", paramLabel = "QUERY", description = "The SQL to run.")
+  @Parameters(index = "0..*", paramLabel = "QUERY", description = "The SQL to run.")
   String sqlText
 
-  @Option(names = ["-u", "--user"], description = "The username")
+  @Option(names = ["-a", "--alias"], description = "Database alias, to reuse previously persisted settings")
+  String alias
+
+  @Option(names = ["-l", "--url"], description = "The JDBC url (if provided along with alias overrides its url)")
+  String url
+
+  @Option(names = ["-u", "--user"], description = "The username (if provided along with alias overrides its url)")
   String username = ""
 
-  @Option(names = ["-p", "--password"], description = "The password")
+  @Option(names = ["-p", "--password"], description = "The password (if provided along with alias overrides its url)")
   String password = ""
 
   @Option(names = ["-P", "--ask-for-password"], description = "Ask for database password before connecting")
@@ -68,8 +71,9 @@ class RunCommand implements Runnable {
 
   @Override
   void run () {
-    runCommandService.run (this);
+    runCommandService.run (this)
   }
+
   @Command(name = "help", description = "Print this help")
   static class HelpCommand implements Runnable {
     @ParentCommand

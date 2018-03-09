@@ -1,5 +1,6 @@
 package com.github.davidecavestro.jdbsee.jdbcli
 
+import com.github.davidecavestro.jdbsee.jdbcli.config.JdbsAliasDao
 import groovy.grape.Grape
 import groovy.io.FileType
 import groovy.transform.CompileStatic
@@ -29,6 +30,8 @@ public class RunCommandService {
   public QueryService queryService
   @Inject
   public DriverManagerFacade driverManagerFacade
+  @Inject
+  public JdbsAliasDao jdbsAliasDao
 
   @Inject
   public RunCommandService (
@@ -46,11 +49,11 @@ public class RunCommandService {
   public void run (final RunCommand runCommand) {
     runCommand.with {
       if (sqlText != null) {//use the passed query
-        final List<String> sql = new ArrayList<>();
+        final List<String> sql = new ArrayList<>()
         if (execute) {
-          sql.addAll(execute);
+          sql.addAll execute
         }
-        sql.add(sqlText);
+        sql.add sqlText
 
         String[] sqlArray = sql.toArray(new String[sql.size()])
 
@@ -63,17 +66,25 @@ public class RunCommandService {
           return null
         }
 
-          String actualpass = askForPassword?System.console().readPassword():password
+        String actualpass = askForPassword?System.console().readPassword():password
 
-          Closure<DataSource> createDataSource = {
+        def aliasDetails = alias!=null?jdbsAliasDao.findAlias (alias).orElse(null):null
+
+        def _username = {username?:aliasDetails?.username?:''}
+        def _password = {actualpass?:aliasDetails?.password?:''}
+        def _driverClassName = {driverClassName?:aliasDetails?.driverDetails.driverClass}
+        def _url = {url?:aliasDetails?.url}
+        def _driverClassMatches = {driverClassMatches?:aliasDetails?.driverDetails.driverClassExpr}
+
+        final Closure<DataSource> createDataSource = {
 //              new BasicDataSource(
 //          (DataSource)new org.apache.tomcat.jdbc.pool.DataSource(
           new DriverManagerDataSource (
-              username: username,
-              password: actualpass,
+              username: _username(),
+              password: _password(),
 //                      driverClassLoader: driversLoader,
-              driverClassName: driverClassName,
-              url: url,
+              driverClassName: _driverClassName,
+              url: _url (),
               driverManagerFacade: driverManagerFacade
           )
         }
@@ -90,11 +101,11 @@ public class RunCommandService {
         alljars.flatten()
         if (alljars || deps) {
           LOG.debug('Loading jars {} and deps {}', alljars, deps)
-          withDynamicDataSource (driverClassName, driverClassMatches, alljars, deps, createDataSource) {dataSource->
+          withDynamicDataSource (_driverClassName(), _driverClassMatches(), alljars, deps, createDataSource) {dataSource->
             queryService.execute(dataSource, callback, sqlArray);
           }
         } else {//no additional jars or deps... assume the driver manager is able to find the driver
-          queryService.execute(url, username, actualpass, callback, sqlArray);
+          queryService.execute(_url(), _username(), _password(), callback, sqlArray);
         }
       } else {//FIXME
 //        consoleService.renderResultSet (queryService.execute (dataSource, sqlFile, callback));

@@ -25,6 +25,7 @@ class CliApplicationITest {
                 "insert into contacts (id, name) values (1, 'Alice');",
                 "-x",
                 "insert into contacts (id, name) values (2, 'Bob');",
+                "-l",
                 "jdbc:h2:mem:test",
                 "SELECT * FROM contacts;"
         )
@@ -54,6 +55,7 @@ class CliApplicationITest {
             '''insert into contacts (id, name) values (4, 'Da"isy"');''',
             "-t",
             "CSV",
+            "-l",
             "jdbc:h2:mem:test",
             "SELECT * FROM contacts;"
         )
@@ -90,6 +92,7 @@ class CliApplicationITest {
                 '''insert into contacts (id, name) values (4, 'Da"isy"');''',
                 "-t",
                 "JSON_PRETTY",
+                "-l",
                 "jdbc:h2:mem:test",
                 "SELECT * FROM contacts;"
         )

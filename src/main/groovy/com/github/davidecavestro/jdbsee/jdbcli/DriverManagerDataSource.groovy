@@ -23,27 +23,27 @@ class DriverManagerDataSource implements DataSource{
     DriverManagerFacade driverManagerFacade
 
     protected ClassLoader getDefaultClassLoader() {
-        ClassLoader cl = null;
+        ClassLoader cl = null
         try {
-            cl = Thread.currentThread().getContextClassLoader();
+            cl = Thread.currentThread().getContextClassLoader()
         }
         catch (final Exception ex) {
             // safe to ignore
         }
         if (cl == null) {
             // No thread context class loader -> use class loader of this class.
-            cl = getClass().getClassLoader();
+            cl = getClass().getClassLoader()
             if (cl == null) {
                 // getClassLoader() returning null indicates the bootstrap ClassLoader
                 try {
-                    cl = ClassLoader.getSystemClassLoader();
+                    cl = ClassLoader.getSystemClassLoader()
                 }
                 catch (Throwable ex) {
                     // safe to ignore
                 }
             }
         }
-        return cl;
+        return cl
     }
 
     @Override
