@@ -9,7 +9,7 @@ public class QueryServiceITest {
 
     @Test
     public void execute() throws Exception {
-        new QueryService(null)
+        new QueryService()
                 .execute("jdbc:h2:mem:test", "", "",
                 new VoidQueryCallback<Exception>() {
                     @Override

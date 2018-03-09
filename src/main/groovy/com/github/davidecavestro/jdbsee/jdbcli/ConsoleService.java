@@ -34,7 +34,7 @@ public class ConsoleService {
   }
 
   public void renderResultSet (final Query query, final OutputType outputType, final File outputFile) throws IOException {
-    try (final PrintWriter outWriter = new PrintWriter (outputFile!=null?new FileWriter (outputFile):new OutputStreamWriter (System.out))) {
+    try (final PrintWriter outWriter = getOutWriter(outputFile)) {
 
       switch (outputType) {
         case CSV:
@@ -96,7 +96,11 @@ public class ConsoleService {
     }
   }
 
-  private static class CsvResultSetScanner implements ResultSetScanner<Void> {
+  protected PrintWriter getOutWriter (final File outputFile) throws IOException {
+    return new PrintWriter (outputFile!=null?new FileWriter (outputFile):new OutputStreamWriter (System.out));
+  }
+
+  static class CsvResultSetScanner implements ResultSetScanner<Void> {
     private final PrintWriter outWriter;
 
     public CsvResultSetScanner (final PrintWriter outWriter) {

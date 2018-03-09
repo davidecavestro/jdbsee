@@ -72,9 +72,9 @@ public class RunCommandService {
 
         def _username = {username?:aliasDetails?.username?:''}
         def _password = {actualpass?:aliasDetails?.password?:''}
-        def _driverClassName = {driverClassName?:aliasDetails?.driverDetails.driverClass}
+        def _driverClassName = {driverClassName?:aliasDetails?.driverDetails?.driverClass}
         def _url = {url?:aliasDetails?.url}
-        def _driverClassMatches = {driverClassMatches?:aliasDetails?.driverDetails.driverClassExpr}
+        def _driverClassMatches = {driverClassMatches?:aliasDetails?.driverDetails?.driverClassExpr}
 
         final Closure<DataSource> createDataSource = {
 //              new BasicDataSource(

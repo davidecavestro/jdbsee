@@ -11,12 +11,8 @@ import java.util.List;
 
 public class QueryService {
 
-  private final DataSourceService dataSourceService;
-
   @Inject
-  public QueryService(final DataSourceService dataSourceService){
-    this.dataSourceService = dataSourceService;
-  }
+  public QueryService(){}
 
   public <X extends Exception> void execute (
       final String url,
