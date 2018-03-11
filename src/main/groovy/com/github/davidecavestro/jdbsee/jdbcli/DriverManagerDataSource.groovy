@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory
 
 import javax.sql.DataSource
 import java.sql.Connection
+import java.sql.Driver
 import java.sql.DriverManager
 import java.sql.SQLException
 import java.util.logging.Logger
@@ -21,6 +22,7 @@ class DriverManagerDataSource implements DataSource{
     Properties connectionProperties
 
     DriverManagerFacade driverManagerFacade
+    Driver driver
 
     protected ClassLoader getDefaultClassLoader() {
         ClassLoader cl = null
@@ -86,7 +88,7 @@ class DriverManagerDataSource implements DataSource{
     }
 
     protected Connection getDrivermanagerConnection(String url, Properties props) throws SQLException {
-        return driverManagerFacade.getConnection(url, props)
+        return driver?driverManagerFacade.getConnection(driver, url, props):driverManagerFacade.getConnection(url, props)
     }
 
 

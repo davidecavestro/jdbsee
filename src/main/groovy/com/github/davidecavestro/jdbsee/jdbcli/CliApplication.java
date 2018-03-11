@@ -21,6 +21,7 @@ public class CliApplication implements Runnable {
   }
 
   public static void main(final String[] args) {
+    Thread.currentThread().setContextClassLoader(MiscTools.addToClasspath());
     DaggerAppComponent.Builder builder = DaggerAppComponent.builder ();
     final AppComponent appComponent = builder.build ();
     final MainCommand mainCommand = appComponent.getMainCommand ();
