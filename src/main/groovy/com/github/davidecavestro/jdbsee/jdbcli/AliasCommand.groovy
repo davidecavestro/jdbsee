@@ -48,12 +48,6 @@ class AliasCommand implements Runnable {
     @Option(names = ["-p", "--password"], description = "The password")
     String password = ""
 
-    @Option(names = ["-V", "--version"], versionHelp = true, description = "display version info")
-    boolean versionInfoRequested;
-
-    @Option(names = ["-h", "--help"], usageHelp = true, description = "display this help message")
-    boolean usageHelpRequested;
-
     @Inject//dagger
     AliasCreateCommand (){}
 
@@ -72,12 +66,6 @@ class AliasCommand implements Runnable {
     @Parameters(index = "0..*", arity = "1", paramLabel = "ALIAS_ID", description = "The ID of the alias.")
     List<Long> aliasIds
 
-    @Option(names = ["-V", "--version"], versionHelp = true, description = "display version info")
-    boolean versionInfoRequested;
-
-    @Option(names = ["-h", "--help"], usageHelp = true, description = "display this help message")
-    boolean usageHelpRequested;
-
     @Inject//dagger
     AliasDeleteCommand () {}
 
@@ -93,20 +81,14 @@ class AliasCommand implements Runnable {
     AliasCommand aliasCommand
 
     @Inject
-    public AliasService aliasCommandService
-
-    @Option(names = ["-V", "--version"], versionHelp = true, description = "display version info")
-    boolean versionInfoRequested;
-
-    @Option(names = ["-h", "--help"], usageHelp = true, description = "display this help message")
-    boolean usageHelpRequested;
+    public AliasService aliasService
 
     @Inject//dagger
     AliasListCommand () {}
 
     @Override
     void run () {
-      aliasCommandService.listAliases()
+      aliasService.listAliases()
     }
   }
 
@@ -116,23 +98,17 @@ class AliasCommand implements Runnable {
     private AliasCommand aliasCommand
 
     @Inject
-    public AliasService aliasCommandService
+    public AliasService aliasService
 
     @Parameters(index = "0", arity = "1", paramLabel = "ALIAS_ID", description = "The ID of the alias.")
     Long aliasId
-
-    @Option(names = ["-V", "--version"], versionHelp = true, description = "display version info")
-    boolean versionInfoRequested;
-
-    @Option(names = ["-h", "--help"], usageHelp = true, description = "display this help message")
-    boolean usageHelpRequested;
 
     @Inject//dagger
     AliasShowCommand () {}
 
     @Override
     void run () {
-      aliasCommandService.showAlias(aliasId)
+      aliasService.showAlias(aliasId)
     }
   }
 
