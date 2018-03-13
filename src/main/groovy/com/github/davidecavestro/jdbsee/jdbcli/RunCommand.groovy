@@ -13,7 +13,7 @@ import static picocli.CommandLine.*;
     showDefaultValues = true,
     subcommands = [HelpCommand]
 )
-class RunCommand implements Runnable {
+class RunCommand extends AbstractDbCommand {
 
   @Inject//public for dagger
   public RunCommandService runCommandService
@@ -24,41 +24,11 @@ class RunCommand implements Runnable {
   @Parameters(index = "0..*", paramLabel = "QUERY", description = "The SQL to run.")
   String sqlText
 
-  @Option(names = ["-a", "--alias"], description = "Database alias, to reuse previously persisted settings")
-  String alias
-
-  @Option(names = ["-l", "--url"], description = "The JDBC url (if provided along with alias overrides its url)")
-  String url
-
-  @Option(names = ["-u", "--user"], description = "The username (if provided along with alias overrides its url)")
-  String username = ""
-
-  @Option(names = ["-p", "--password"], description = "The password (if provided along with alias overrides its url)")
-  String password = ""
-
-  @Option(names = ["-P", "--ask-for-password"], description = "Ask for database password before connecting")
-  boolean askForPassword
-
-//  @Parameters(arity = "0..1", paramLabel = "DATA_SOURCE", description = "The name of the data source.")
-//  private String dataSourceName;
-
 //  @Option(names = ["-f", "--file"], description = "File containing the query to run.")
 //  File sqlFile;
 
   @Option(names = ["-x", "--execute"], description = "Additional SQL commands to be executed before the specified QUERY")
   List<String> execute
-
-  @Option(names = ["-j", "--jar"], description = "External jar file to search for the driver classes")
-  List<File> jars
-
-  @Option(names = ["-d", "--dependency"], description = "Maven artifact dependency to be resolved for driver class loading")
-  List<String> deps
-
-  @Option(names = ["-c", "--driver-class"], description = "External driver class name (detected from URL if not specified)")
-  String driverClassName
-
-  @Option(names = ["-m", "--driver-class-match"], description = "Regex used to detect driver class by name. Defaults to '(.*)Driver(.*)'")
-  String driverClassMatches = '(.*)Driver(.*)'
 
   @Option(names = ["-t", "--output-format"], paramLabel = "OUTPUT_FORMAT", description = "Select output format. One between TABLE, CSV, JSON, JSON_PRETTY")
   OutputType outputType = OutputType.TABLE;

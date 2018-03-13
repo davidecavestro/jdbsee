@@ -82,6 +82,12 @@ interface AppComponent {
   void inject (AliasCommand.AliasShowCommand command);
   void inject (AliasCommand.HelpCommand command);
 
+  void inject (DescribeCommand command);
+  void inject (DescribeCommand.DescribeTablesCommand command);
+  void inject (DescribeCommand.DescribeViewsCommand command);
+  void inject (DescribeCommand.DescribeAllCommand command);
+  void inject (DescribeCommand.HelpCommand command);
+
   void inject (RunCommand command);
   void inject (RunCommand.HelpCommand command);
 }
