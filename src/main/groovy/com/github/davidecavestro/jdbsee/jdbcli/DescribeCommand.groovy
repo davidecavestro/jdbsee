@@ -8,7 +8,7 @@ import static picocli.CommandLine.*
 @Command(name = "describe", description = "Provides info about database and driver",
     subcommands = [
         DescribeTablesCommand,
-        HelpCommand
+        DescribeTablesCommand.HelpCommand
     ]
 )
 class DescribeCommand implements Runnable {
@@ -36,15 +36,14 @@ class DescribeCommand implements Runnable {
     @Override
     void run () {
       //TODO implement
-//      parentCommand.service.execute(new ConnectionCallback<Void, SQLException>() {
+//      parentCommand.service.doRun(this, (new ConnectionCallback<Void, SQLException>() {
 //        @Override
 //        Void withConnection(final Connection connection) throws SQLException {
 //
 //          return null
 //        }
-//      }
-//          )
-    }
+//      })
+//    }
   }
 
   @Command(name = "views", description = "List all views")

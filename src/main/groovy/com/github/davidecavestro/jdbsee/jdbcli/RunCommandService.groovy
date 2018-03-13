@@ -41,66 +41,81 @@ public class RunCommandService {
   void run (final RunCommand runCommand) {
     runCommand.with {
       if (sqlText != null) {//use the passed query
-        final List<String> sql = new ArrayList<>()
-        if (execute) {
-          sql.addAll execute
-        }
-        sql.add sqlText
+        String[] sqlArray = getSqlArray(runCommand)
 
-        String[] sqlArray = sql.toArray(new String[sql.size()])
-
-        final QueryCallback<Void, Exception> callback = { Query query ->
-          try {
-            consoleService.renderResultSet(query, outputType, outputFile)
-          } catch (final SQLException e) {
-            throw new RuntimeException(e)
+        Closure<Void> queryCall = {dataSource->
+          final QueryCallback<Void, Exception> callback = { Query query ->
+            try {
+              consoleService.renderResultSet(query, outputType, outputFile)
+            } catch (final SQLException e) {
+              throw new RuntimeException(e)
+            }
+            return null
           }
-          return null
+
+          queryService.execute(dataSource, callback, sqlArray)
         }
 
-        String actualpass = askForPassword?System.console().readPassword():password
-
-        def aliasDetails = alias!=null?jdbsAliasDao.findAlias (alias).orElse(null):null
-
-        def _username = {username?:aliasDetails?.username?:''}
-        def _password = {actualpass?:aliasDetails?.password?:''} as Closure<String>
-        def _driverClassName = {driverClassName?:aliasDetails?.driverDetails?.driverClass}
-        def _url = {url?:aliasDetails?.url}
-        def _driverClassMatches = {driverClassMatches?:aliasDetails?.driverDetails?.driverClassExpr}
-
-        final Closure<DataSource> createDataSource = {driver->
-
-          new DriverManagerDataSource (
-              username: _username(),
-              password: _password(),
-              driverClassName: _driverClassName,
-              url: _url (),
-              driverManagerFacade: driverManagerFacade,
-              driver: driver
-          )
-        } as Closure<DataSource>
-
-        def alljars = []
-        if (jars) {
-          alljars.addAll (jars)
-        }
-        def dropinsDir = configService.getDropinsDir()
-        LOG.debug('Looking for dropins at {}', dropinsDir)
-        if (dropinsDir && dropinsDir.exists()) {
-          alljars.addAll (dropinsDir.listFiles ({dir, name -> name.toLowerCase().endsWith('.jar')} as FilenameFilter))
-        }
-        alljars.flatten()
-        if (alljars || deps) {
-          LOG.debug('Loading jars {} and deps {}', alljars, deps)
-          withDynamicDataSource (_driverClassName(), _driverClassMatches(), alljars, deps, createDataSource) {dataSource->
-            queryService.execute(dataSource, callback, sqlArray)
-          }
-        } else {//no additional jars or deps... assume the driver manager is able to find the driver
-          queryService.execute(_url(), _username(), _password(), callback, sqlArray)
-        }
+        doRun (runCommand, queryCall)
       } else {//FIXME
 //        consoleService.renderResultSet (queryService.execute (dataSource, sqlFile, callback));
       }
+    }
+  }
+
+  def doRun(final AbstractDbCommand runCommand, Closure<Void> dbCallback) {
+    runCommand.with {
+      String actualpass = askForPassword ? System.console().readPassword() : password
+
+      def aliasDetails = alias != null ? jdbsAliasDao.findAlias(alias).orElse(null) : null
+
+      def _username = { username ?: aliasDetails?.username ?: '' }
+      def _password = { actualpass ?: aliasDetails?.password ?: '' } as Closure<String>
+      def _driverClassName = { driverClassName ?: aliasDetails?.driverDetails?.driverClass }
+      def _url = { url ?: aliasDetails?.url }
+      def _driverClassMatches = { driverClassMatches ?: aliasDetails?.driverDetails?.driverClassExpr }
+
+      final Closure<DataSource> createDataSource = { driver ->
+
+        new DriverManagerDataSource(
+            username: _username(),
+            password: _password(),
+            driverClassName: _driverClassName,
+            url: _url(),
+            driverManagerFacade: driverManagerFacade,
+            driver: driver
+        )
+      } as Closure<DataSource>
+
+      def alljars = []
+      if (jars) {
+        alljars.addAll(jars)
+      }
+      def dropinsDir = configService.getDropinsDir()
+      LOG.debug('Looking for dropins at {}', dropinsDir)
+      if (dropinsDir && dropinsDir.exists()) {
+        alljars.addAll(dropinsDir.listFiles({ dir, name -> name.toLowerCase().endsWith('.jar') } as FilenameFilter))
+      }
+      alljars.flatten()
+      if (alljars || deps) {
+        LOG.debug('Loading jars {} and deps {}', alljars, deps)
+        withDynamicDataSource(_driverClassName(), _driverClassMatches(), alljars, deps, createDataSource, dbCallback)
+      } else {//no additional jars or deps... assume the driver manager is able to find the driver
+        dbCallback(new DriverManagerDataSource(url: _url(), username: _username(), password: _password()))
+      }
+    }
+
+  }
+
+  protected String[] getSqlArray (final RunCommand runCommand) {
+    runCommand.with {
+      final List<String> sql = new ArrayList<>()
+      if (execute) {
+        sql.addAll execute
+      }
+      sql.add sqlText
+
+      return sql.toArray(new String[sql.size()])
     }
   }
 
