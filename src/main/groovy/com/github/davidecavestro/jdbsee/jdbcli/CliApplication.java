@@ -86,6 +86,7 @@ interface AppComponent {
   void inject (DescribeCommand.DescribeTablesCommand command);
   void inject (DescribeCommand.DescribeViewsCommand command);
   void inject (DescribeCommand.DescribeFullCommand command);
+  void inject (DescribeCommand.DescribeDriverCommand command);
   void inject (DescribeCommand.HelpCommand command);
 
   void inject (RunCommand command);

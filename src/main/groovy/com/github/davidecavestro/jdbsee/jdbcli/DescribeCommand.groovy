@@ -10,6 +10,7 @@ import static picocli.CommandLine.*
         DescribeTablesCommand,
         DescribeViewsCommand,
         DescribeFullCommand,
+        DescribeDriverCommand,
         HelpCommand
     ]
 )
@@ -19,7 +20,7 @@ class DescribeCommand implements Runnable {
 
   @Inject
 //public for dagger
-  public RunCommandService service
+  public DescribeCommandService service
 
   @Inject
   DescribeCommand() {}
@@ -96,6 +97,21 @@ class DescribeCommand implements Runnable {
 //        }
 //      }
 //          )
+    }
+  }
+
+  @Command(name = "driver", description = "Show driver info")
+  static class DescribeDriverCommand extends AbstractDbCommand {
+
+    @ParentCommand
+    private DescribeCommand parentCommand
+
+    @Inject//dagger
+    DescribeDriverCommand() {}
+
+    @Override
+    void run() {
+      parentCommand.service.run(this)
     }
   }
 

@@ -6,6 +6,10 @@ import com.fasterxml.jackson.databind.SequenceWriter;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvParser;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.google.common.base.Function;
+import com.google.common.collect.Streams;
+import com.google.common.collect.Table;
+import de.vandermeer.asciitable.AsciiTable;
 import org.jdbi.v3.core.result.NoResultsException;
 import org.jdbi.v3.core.result.ResultSetScanner;
 import org.jdbi.v3.core.statement.Query;
@@ -13,6 +17,7 @@ import org.jdbi.v3.core.statement.StatementContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.*;
 import java.sql.ResultSet;
@@ -20,7 +25,12 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import static com.google.common.collect.Iterators.concat;
+import static com.google.common.collect.Iterators.transform;
 
 public class ConsoleService {
 
@@ -170,6 +180,30 @@ public class ConsoleService {
         throw new RuntimeException (e);
       }
       return null;
+    }
+  }
+
+  public void renderTable (final Table<String,String,String> table) throws IOException {
+    final AsciiTable ascii = new AsciiTable ();
+
+    final int columnCount = table.columnKeySet().size();
+    ascii.addRule ();// above header
+    final Collection<String> headers = new ArrayList<> ();
+
+    for (final String col : table.columnKeySet()) {
+      headers.add (col);
+    }
+    ascii.addRow (headers); // header
+    ascii.addRule (); // below header
+
+    try (final PrintWriter outWriter = getOutWriter(null)) {
+      table.rowMap().forEach((String row, Map<String, String> colVal) -> {
+        final List<String> rowVals = new ArrayList<>(columnCount);
+        colVal.forEach((String col, String val) -> rowVals.add(val));
+        ascii.addRow(rowVals);
+      });
+
+      ascii.renderAsIterator(80).forEachRemaining(outWriter::println);
     }
   }
 }
