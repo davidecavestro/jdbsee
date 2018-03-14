@@ -1,11 +1,6 @@
 package com.github.davidecavestro.jdbsee.jdbcli
 
 import com.github.davidecavestro.jdbsee.jdbcli.config.JdbsAliasDao
-import groovy.grape.Grape
-import groovy.io.FileType
-import groovy.transform.CompileStatic
-import groovy.xml.NamespaceBuilder
-import org.apache.ivy.Ivy
 import org.jboss.shrinkwrap.resolver.api.maven.Maven
 import org.jdbi.v3.core.statement.Query
 import org.slf4j.Logger
@@ -20,7 +15,7 @@ import java.util.jar.JarEntry
 import java.util.jar.JarFile
 
 //@CompileStatic
-public class RunCommandService {
+class RunCommandService {
 
   private final static Logger LOG = LoggerFactory.getLogger (RunCommandService.class)
 
@@ -101,7 +96,12 @@ public class RunCommandService {
         LOG.debug('Loading jars {} and deps {}', alljars, deps)
         withDynamicDataSource(_driverClassName(), _driverClassMatches(), alljars, deps, createDataSource, dbCallback)
       } else {//no additional jars or deps... assume the driver manager is able to find the driver
-        dbCallback(new DriverManagerDataSource(url: _url(), username: _username(), password: _password()))
+        dbCallback(new DriverManagerDataSource(
+            url: _url(),
+            username: _username(),
+            password: _password(),
+            driverManagerFacade: driverManagerFacade
+        ))
       }
     }
 

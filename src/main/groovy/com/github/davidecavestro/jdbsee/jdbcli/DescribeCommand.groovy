@@ -8,21 +8,24 @@ import static picocli.CommandLine.*
 @Command(name = "describe", description = "Provides info about database and driver",
     subcommands = [
         DescribeTablesCommand,
-        DescribeTablesCommand.HelpCommand
+        DescribeViewsCommand,
+        DescribeFullCommand,
+        HelpCommand
     ]
 )
 class DescribeCommand implements Runnable {
   @ParentCommand
   private MainCommand mainCommand
 
-  @Inject//public for dagger
+  @Inject
+//public for dagger
   public RunCommandService service
 
   @Inject
-  DescribeCommand(){}
+  DescribeCommand() {}
 
   @Override
-  void run () {CommandLine.usage(this, System.out)}
+  void run() { CommandLine.usage(this, System.out) }
 
   @Command(name = "tables", description = "List all tables")
   static class DescribeTablesCommand extends AbstractDbCommand {
@@ -30,11 +33,12 @@ class DescribeCommand implements Runnable {
     @ParentCommand
     private DescribeCommand parentCommand
 
-    @Inject//dagger
-    DescribeTablesCommand (){}
+    @Inject
+//dagger
+    DescribeTablesCommand() {}
 
     @Override
-    void run () {
+    void run() {
       //TODO implement
 //      parentCommand.service.doRun(this, (new ConnectionCallback<Void, SQLException>() {
 //        @Override
@@ -44,6 +48,7 @@ class DescribeCommand implements Runnable {
 //        }
 //      })
 //    }
+    }
   }
 
   @Command(name = "views", description = "List all views")
@@ -52,11 +57,12 @@ class DescribeCommand implements Runnable {
     @ParentCommand
     private DescribeCommand parentCommand
 
-    @Inject//dagger
-    DescribeViewsCommand (){}
+    @Inject
+//dagger
+    DescribeViewsCommand() {}
 
     @Override
-    void run () {
+    void run() {
       //TODO implement
 //      parentCommand.service.execute(new ConnectionCallback<Void, SQLException>() {
 //        @Override
@@ -75,11 +81,12 @@ class DescribeCommand implements Runnable {
     @ParentCommand
     private DescribeCommand parentCommand
 
-    @Inject//dagger
-    DescribeFullCommand (){}
+    @Inject
+//dagger
+    DescribeFullCommand() {}
 
     @Override
-    void run () {
+    void run() {
       //TODO implement
 //      parentCommand.service.execute(new ConnectionCallback<Void, SQLException>() {
 //        @Override
@@ -98,10 +105,10 @@ class DescribeCommand implements Runnable {
     private DescribeCommand parentCommand
 
     @Inject//dagger
-    HelpCommand (){}
+    HelpCommand() {}
 
     @Override
-    void run () {CommandLine.usage(parentCommand, System.out)}
+    void run() { CommandLine.usage(parentCommand, System.out) }
   }
 
 }

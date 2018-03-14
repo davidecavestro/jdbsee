@@ -2,6 +2,8 @@ package com.github.davidecavestro.jdbsee.jdbcli
 
 import spock.lang.Specification
 
+import javax.sql.DataSource
+
 class RunCommandSpec extends Specification {
     def "args and opts are passed to query service"() {
         given: "a run command initialized with args and opts"
@@ -27,10 +29,13 @@ class RunCommandSpec extends Specification {
 
         then: "the queryService is indeed called with the respective args and opts"
         1 * queryService.execute(
-                'jdbc:h2:mem:test',
-                'testuser',
-                'testpass',
+                {
+                    it.url == 'jdbc:h2:mem:test' &&
+                    it.username == 'testuser' &&
+                    it.password == 'testpass'
+                },
                 _ as QueryCallback,
-                ['cmd1...', 'cmd2...', 'SELECT * FROM foo'])
+                ['cmd1...', 'cmd2...', 'SELECT * FROM foo']
+        )
     }
 }
