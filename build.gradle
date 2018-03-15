@@ -85,8 +85,7 @@ dependencies {
 
   testCompile 'junit:junit:4.12'
   testCompile 'commons-io:commons-io:2.6'
-  testRuntime 'com.h2database:h2:1.4.196'
-  testRuntime 'org.hsqldb:hsqldb:2.4.0'
+//  testRuntime 'com.h2database:h2:1.4.196'
 
 
   //drivers distribution

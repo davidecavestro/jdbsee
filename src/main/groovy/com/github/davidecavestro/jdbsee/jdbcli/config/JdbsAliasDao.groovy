@@ -113,14 +113,11 @@ class JdbsAliasDao {
   }
 
   Optional<JdbsAliasDetails> findAlias (final String aliasRef) {
-    def aliasId
     try {
-      aliasId = Long.valueOf(aliasRef)
+      findAliasById(Long.valueOf(aliasRef))
     } catch (final NumberFormatException e) {
       findAliasByName(aliasRef)
     }
-    findAliasById(aliasId)
-
   }
 
   Optional<JdbsAliasDetails> getAliasDetails (final Closure<GroovyRowResult> aliasRowClosure) {

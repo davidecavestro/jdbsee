@@ -6,6 +6,20 @@ import org.junit.Test
 
 class CliApplicationITest {
 
+    void checkOutput(String expected, String... args) throws Exception {
+        StringWriter writer = new StringWriter()
+        PrintStream out = new PrintStream(new WriterOutputStream(writer))
+
+        // replace sysout
+        System.setOut(out)
+        //run
+        CliApplication.main(args)
+
+        def actualData = writer.toString().trim()
+        def expectedData = expected.stripIndent().trim()
+
+        assert actualData == expectedData
+    }
 
     @Test
     void testTable() throws Exception {
@@ -97,19 +111,23 @@ class CliApplicationITest {
                 "SELECT * FROM contacts;"
         )
     }
-    void checkOutput(String expected, String... args) throws Exception {
-        StringWriter writer = new StringWriter()
-        PrintStream out = new PrintStream(new WriterOutputStream(writer))
 
-        // replace sysout
-        System.setOut(out)
-        //run
-        CliApplication.main(args)
-
-        def actualData = writer.toString().trim()
-        def expectedData = expected.stripIndent().trim()
-
-        assert actualData == expectedData
+    @Test
+    void testDeps() throws Exception {
+        checkOutput (
+            '''\
+                FOO
+                1
+            ''',
+            "run",
+            "-t",
+            "CSV",
+            "-d",
+            "com.h2database:h2:1.4.196",
+            "-l",
+            "jdbc:h2:mem:test",
+            "SELECT 1 AS foo;"
+        )
     }
 
 }

@@ -129,7 +129,9 @@ abstract class AbstractDbCommandService {
       LOG.info('Deps resolved {}', groovyClassLoader.getURLs())
 
       //collect dependency urls
-      def urls = (ClasspathHelper.forClassLoader(groovyClassLoader) - ClasspathHelper.forClassLoader(currThreadClassLoader)).toArray() as URL[]
+      //since deps are cached, a diff would remove even the relevant ones
+//      def urls = (ClasspathHelper.forClassLoader(groovyClassLoader) - ClasspathHelper.forClassLoader(currThreadClassLoader)).toArray() as URL[]
+      def urls = ClasspathHelper.forClassLoader(groovyClassLoader)
 
       //add the URLs to the SystemClassLoader
       LOG.debug ('Determined deps urls {}', urls)
