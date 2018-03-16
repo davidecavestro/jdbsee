@@ -43,7 +43,7 @@ abstract class AbstractDbCommandService {
         new DriverManagerDataSource(
             username: _username(),
             password: _password(),
-            driverClassName: _driverClassName,
+            driverClassName: _driverClassName(),
             url: _url(),
             driverManagerFacade: driverManagerFacade,
             driver: driver
@@ -142,26 +142,26 @@ abstract class AbstractDbCommandService {
           def sysloader = ClassLoader.getSystemClassLoader()
 
 
-          if (sysloader instanceof URLClassLoader) {
-            //java < 9, reflection
-            final Class sysclass = URLClassLoader.class
-
-            Method method = sysclass.getDeclaredMethod("addURL", [URL] as Class[])
-            method.setAccessible(true)
-            method.invoke(sysloader, url)
-
-            try {
-              result = testDataSource()
-            } catch (Throwable e) {// seems safe to ignore here :-/
-              LOG.trace('Caught exception {}', e)
-            }
-          } else {//java >= 9
+//          if (sysloader instanceof URLClassLoader) {
+//            //java < 9, reflection
+//            final Class sysclass = URLClassLoader.class
+//
+//            Method method = sysclass.getDeclaredMethod("addURL", [URL] as Class[])
+//            method.setAccessible(true)
+//            method.invoke(sysloader, url)
+//
+//            try {
+//              result = testDataSource()
+//            } catch (Throwable e) {// seems safe to ignore here :-/
+//              LOG.trace('Caught exception {}', e)
+//            }
+//          } else {//java >= 9
             try {
               result = registerDriverClass(driverClassName, driverClassMatches, new File(url.file), new URLClassLoader([url] as URL[], sysloader), testDataSource);
             } catch (Throwable e) {// seems safe to ignore here :-/
               LOG.trace('Caught exception {}', e)
             }
-          }
+//          }
         }
         return result
       } as DataSource

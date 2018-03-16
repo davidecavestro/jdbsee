@@ -202,6 +202,7 @@ public class ConsoleService {
         colVal.forEach((String col, String val) -> rowVals.add(val));
         ascii.addRow(rowVals);
       });
+      ascii.addRule (); // bottom line
 
       ascii.renderAsIterator(80).forEachRemaining(outWriter::println);
     }

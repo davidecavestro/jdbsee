@@ -26,16 +26,20 @@ class DescribeCommandService extends AbstractDbCommandService{
 
   void run (final DescribeDriverCommand cmd) {
     cmd.with {
-      Closure<Void> callback = {dataSource->
-        dataSource.getConnection().withCloseable{Connection connection->
+      Closure<Void> callback = { dataSource ->
+        Connection connection = dataSource.getConnection()
+        try {
           DatabaseMetaData dbMeta = connection.metaData
-          Table table = ArrayTable.create(dbMeta.properties, ['Key', 'value'])
-          dbMeta.properties.with {props->
-            props.each {k,v->
-              table.put(k,v)
+          Table table = ArrayTable.create(dbMeta.properties.keySet(), ['key', 'value'])
+          dbMeta.properties.with { props ->
+            props.each { k, v ->
+              table.put(k, 'key', k)
+              table.put(k, 'value', v as String)
             }
           }
           consoleService.renderTable(table)
+        } finally {
+          connection.close()
         }
       }
 
