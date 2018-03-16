@@ -34,6 +34,9 @@ class DescribeCommandService extends AbstractDbCommandService{
           dbMeta.properties.with { props ->
             props.each { k, v ->
               table.put(k, 'key', k)
+              def valueString = v.with {
+                it instanceof Iterable?it.collect {it as String}:it as String
+              }
               table.put(k, 'value', v as String)
             }
           }

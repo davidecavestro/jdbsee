@@ -104,7 +104,7 @@ class DescribeCommand implements Runnable {
   static class DescribeDriverCommand extends AbstractDbCommand {
 
     @ParentCommand
-    private DescribeCommand parentCommand
+    DescribeCommand parentCommand
 
     @Inject//dagger
     DescribeDriverCommand() {}
