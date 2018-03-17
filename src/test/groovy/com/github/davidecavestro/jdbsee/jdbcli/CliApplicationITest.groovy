@@ -6,7 +6,7 @@ import org.junit.Test
 
 class CliApplicationITest {
 
-    void checkOutput(String expected, String... args) throws Exception {
+    void checkOutput(String expected, Closure transform = {it->it}, String... args) throws Exception {
         StringWriter writer = new StringWriter()
         PrintStream out = new PrintStream(new WriterOutputStream(writer))
 
@@ -15,7 +15,7 @@ class CliApplicationITest {
         //run
         CliApplication.main(args)
 
-        def actualData = writer.toString().trim()
+        def actualData = transform(writer.toString().trim())
         def expectedData = expected.stripIndent().trim()
 
         assert actualData == expectedData
@@ -138,6 +138,7 @@ class CliApplicationITest {
 
     @Test
     void testDescribeDriver() throws Exception {
+        //FIXME replace with smarter check
         checkOutput (
             '''\
        ┌───────────────────────────────────────┬──────────────────────────────────────┐
@@ -455,7 +456,7 @@ class CliApplicationITest {
        │JDBCMinorVersion                       │0                                     │
        │identifierQuoteString                  │"                                     │
        │userName                               │TEST                                  │
-       │connection                             │conn1: url=jdbc:h2:mem:test user=TEST │
+       │connection                             │connX: url=jdbc:h2:mem:test user=TEST │
        │class                                  │class org.h2.jdbc.JdbcDatabaseMetaData│
        │catalogTerm                            │catalog                               │
        │debugEnabled                           │false                                 │
@@ -493,6 +494,7 @@ class CliApplicationITest {
        │driverVersion                          │1.4.196 (2017-06-10)                  │
        └───────────────────────────────────────┴──────────────────────────────────────┘
             ''',
+            {it.replaceFirst (/\│conn\d{1}: /, '│connX: ')},//replace dynamic data such as connection number
             "describe",
             "driver",
             "-u",
