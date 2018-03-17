@@ -143,9 +143,10 @@ class CliApplicationITest {
        ┌───────────────────────────────────────┬──────────────────────────────────────┐
        │key                                    │value                                 │
        ├───────────────────────────────────────┼──────────────────────────────────────┤
-       │schemas                                │rs8:                                  │
-       │                                       │org.h2.result.LocalResult@503         │
-       │                                       │56b5 columns: 3 rows: 2 pos: -1       │
+       │schemas                                │[[CATALOG_NAME:TEST, IS_DEFAULT:false,│
+       │                                       │SCHEMA_NAME:INFORMATION_SCHEMA], [CATA│
+       │                                       │LOG_NAME:TEST,        IS_DEFAULT:true,│
+       │                                       │SCHEMA_NAME:PUBLIC]]                  │
        │extraNameCharacters                    │                                      │
        │maxBinaryLiteralLength                 │0                                     │
        │numericFunctions                       │ABS,ACOS,ASIN,ATAN,COS,COSH,COT,SIN,SI│
@@ -158,9 +159,9 @@ class CliApplicationITest {
        │maxConnections                         │0                                     │
        │URL                                    │jdbc:h2:mem:test                      │
        │maxCharLiteralLength                   │0                                     │
-       │tableTypes                             │rs10:                                 │
-       │                                       │org.h2.result.LocalResult@5           │
-       │                                       │67268 columns: 1 rows: 5 pos: -1      │
+       │tableTypes                             │[[TYPE:EXTERNAL], [TYPE:SYSTEM TABLE],│
+       │                                       │[TYPE:TABLE],    [TYPE:TABLE    LINK],│
+       │                                       │[TYPE:VIEW]]                          │
        │traceObjectName                        │dbMeta0                               │
        │timeDateFunctions                      │CURRENT_DATE,CURRENT_TIME,CURRENT_TIME│
        │                                       │STAMP,DATEADD,DATEDIFF,DAYNAME,DAY_OF_│
@@ -171,7 +172,7 @@ class CliApplicationITest {
        │catalogSeparator                       │.                                     │
        │maxColumnsInIndex                      │0                                     │
        │databaseMinorVersion                   │4                                     │
-       │clientInfoProperties                   │org.h2.tools.SimpleResultSet@1af7f54a │
+       │clientInfoProperties                   │[[Value:0, Name:numServers]]          │
        │JDBCMajorVersion                       │4                                     │
        │maxIndexLength                         │0                                     │
        │maxStatementLength                     │0                                     │
@@ -182,9 +183,257 @@ class CliApplicationITest {
        │maxCursorNameLength                    │0                                     │
        │databaseMajorVersion                   │1                                     │
        │searchStringEscape                     │\\                                     │
-       │typeInfo                               │rs12:                                 │
-       │                                       │org.h2.result.LocalResult@4d          │
-       │                                       │57787 columns: 18 rows: 31 pos: -1    │
+       │typeInfo                               │[[SUFFIX:null,   CASE_SENSITIVE:false,│
+       │                                       │RADIX:null,                NULLABLE:1,│
+       │                                       │UNSIGNED_ATTRIBUTE:false, MINIMUM_SCAL│
+       │                                       │E:0, PRECISION:0,  SQL_DATETIME_SUB:0,│
+       │                                       │AUTO_INCREMENT:false, MAXIMUM_SCALE:0,│
+       │                                       │SEARCHABLE:3,             PREFIX:null,│
+       │                                       │FIXED_PREC_SCALE:false,   PARAMS:null,│
+       │                                       │TYPE_NAME:RESULT_SET,  DATA_TYPE:-10],│
+       │                                       │[SUFFIX:null,    CASE_SENSITIVE:false,│
+       │                                       │RADIX:10,                  NULLABLE:1,│
+       │                                       │UNSIGNED_ATTRIBUTE:false, MINIMUM_SCAL│
+       │                                       │E:0, PRECISION:3,  SQL_DATETIME_SUB:0,│
+       │                                       │AUTO_INCREMENT:false, MAXIMUM_SCALE:0,│
+       │                                       │SEARCHABLE:3,             PREFIX:null,│
+       │                                       │FIXED_PREC_SCALE:false,   PARAMS:null,│
+       │                                       │TYPE_NAME:TINYINT,      DATA_TYPE:-6],│
+       │                                       │[SUFFIX:null,    CASE_SENSITIVE:false,│
+       │                                       │RADIX:10,                  NULLABLE:1,│
+       │                                       │UNSIGNED_ATTRIBUTE:false, MINIMUM_SCAL│
+       │                                       │E:0, PRECISION:19, SQL_DATETIME_SUB:0,│
+       │                                       │AUTO_INCREMENT:false, MAXIMUM_SCALE:0,│
+       │                                       │SEARCHABLE:3,             PREFIX:null,│
+       │                                       │FIXED_PREC_SCALE:false,   PARAMS:null,│
+       │                                       │TYPE_NAME:BIGINT,       DATA_TYPE:-5],│
+       │                                       │[SUFFIX:null,    CASE_SENSITIVE:false,│
+       │                                       │RADIX:10,                  NULLABLE:1,│
+       │                                       │UNSIGNED_ATTRIBUTE:false, MINIMUM_SCAL│
+       │                                       │E:0, PRECISION:19, SQL_DATETIME_SUB:0,│
+       │                                       │AUTO_INCREMENT:true,  MAXIMUM_SCALE:0,│
+       │                                       │SEARCHABLE:3,             PREFIX:null,│
+       │                                       │FIXED_PREC_SCALE:false,   PARAMS:null,│
+       │                                       │TYPE_NAME:IDENTITY,     DATA_TYPE:-5],│
+       │                                       │[SUFFIX:',       CASE_SENSITIVE:false,│
+       │                                       │RADIX:null,                NULLABLE:1,│
+       │                                       │UNSIGNED_ATTRIBUTE:false, MINIMUM_SCAL│
+       │                                       │E:0,             PRECISION:2147483647,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:',      FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:LENGTH, TYPE_NAME:LONGVARBINARY│
+       │                                       │,      DATA_TYPE:-4],       [SUFFIX:',│
+       │                                       │CASE_SENSITIVE:false,      RADIX:null,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0, PRECISION:2147483647,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:',      FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:LENGTH,    TYPE_NAME:VARBINARY,│
+       │                                       │DATA_TYPE:-3],              [SUFFIX:',│
+       │                                       │CASE_SENSITIVE:false,      RADIX:null,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0, PRECISION:2147483647,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:',      FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:LENGTH,       TYPE_NAME:BINARY,│
+       │                                       │DATA_TYPE:-2],              [SUFFIX:',│
+       │                                       │CASE_SENSITIVE:false,      RADIX:null,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0, PRECISION:2147483647,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:',      FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:LENGTH,         TYPE_NAME:UUID,│
+       │                                       │DATA_TYPE:-2],              [SUFFIX:',│
+       │                                       │CASE_SENSITIVE:true,       RADIX:null,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0, PRECISION:2147483647,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:',      FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:LENGTH,  TYPE_NAME:LONGVARCHAR,│
+       │                                       │DATA_TYPE:-1],              [SUFFIX:',│
+       │                                       │CASE_SENSITIVE:true,       RADIX:null,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0, PRECISION:2147483647,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:',      FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:LENGTH,         TYPE_NAME:CHAR,│
+       │                                       │DATA_TYPE:1],            [SUFFIX:null,│
+       │                                       │CASE_SENSITIVE:false,        RADIX:10,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0, PRECISION:2147483647,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:null,   FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:PRECISION,SCALE, TYPE_NAME:NUME│
+       │                                       │RIC,    DATA_TYPE:2],    [SUFFIX:null,│
+       │                                       │CASE_SENSITIVE:false,        RADIX:10,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0, PRECISION:2147483647,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:null,   FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:PRECISION,SCALE, TYPE_NAME:DECI│
+       │                                       │MAL,    DATA_TYPE:3],    [SUFFIX:null,│
+       │                                       │CASE_SENSITIVE:false,        RADIX:10,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0,         PRECISION:10,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:null,   FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:null,        TYPE_NAME:INTEGER,│
+       │                                       │DATA_TYPE:4],            [SUFFIX:null,│
+       │                                       │CASE_SENSITIVE:false,        RADIX:10,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0,         PRECISION:10,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:tru│
+       │                                       │e,   MAXIMUM_SCALE:0,    SEARCHABLE:3,│
+       │                                       │PREFIX:null,   FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:null,         TYPE_NAME:SERIAL,│
+       │                                       │DATA_TYPE:4],            [SUFFIX:null,│
+       │                                       │CASE_SENSITIVE:false,        RADIX:10,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0,          PRECISION:5,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:null,   FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:null,       TYPE_NAME:SMALLINT,│
+       │                                       │DATA_TYPE:5],            [SUFFIX:null,│
+       │                                       │CASE_SENSITIVE:false,        RADIX:10,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0,         PRECISION:17,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:null,   FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:null,          TYPE_NAME:FLOAT,│
+       │                                       │DATA_TYPE:6],            [SUFFIX:null,│
+       │                                       │CASE_SENSITIVE:false,        RADIX:10,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0,          PRECISION:7,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:null,   FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:null,           TYPE_NAME:REAL,│
+       │                                       │DATA_TYPE:7],            [SUFFIX:null,│
+       │                                       │CASE_SENSITIVE:false,        RADIX:10,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0,         PRECISION:17,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:null,   FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:null,         TYPE_NAME:DOUBLE,│
+       │                                       │DATA_TYPE:8],               [SUFFIX:',│
+       │                                       │CASE_SENSITIVE:true,       RADIX:null,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0, PRECISION:2147483647,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:',      FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:LENGTH,      TYPE_NAME:VARCHAR,│
+       │                                       │DATA_TYPE:12],              [SUFFIX:',│
+       │                                       │CASE_SENSITIVE:false,      RADIX:null,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0, PRECISION:2147483647,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:',      FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:LENGTH, TYPE_NAME:VARCHAR_IGNOR│
+       │                                       │ECASE,  DATA_TYPE:12],   [SUFFIX:null,│
+       │                                       │CASE_SENSITIVE:false,        RADIX:10,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0,          PRECISION:1,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:null,   FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:null,        TYPE_NAME:BOOLEAN,│
+       │                                       │DATA_TYPE:16],              [SUFFIX:',│
+       │                                       │CASE_SENSITIVE:false,      RADIX:null,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0,          PRECISION:8,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:DATE ', FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:null,           TYPE_NAME:DATE,│
+       │                                       │DATA_TYPE:91],              [SUFFIX:',│
+       │                                       │CASE_SENSITIVE:false,      RADIX:null,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0,          PRECISION:6,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:TIME ', FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:null,           TYPE_NAME:TIME,│
+       │                                       │DATA_TYPE:92],              [SUFFIX:',│
+       │                                       │CASE_SENSITIVE:false,      RADIX:null,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0,         PRECISION:23,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,  MAXIMUM_SCALE:10,   SEARCHABLE:3,│
+       │                                       │PREFIX:TIMESTAMP                    ',│
+       │                                       │FIXED_PREC_SCALE:false,   PARAMS:null,│
+       │                                       │TYPE_NAME:TIMESTAMP,    DATA_TYPE:93],│
+       │                                       │[SUFFIX:',       CASE_SENSITIVE:false,│
+       │                                       │RADIX:null,                NULLABLE:1,│
+       │                                       │UNSIGNED_ATTRIBUTE:false, MINIMUM_SCAL│
+       │                                       │E:0,             PRECISION:2147483647,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:',      FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:LENGTH,        TYPE_NAME:OTHER,│
+       │                                       │DATA_TYPE:1111],            [SUFFIX:',│
+       │                                       │CASE_SENSITIVE:false,      RADIX:null,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0, PRECISION:2147483647,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:',      FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:LENGTH,     TYPE_NAME:GEOMETRY,│
+       │                                       │DATA_TYPE:1111],            [SUFFIX:',│
+       │                                       │CASE_SENSITIVE:false,      RADIX:null,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0, PRECISION:2147483647,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:',      FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:LENGTH,         TYPE_NAME:ENUM,│
+       │                                       │DATA_TYPE:1111],           [SUFFIX:'),│
+       │                                       │CASE_SENSITIVE:false,      RADIX:null,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0,          PRECISION:0,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:(,      FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:null,          TYPE_NAME:ARRAY,│
+       │                                       │DATA_TYPE:2003],            [SUFFIX:',│
+       │                                       │CASE_SENSITIVE:true,       RADIX:null,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0, PRECISION:2147483647,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:',      FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:LENGTH,         TYPE_NAME:BLOB,│
+       │                                       │DATA_TYPE:2004],            [SUFFIX:',│
+       │                                       │CASE_SENSITIVE:true,       RADIX:null,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0, PRECISION:2147483647,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,   MAXIMUM_SCALE:0,   SEARCHABLE:3,│
+       │                                       │PREFIX:',      FIXED_PREC_SCALE:false,│
+       │                                       │PARAMS:LENGTH,         TYPE_NAME:CLOB,│
+       │                                       │DATA_TYPE:2005],            [SUFFIX:',│
+       │                                       │CASE_SENSITIVE:false,      RADIX:null,│
+       │                                       │NULLABLE:1,  UNSIGNED_ATTRIBUTE:false,│
+       │                                       │MINIMUM_SCALE:0,         PRECISION:30,│
+       │                                       │SQL_DATETIME_SUB:0, AUTO_INCREMENT:fal│
+       │                                       │se,  MAXIMUM_SCALE:10,   SEARCHABLE:3,│
+       │                                       │PREFIX:TIMESTAMP_TZ                 ',│
+       │                                       │FIXED_PREC_SCALE:false,   PARAMS:null,│
+       │                                       │TYPE_NAME:TIMESTAMP  WITH  TIME  ZONE,│
+       │                                       │DATA_TYPE:2014]]                      │
        │procedureTerm                          │procedure                             │
        │infoEnabled                            │false                                 │
        │stringFunctions                        │ASCII,BIT_LENGTH,LENGTH,OCTET_LENGTH,C│
@@ -200,9 +449,7 @@ class CliApplicationITest {
        │maxStatements                          │0                                     │
        │SQLKeywords                            │LIMIT,MINUS,ROWNUM,SYSDATE,SYSTIME,SYS│
        │                                       │TIMESTAMP,TODAY                       │
-       │catalogs                               │rs14:                                 │
-       │                                       │org.h2.result.LocalResult@51          │
-       │                                       │929ae columns: 1 rows: 1 pos: -1      │
+       │catalogs                               │[[CATALOG_NAME:TEST]]                 │
        │databaseProductVersion                 │1.4.196 (2017-06-10)                  │
        │resultSetHoldability                   │2                                     │
        │JDBCMinorVersion                       │0                                     │

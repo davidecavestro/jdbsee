@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory
 import javax.inject.Inject
 import java.sql.Connection
 import java.sql.DatabaseMetaData
+import java.sql.ResultSet
+import java.sql.ResultSetMetaData
 
 import static DescribeCommand.*
 
@@ -35,9 +37,17 @@ class DescribeCommandService extends AbstractDbCommandService{
             props.each { k, v ->
               table.put(k, 'key', k)
               def valueString = v.with {
-                it instanceof Iterable?it.collect {it as String}:it as String
+                switch (it) {
+                  case ResultSet:
+                    toString (it)
+                    break
+                  case Iterable:
+                    it.collect {it as String}
+                  default:
+                    it as String
+                }
               }
-              table.put(k, 'value', v as String)
+              table.put(k, 'value', valueString)
             }
           }
           consoleService.renderTable(table)
@@ -50,4 +60,24 @@ class DescribeCommandService extends AbstractDbCommandService{
     }
   }
 
+  String toString (final ResultSet resultSet) {
+    toList (resultSet) as String
+  }
+
+  List<Map<String,Object>> toList (final ResultSet resultSet) {
+    resultSet.with {
+      metaData.with {
+        List<Map<String, Object>> rows = new ArrayList<Map<String, Object>> ()
+        while (next ()) {
+          int colCount = columnCount
+          Map<String, Object> row = new HashMap<String, Object> (colCount)
+          for(int i = 1; i <= colCount; ++i){
+            row[getColumnName(i)] = getObject(i)
+          }
+          rows << row
+        }
+        return rows
+      }
+    }
+  }
 }
