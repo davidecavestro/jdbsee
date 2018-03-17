@@ -21,7 +21,7 @@ class RunCommand extends AbstractDbCommand {
   @Option(names = ["-h", "--help"], usageHelp = true, description = "display this help message")
   boolean help
 
-  @Parameters(index = "0..*", paramLabel = "QUERY", description = "The SQL to run.")
+  @Parameters(arity = "0..1", index = "0..*", paramLabel = "QUERY", description = "The SQL to run.")
   String sqlText
 
 //  @Option(names = ["-f", "--file"], description = "File containing the query to run.")

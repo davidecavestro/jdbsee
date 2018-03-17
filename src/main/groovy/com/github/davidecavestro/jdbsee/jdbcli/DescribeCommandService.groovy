@@ -60,6 +60,54 @@ class DescribeCommandService extends AbstractDbCommandService{
     }
   }
 
+  void run (final DescribeViewsCommand cmd) {
+    describeTables (cmd, cmd.matches, 'VIEW')
+  }
+
+  void run (final DescribeTablesCommand cmd) {
+    describeTables (cmd, cmd.matches, 'TABLE')
+  }
+
+  void describeTables (final AbstractDbCommand cmd, final String matches, final String... types) {
+    Closure<Void> callback = { dataSource ->
+      Connection connection = dataSource.getConnection()
+      try {
+
+        final Table table = connection.metaData.getTables(null, null, matches, types).with {
+          List<Map<String,Object>> rows = []
+          def header = [key: 'header', catalog:'CATALOG', schema:'SCHEMA', name:'NAME']
+          rows << header
+          def count = 0
+          while (next()) {
+            rows << [
+                key: count++ as String,
+                catalog: getObject(1),
+                schema: getObject(2),
+                name: getObject(3)
+            ]
+          }
+          final Table table = ArrayTable.create(rows.collect {it.key}, header.keySet()-'key')
+          if (rows) {
+            rows.each {row->
+              row.each {k,v->
+                if (k!='key') {
+                  table.put(row.key, k, v?:'-' as String)
+                }
+              }
+            }
+          }
+          return table
+        }
+
+        consoleService.renderTable(table)
+      } finally {
+        connection.close()
+      }
+    }
+
+    doRun (cmd, callback)
+  }
+
   String toString (final ResultSet resultSet) {
     toList (resultSet) as String
   }

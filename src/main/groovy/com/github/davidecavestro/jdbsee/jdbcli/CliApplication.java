@@ -21,13 +21,19 @@ public class CliApplication implements Runnable {
   }
 
   public static void main(final String[] args) {
+    multiCmd(new String[][] {args});
+  }
+
+  public static void multiCmd(final String[][] multiArgs) {
     Thread.currentThread().setContextClassLoader(MiscTools.addToClasspath());
     DaggerAppComponent.Builder builder = DaggerAppComponent.builder ();
     final AppComponent appComponent = builder.build ();
     final MainCommand mainCommand = appComponent.getMainCommand ();
     final IFactory daggerFactory = new AppIFactory (appComponent);
     CommandLine commandLine = new CommandLine (mainCommand, daggerFactory);
-    commandLine.parseWithHandler(new RunLast(), System.err, args);
+    for (final String[] args : multiArgs) {
+      commandLine.parseWithHandler(new RunLast(), System.err, args);
+    }
   }
 
 }
@@ -85,7 +91,6 @@ interface AppComponent {
   void inject (DescribeCommand command);
   void inject (DescribeCommand.DescribeTablesCommand command);
   void inject (DescribeCommand.DescribeViewsCommand command);
-  void inject (DescribeCommand.DescribeFullCommand command);
   void inject (DescribeCommand.DescribeDriverCommand command);
   void inject (DescribeCommand.HelpCommand command);
 

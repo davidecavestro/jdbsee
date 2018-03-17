@@ -22,26 +22,22 @@ class RunCommandService extends AbstractDbCommandService{
 
   void run (final RunCommand runCommand) {
     runCommand.with {
-      if (sqlText != null) {//use the passed query
-        String[] sqlArray = getSqlArray(runCommand)
+      String[] sqlArray = getSqlArray(runCommand)
 
-        Closure<Void> queryCall = {dataSource->
-          final QueryCallback<Void, Exception> callback = { Query query ->
-            try {
-              consoleService.renderResultSet(query, outputType, outputFile)
-            } catch (final SQLException e) {
-              throw new RuntimeException(e)
-            }
-            return null
+      Closure<Void> queryCall = {dataSource->
+        final QueryCallback<Void, Exception> callback = { Query query ->
+          try {
+            consoleService.renderResultSet(query, outputType, outputFile)
+          } catch (final SQLException e) {
+            throw new RuntimeException(e)
           }
-
-          queryService.execute(dataSource, callback, sqlArray)
+          return null
         }
 
-        doRun (runCommand, queryCall)
-      } else {//FIXME
-//        consoleService.renderResultSet (queryService.execute (dataSource, sqlFile, callback));
+        queryService.execute(dataSource, callback, sqlArray)
       }
+
+      doRun (runCommand, queryCall)
     }
   }
 
@@ -51,7 +47,9 @@ class RunCommandService extends AbstractDbCommandService{
       if (execute) {
         sql.addAll execute
       }
-      sql.add sqlText
+      if (sqlText) {
+        sql.add sqlText
+      }
 
       return sql.toArray(new String[sql.size()])
     }

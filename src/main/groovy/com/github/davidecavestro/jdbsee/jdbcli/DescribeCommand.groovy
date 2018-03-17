@@ -9,7 +9,6 @@ import static picocli.CommandLine.*
     subcommands = [
         DescribeTablesCommand,
         DescribeViewsCommand,
-        DescribeFullCommand,
         DescribeDriverCommand,
         HelpCommand
     ]
@@ -28,27 +27,22 @@ class DescribeCommand implements Runnable {
   @Override
   void run() { CommandLine.usage(this, System.out) }
 
+
   @Command(name = "tables", description = "List all tables")
   static class DescribeTablesCommand extends AbstractDbCommand {
 
     @ParentCommand
     private DescribeCommand parentCommand
 
-    @Inject
-//dagger
+    @Parameters(index = "0", arity = "0..1", paramLabel = "PATTERN", description = "A table name pattern; when specified must match the table name as it is stored in the database.")
+    String matches
+
+    @Inject//dagger
     DescribeTablesCommand() {}
 
     @Override
     void run() {
-      //TODO implement
-//      parentCommand.service.doRun(this, (new ConnectionCallback<Void, SQLException>() {
-//        @Override
-//        Void withConnection(final Connection connection) throws SQLException {
-//
-//          return null
-//        }
-//      })
-//    }
+      parentCommand.service.run(this)
     }
   }
 
@@ -58,45 +52,15 @@ class DescribeCommand implements Runnable {
     @ParentCommand
     private DescribeCommand parentCommand
 
-    @Inject
-//dagger
+    @Parameters(index = "0", arity = "0..1", paramLabel = "PATTERN", description = "A table name pattern; when specified must match the table name as it is stored in the database.")
+    String matches
+
+    @Inject//dagger
     DescribeViewsCommand() {}
 
     @Override
     void run() {
-      //TODO implement
-//      parentCommand.service.execute(new ConnectionCallback<Void, SQLException>() {
-//        @Override
-//        Void withConnection(final Connection connection) throws SQLException {
-//
-//          return null
-//        }
-//      }
-//          )
-    }
-  }
-
-  @Command(name = "full", description = "Show available database metadata")
-  static class DescribeFullCommand extends AbstractDbCommand {
-
-    @ParentCommand
-    private DescribeCommand parentCommand
-
-    @Inject
-//dagger
-    DescribeFullCommand() {}
-
-    @Override
-    void run() {
-      //TODO implement
-//      parentCommand.service.execute(new ConnectionCallback<Void, SQLException>() {
-//        @Override
-//        Void withConnection(final Connection connection) throws SQLException {
-//
-//          return null
-//        }
-//      }
-//          )
+      parentCommand.service.run(this)
     }
   }
 

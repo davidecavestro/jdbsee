@@ -6,6 +6,7 @@ import static com.google.common.collect.Iterators.*;
 
 import com.google.common.collect.Streams;
 import de.vandermeer.asciitable.AsciiTable;
+import org.jdbi.v3.core.result.NoResultsException;
 import org.jdbi.v3.core.result.ResultSetScanner;
 import org.jdbi.v3.core.statement.StatementContext;
 
@@ -15,10 +16,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
@@ -33,38 +31,42 @@ public class AsciiTableResultSetScanner implements ResultSetScanner<Stream<Strin
 
   @Override
   public Stream<String> scanResultSet (final Supplier<ResultSet> supplier, final StatementContext ctx) throws SQLException {
-    final ResultSet resultSet = supplier.get ();
-    final AsciiTable asciiHeader = new AsciiTable ();
+    try {
+      final ResultSet resultSet = supplier.get();
+      final AsciiTable asciiHeader = new AsciiTable();
 
-    final ResultSetMetaData metaData = resultSet.getMetaData ();
-    final int columnCount = metaData.getColumnCount ();
-    asciiHeader.addRule ();// above header
-    final Collection<String> headers = new ArrayList<> ();
+      final ResultSetMetaData metaData = resultSet.getMetaData();
+      final int columnCount = metaData.getColumnCount();
+      asciiHeader.addRule();// above header
+      final Collection<String> headers = new ArrayList<>();
 
-    final AtomicInteger estimatedDisplaySize = new AtomicInteger (1);
-    for (int colPos = 1; colPos <= columnCount; colPos++) {
-      headers.add (metaData.getColumnLabel (colPos));
-      estimatedDisplaySize.addAndGet (metaData.getColumnDisplaySize (colPos) + 1);
+      final AtomicInteger estimatedDisplaySize = new AtomicInteger(1);
+      for (int colPos = 1; colPos <= columnCount; colPos++) {
+        headers.add(metaData.getColumnLabel(colPos));
+        estimatedDisplaySize.addAndGet(metaData.getColumnDisplaySize(colPos) + 1);
+      }
+      asciiHeader.addRow(headers); // header
+      asciiHeader.addRule(); // below header
+
+      return Streams.stream( // iterator -> strem
+          concat(            // flat
+              transform(       // render buffer
+                  concat(        // header + row*
+                      Arrays.asList(asciiHeader).iterator(),
+                      iterate(resultSet)
+                  ),
+                  new Function<AsciiTable, Iterator<String>>() {
+                    @Nullable
+                    @Override
+                    public Iterator<String> apply(@Nullable final AsciiTable input) {
+                      return input.renderAsCollection(Math.min(estimatedDisplaySize.get(), 80)).iterator();
+                    }
+                  })
+          )
+      );
+    } catch (final NoResultsException ex) {
+      return Streams.stream(Optional.empty());
     }
-    asciiHeader.addRow (headers); // header
-    asciiHeader.addRule (); // below header
-
-    return Streams.stream ( // iterator -> strem
-        concat (            // flat
-          transform (       // render buffer
-            concat (        // header + row*
-                Arrays.asList (asciiHeader).iterator (),
-              iterate (resultSet)
-            ),
-            new Function<AsciiTable, Iterator<String>> () {
-              @Nullable
-              @Override
-              public Iterator<String> apply (@Nullable final AsciiTable input) {
-                return input.renderAsCollection (Math.min (estimatedDisplaySize.get (), 80)).iterator ();
-              }
-            })
-        )
-    );
   }
 
   protected Iterator<AsciiTable> iterate (final ResultSet resultSet) throws SQLException {

@@ -188,23 +188,26 @@ public class ConsoleService {
 
     final int columnCount = table.columnKeySet().size();
     ascii.addRule ();// above header
-    final Collection<String> headers = new ArrayList<> ();
-
-    for (final String col : table.columnKeySet()) {
-      headers.add (col);
-    }
-    ascii.addRow (headers); // header
-    ascii.addRule (); // below header
+//    final Collection<String> headers = new ArrayList<> ();
+//
+//    for (final String col : table.columnKeySet()) {
+//      headers.add (col);
+//    }
+//    ascii.addRow (headers); // header
+//    ascii.addRule (); // below header
 
     try (final PrintWriter outWriter = getOutWriter(null)) {
       table.rowMap().forEach((String row, Map<String, String> colVal) -> {
         final List<String> rowVals = new ArrayList<>(columnCount);
         colVal.forEach((String col, String val) -> rowVals.add(val));
         ascii.addRow(rowVals);
+        ascii.addRule ();
       });
-      ascii.addRule (); // bottom line
 
-      ascii.renderAsIterator(80).forEachRemaining(outWriter::println);
+      ascii.renderAsIterator(80).forEachRemaining((String row)->{
+        outWriter.println (row);
+      });
+      outWriter.flush();
     }
   }
 }
