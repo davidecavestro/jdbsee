@@ -22,7 +22,7 @@ class JdbsDriverDaoSpec extends Specification {
 
         configService = new ConfigService(){
             @Override
-            File getConfigDir() {
+            File getUserDataDir() {
                 return tmpDataDir
             }
         }
@@ -39,8 +39,7 @@ class JdbsDriverDaoSpec extends Specification {
 
         SettingsService settingsService = new SettingsService(configService: configService)
         JdbsDriverDao driverDao = new JdbsDriverDao(
-            settingsService: settingsService,
-            configService: configService
+            settingsService: settingsService
         )
 
         when: "listing all drivers"
@@ -57,8 +56,7 @@ class JdbsDriverDaoSpec extends Specification {
 
         SettingsService settingsService = new SettingsService(configService: configService)
         JdbsDriverDao driverDao = new JdbsDriverDao(
-            settingsService: settingsService,
-            configService: configService
+            settingsService: settingsService
         )
 
         when: "inserting two drivers and listing all drivers"
@@ -87,8 +85,7 @@ class JdbsDriverDaoSpec extends Specification {
 
         SettingsService settingsService = new SettingsService(configService: configService)
         JdbsDriverDao driverDao = new JdbsDriverDao(
-            settingsService: settingsService,
-            configService: configService
+            settingsService: settingsService
         )
 
         when: "inserting two drivers and finding single drivers by name"
@@ -136,8 +133,7 @@ class JdbsDriverDaoSpec extends Specification {
 
         SettingsService settingsService = new SettingsService(configService: configService)
         JdbsDriverDao driverDao = new JdbsDriverDao(
-            settingsService: settingsService,
-            configService: configService
+            settingsService: settingsService
         )
 
         when: "inserting two drivers, removing one and finding drivers by name"
@@ -161,8 +157,7 @@ class JdbsDriverDaoSpec extends Specification {
 
         SettingsService settingsService = new SettingsService(configService: configService)
         JdbsDriverDao driverDao = new JdbsDriverDao(
-            settingsService: settingsService,
-            configService: configService
+            settingsService: settingsService
         )
 
         when: "creating a driver, adding jars and deps and finding the driver by id"
@@ -221,8 +216,7 @@ class JdbsDriverDaoSpec extends Specification {
 
         SettingsService settingsService = new SettingsService(configService: configService)
         JdbsDriverDao driverDao = new JdbsDriverDao(
-            settingsService: settingsService,
-            configService: configService
+            settingsService: settingsService
         )
         Long driverId  = driverDao.insert('h2', 'org.h2.Driver', null, [new File ('/fake/path/to/driver.jar')], ['com.h2database:h2:1.4.196'])
 

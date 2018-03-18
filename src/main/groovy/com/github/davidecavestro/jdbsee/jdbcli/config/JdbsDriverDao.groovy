@@ -1,6 +1,5 @@
 package com.github.davidecavestro.jdbsee.jdbcli.config
 
-import com.github.davidecavestro.jdbsee.jdbcli.ConfigService
 import com.github.davidecavestro.jdbsee.jdbcli.SettingsService
 import groovy.sql.BatchingPreparedStatementWrapper
 import groovy.sql.GroovyResultSet
@@ -14,16 +13,13 @@ import javax.inject.Inject
 class JdbsDriverDao {
 
   SettingsService settingsService
-  ConfigService configService
 
   JdbsDriverDao(){}
 
   @Inject
   JdbsDriverDao(
-      SettingsService settingsService,
-      ConfigService configService
+      SettingsService settingsService
   ){
-    this.configService = configService
     this.settingsService = settingsService
   }
 

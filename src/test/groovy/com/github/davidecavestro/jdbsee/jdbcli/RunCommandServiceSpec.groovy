@@ -21,7 +21,7 @@ class RunCommandServiceSpec extends Specification {
 
         configService = new ConfigService(){
             @Override
-            File getConfigDir() {
+            File getUserDataDir() {
                 return tmpDataDir
             }
         }

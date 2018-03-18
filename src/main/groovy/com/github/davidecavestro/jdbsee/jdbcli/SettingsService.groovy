@@ -42,7 +42,7 @@ class SettingsService {
   }
 
   protected File getDbFile () {
-    new File(configService.getDataDir(), dbFileName)
+    new File(configService.getUserDataDir(), dbFileName)
   }
 
   protected String getDbUrl () {

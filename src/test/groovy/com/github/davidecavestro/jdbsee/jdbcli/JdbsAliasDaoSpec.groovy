@@ -17,8 +17,7 @@ class JdbsAliasDaoSpec extends DaoSpec {
 
         SettingsService settingsService = new SettingsService(configService: configService)
         JdbsAliasDao aliasDao = new JdbsAliasDao(
-            settingsService: settingsService,
-            configService: configService
+            settingsService: settingsService
         )
 
         when: "listing all aliases"
@@ -35,12 +34,10 @@ class JdbsAliasDaoSpec extends DaoSpec {
 
         SettingsService settingsService = new SettingsService(configService: configService)
         JdbsDriverDao driverDao = new JdbsDriverDao(
-            settingsService: settingsService,
-            configService: configService
+            settingsService: settingsService
         )
         JdbsAliasDao aliasDao = new JdbsAliasDao(
             settingsService: settingsService,
-            configService: configService,
             driverDao: driverDao
         )
 
@@ -73,12 +70,10 @@ class JdbsAliasDaoSpec extends DaoSpec {
 
         SettingsService settingsService = new SettingsService(configService: configService)
         JdbsDriverDao driverDao = new JdbsDriverDao(
-            settingsService: settingsService,
-            configService: configService
+            settingsService: settingsService
         )
         JdbsAliasDao aliasDao = new JdbsAliasDao(
             settingsService: settingsService,
-            configService: configService,
             driverDao: driverDao
         )
 
@@ -124,12 +119,10 @@ class JdbsAliasDaoSpec extends DaoSpec {
 
         SettingsService settingsService = new SettingsService(configService: configService)
         JdbsDriverDao driverDao = new JdbsDriverDao(
-            settingsService: settingsService,
-            configService: configService
+            settingsService: settingsService
         )
         JdbsAliasDao aliasDao = new JdbsAliasDao(
             settingsService: settingsService,
-            configService: configService,
             driverDao: driverDao
         )
 

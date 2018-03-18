@@ -1,0 +1,261 @@
+= JDBSEE - CLI
+Davide Cavestro <https://github.com/davidecavestro[@davidecavestro]>
+// Settings:
+:idprefix:
+:idseparator: -
+ifndef::env-github[:icons: font]
+ifdef::env-github,env-browser[]
+:toc: macro
+:toclevels: 1
+endif::[]
+ifdef::env-github[]
+:branch: master
+:status:
+:outfilesuffix: .adoc
+:!toc-title:
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :paperclip:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+endif::[]
+// URIs:
+:uri-repo: https://github.com/davidecavestro/jdbsee
+:uri-issues: {uri-repo}/issues
+:uri-search-issues: {uri-repo}/search?type=Issues
+:uri-ci-travis: https://travis-ci.org/davidecavestro/jdbsee
+:uri-coverage-coveralls: https://coveralls.io/github/davidecavestro/jdbsee?branch=master
+:uri-twitter-jdbsee: https://twitter.com/intent/follow?screen_name=jdbsee
+:uri-twitter-davide: https://twitter.com/intent/follow?screen_name=davide_cavestro
+ifdef::status[]
+image:https://img.shields.io/github/license/davidecavestro/jdbsee.svg[Apache License 2.0, link=#copyright-and-license]
+image:https://img.shields.io/travis/davidecavestro/jdbsee/master.svg[Build Status (Travis CI), link={uri-ci-travis}]
+image:https://img.shields.io/coveralls/github/davidecavestro/jdbsee.svg[Coverage Status (Coveralls), link={uri-coverage-coveralls}]
+image:https://img.shields.io/twitter/follow/davide_cavestro.svg?style=social[Follow @davide_cavestro, link={uri-twitter-jdbsee}]
+image:https://img.shields.io/twitter/follow/jdbsee.svg?style=social[Follow @jdbsee, link={uri-twitter-jdbsee}]
+endif::[]
+
+A simple jdbc CLI tool
+
+toc::[]
+
+:imagesdir: docs/images
+
+This is the POC for a command line tool providing access to relational databases.
+
+
+# Project status
+
+The project has no official releases yet, though it is stable enough to run queries
+using drivers from local jars.
+
+# Features
+
+The set of available commands will expand.
+
+As of now only a subset of the `run` command features are implemented, that is
+executing queries on a database and export results in CSV, JSON or plain text tables.
+
+The JDBC drivers can be automatically downloaded or loaded local jars.
+
+
+# Usage
+
+
+Invoke the distributable binary passing appropriate commands and params
+
+image::jdbsee.Demo.png[Jdbsee help message]
+
+## `run` command
+
+```
+Usage: run [-h] [-c=<driverClassName>] [-m=<driverClassMatches>]
+           [-o=OUTPUT_FILE] [-p=<password>] [-t=OUTPUT_FORMAT] [-u=<username>]
+           [-d=<deps>]... [-j=<jars>]... [-x=<execute>]... URL QUERY
+      URL                     The JDBC url.
+      QUERY                   The SQL to run.
+  -c, --driver-class=<driverClassName>
+                              External driver class name (detected from URL if
+                                not specified)
+  -d, --dependency=<deps>     Maven artifact dependency to be resolved for
+                                driver class loading
+  -h, --help                  display this help message
+  -j, --jar=<jars>            External jar file to search for the driver classes
+  -m, --driver-class-match=<driverClassMatches>
+                              Regex used to detect driver class by name.
+                                Defaults to '(.*)Driver(.*)'
+  -o, --output-file=OUTPUT_FILE
+                              File to use for saving output
+  -p, --password=<password>   The password
+  -t, --output-format=OUTPUT_FORMAT
+                              Select output format. One between TABLE, CSV,
+                                JSON, JSON_PRETTY
+  -u, --user=<username>       The username
+  -x, --execute=<execute>     Additional SQL commands to be executed before the
+                                specified QUERY
+
+```
+
+
+### Loading JDBC drivers
+
+Before opening any connection to the database, the application needs to load the appropriate jdbc driver.
+
+In order to load the driver the application tries to:
+
+1. determine the driver class
+2. load it through a java classloader
+
+
+#### Determining the driver class name
+
+The application supports 3 ways to define the driver class to use:
+
+explicit by driver class name (`-c` switch)::
+pass the driver class FQN to explicitly load it
+
+explicit by regex (`-m` switch)::
+pass a regex for driver class FQN matching to limit the number of scanned classes
+
+implicit by url::
+the driver manager will try to detect which driver is compatible for the specified url
+
+
+
+#### Driver class loading strategies
+
+In order to load the jdbc driver, its code must be accessible through a jvm classloader.
+
+The application supports the following classloading strategies:
+
+automatically from the application classpath::
+
+works for bundled drivers, that are drivers distributed along with the application.
+Please note that the distribution of 3rd party libraries can lead to license issues
+
+
+from the `dropins` folder::
+
+copy the jar files with your jdbc drivers within he application distribution subfolder named `dropins`
+and their contents will be scanned
+
+
+downloading as dependency::
+
+passing the `-d` switch along with a maven dependency - with the usual _groupId:artifactId:version_ notation - it will
+be automatically downloaded and scanned for jdbc drivers
+
+
+from explicitly referenced jar files::
+
+passing the `-j` switch along with the path of a jar in the local filesystem it will be scanned for jdbc drivers
+
+
+### Output types
+
+The application supports multiple output formats:
+
+TABLE::
+rows formatted as a plain text table
+
+CSV::
+values separated by semicolons
+
+JSON, JSON_PRETTY::
+json in a raw or pretty printed flavor
+
+The data is written to the standard output, while informational messages are sent to the
+standard error, so that output data can be redirected to an output file.
+
+
+# Examples
+
+## Automatic downloading drivers
+
+Use the `-d` switch to automatically download drivers
+```
+./bin/jdbsee run -u postgres -p postgres \
+  -d "org.postgresql:postgresql:42.2.1" \
+  "jdbc:postgresql://localhost:5432/test" \
+  "SELECT * FROM contacts;"
+```
+
+
+
+## Loading drivers from external jars
+
+Use the `-j` switch to load drivers from filesystem
+```
+./bin/jdbsee run -u postgres -p postgres \
+  -j "/path/to/postgresql.jar" \
+  "jdbc:postgresql://localhost:5432/test" \
+  "SELECT * FROM contacts;"
+```
+
+## Loading drivers from the `dropins` subfolder
+
+Copy your jdbc driver jars into the app distribution under the `dropins` folder, and they will be scanned for jdbc
+drivers
+
+```
+./bin/jdbsee run -u postgres -p postgres \
+  "jdbc:postgresql://localhost:5432/test" \
+  "SELECT * FROM contacts;"
+```
+
+
+# How to build
+
+The build system supports producing the distribution of the application both with or
+without drivers.
+
+The _main_ distribution comes without drivers, while the _full_ provides
+drivers within the `dropins` folder.
+
+The following command generates both _main_ and _full_ distribution archives
+
+```
+./gradlew fullDistTar fullDistZip distTar distZip
+```
+
+the generated archives are located into the `build/distributions` subfolder
+
+```
+build/distributions/
+├── jdbsee-0.0.1-SNAPSHOT.tar
+├── jdbsee-0.0.1-SNAPSHOT.zip
+├── jdbsee-full-0.0.1-SNAPSHOT.tar
+└── jdbsee-full-0.0.1-SNAPSHOT.zip
+
+```
+
+Follows an example on how to build with drivers (full distribution) and launch some queries on an in-memory h2 db
+
+```
+./gradlew installFullDist && \
+./build/install/jdbsee-full/bin/jdbsee run \
+-x "create table contacts (id int primary key, name varchar(100));" \
+-x "insert into contacts (id, name) values (1, 'Alice');" \
+-x "insert into contacts (id, name) values (2, 'Bob');" \
+-x "insert into contacts (id, name) values (3, 'John');" \
+-x "insert into contacts (id, name) values (4, 'Daisy');" \
+"jdbc:h2:mem:test" \
+"SELECT * FROM contacts;"
+```
+
+you should get
+
+```
+┌───────────────────────────────────────┬──────────────────────────────────────┐
+│ID                                     │NAME                                  │
+├───────────────────────────────────────┼──────────────────────────────────────┤
+│1                                      │Alice                                 │
+├───────────────────────────────────────┼──────────────────────────────────────┤
+│2                                      │Bob                                   │
+├───────────────────────────────────────┼──────────────────────────────────────┤
+│3                                      │John                                  │
+├───────────────────────────────────────┼──────────────────────────────────────┤
+│4                                      │Daisy                                 │
+└───────────────────────────────────────┴──────────────────────────────────────┘
+
+```

@@ -54,10 +54,11 @@ abstract class AbstractDbCommandService {
       if (jars) {
         alljars.addAll(jars)
       }
-      def dropinsDir = configService.getDropinsDir()
-      LOG.debug('Looking for dropins at {}', dropinsDir)
-      if (dropinsDir && dropinsDir.exists()) {
-        alljars.addAll(dropinsDir.listFiles({ dir, name -> name.toLowerCase().endsWith('.jar') } as FilenameFilter))
+      configService.getDropinsDirs().each {File dropinsDir->
+        LOG.debug('Looking for dropins at {}', dropinsDir)
+        if (dropinsDir && dropinsDir.exists()) {
+          alljars.addAll(dropinsDir.listFiles({ dir, name -> name.toLowerCase().endsWith('.jar') } as FilenameFilter))
+        }
       }
       alljars.flatten()
       if (alljars || deps) {

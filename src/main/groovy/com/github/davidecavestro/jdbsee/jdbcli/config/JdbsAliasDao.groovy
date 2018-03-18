@@ -1,8 +1,6 @@
 package com.github.davidecavestro.jdbsee.jdbcli.config
 
-import com.github.davidecavestro.jdbsee.jdbcli.ConfigService
 import com.github.davidecavestro.jdbsee.jdbcli.SettingsService
-import groovy.sql.GroovyResultSet
 import groovy.sql.GroovyRowResult
 import groovy.sql.Sql
 import groovy.transform.CompileStatic
@@ -13,7 +11,6 @@ import javax.inject.Inject
 class JdbsAliasDao {
 
   SettingsService settingsService
-  ConfigService configService
   JdbsDriverDao driverDao
 
   JdbsAliasDao(){}
@@ -21,10 +18,8 @@ class JdbsAliasDao {
   @Inject
   JdbsAliasDao(
       SettingsService settingsService,
-      ConfigService configService,
       JdbsDriverDao driverDao
   ){
-    this.configService = configService
     this.settingsService = settingsService
     this.driverDao = driverDao
   }
