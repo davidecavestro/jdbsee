@@ -65,7 +65,8 @@ public class AsciiTableResultSetScanner implements ResultSetScanner<Stream<Strin
                   @Nullable
                   @Override
                   public Iterator<String> apply(@Nullable final AsciiTable input) {
-                    return input.renderAsCollection(Math.min(estimatedDisplaySize.get(), 80)).iterator();
+//                    return input.renderAsCollection(Math.min(estimatedDisplaySize.get(), 80)).iterator();
+                    return input.renderAsCollection(80).iterator();
                   }
                 })
         )
