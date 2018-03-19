@@ -75,7 +75,7 @@ class DescribeCommandService extends AbstractDbCommandService{
                 table.put(k, 'value', valueString)
               }
             }
-            consoleService.renderTable(table)
+            consoleService.renderTable(table, cmd.width)
           }
         } finally {
           connection.close()
@@ -125,7 +125,7 @@ class DescribeCommandService extends AbstractDbCommandService{
           return table
         }
 
-        consoleService.renderTable(table, cmd.width)
+        consoleService.renderTable(table, 80)
       } finally {
         connection.close()
       }
