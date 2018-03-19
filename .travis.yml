@@ -1,7 +1,15 @@
 language: java
-
 jdk:
-  - oraclejdk8
-
+- oraclejdk8
 after_success:
-- ./gradlew jacocoTestReport coveralls
+- "./gradlew jacocoTestReport coveralls"
+deploy:
+  provider: releases
+  api_key:
+    secure: FrC+uSaRsw0RZtnLfL4fQnLLOPk/uvK+88RBct3nwDErQru+fQoP4/x38kLDxa0b2muTORMx+1ZER04/QmMrolcCfZch0cS4iUZ0W74OeLf76tW68GJ9c34gw5VrJkAANvgpNynEriCpZHRwK/C5leBczf+45Ke5eR1Ds1/iGBdQN6oC4Us5OdhwwgP9iWWlQKVeMd5o8aVeAhzEStzmY+kcoSv1q3Pdbs+yXllTCdrA9ngiGZp80krCcl+7F0uo4j5SuErH5xxx00aYCbqe3Bg4zGD5mkUAG+dR4XPBtw6xw0QJRJ9LhoAI+AIebfQqyZiMJmt6s54XxVqbapK0Lod5fN/SY/0XbAUdN9YzfArRoEOLDBxf+I3FEqCIlBd65DeW4Eaqko9Wy5TnD53B3cn5bANbAZiqiB9XuEpOZAHEUmsaZQf5NEvXSch5NV8JUpX8NPC6/lhe7UoRpvKnNrqfWl/ZfKnM5Mp+VWWybNOD8kEDiqTNQ6OFoXKISNnhCScLyhINNoXntwWG59xGqCZbNPPfQRIl/TJcH5qflP1bmmxipNEqlRKKzzzcZUOlJpyuU9V6sBGAF1tYoLpd0GkWbcJ+Y4GvJltcPS04wsiZEIfcn66kLCCu/AHNQ/hSfAO4Eq60QFwwIVL58ssJS2Q4Oz3Nr+EK6m78gEQWHXw=
+  file_glob: true
+  file: build/distributions/*
+  skip_cleanup: true
+  on:
+    tags: true
+    repo: davidecavestro/jdbsee

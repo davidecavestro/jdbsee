@@ -14,14 +14,16 @@ plugins {
   // see plugin: https://docs.gradle.org/current/userguide/buildDashboard_plugin.html
   id 'build-dashboard'
   id 'com.github.kt3k.coveralls' version '2.6.3'
+  id 'pl.allegro.tech.build.axion-release' version '1.9.0'
 }
+
 
 //apply plugin: 'java'
 //apply plugin: 'application'
 //
 
 group = 'com.github.davidecavestro.jdbsee'
-version = '0.0.1-SNAPSHOT'
+project.version = scmVersion.version
 
 mainClassName = 'com.github.davidecavestro.jdbsee.jdbcli.CliApplication'
 
