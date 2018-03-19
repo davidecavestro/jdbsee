@@ -183,7 +183,20 @@ public class ConsoleService {
     }
   }
 
-  public void renderTable (final Table<String,String,String> table) throws IOException {
+  public void printResultSet (final ResultSet resultSet) throws SQLException, IOException {
+    renderStream(ascii.printResultSet(resultSet));
+  }
+
+  protected void renderStream (final Stream<String> stream) throws IOException {
+    try (final PrintWriter outWriter = getOutWriter(null)) {
+      stream.forEach((String row)->{
+        outWriter.println (row);
+      });
+      outWriter.flush();
+    }
+  }
+
+  public void renderTable (final Table<String,String,String> table, final int width) throws IOException {
     final AsciiTable ascii = new AsciiTable ();
 
     final int columnCount = table.columnKeySet().size();
@@ -204,7 +217,7 @@ public class ConsoleService {
         ascii.addRule ();
       });
 
-      ascii.renderAsIterator(80).forEachRemaining((String row)->{
+      ascii.renderAsIterator(width).forEachRemaining((String row)->{
         outWriter.println (row);
       });
       outWriter.flush();

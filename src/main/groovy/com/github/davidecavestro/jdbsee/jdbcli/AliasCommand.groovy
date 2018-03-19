@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 import static picocli.CommandLine.*
 
-@Command(name = "alias", description = "Provides persistent settings db configuration",
+@Command(name = "alias", description = "Provides persistent settings for db connections",
     subcommands = [
         AliasCreateCommand, AliasDeleteCommand,
         AliasListCommand, AliasShowCommand,

@@ -70,6 +70,12 @@ class DescribeCommand implements Runnable {
     @ParentCommand
     DescribeCommand parentCommand
 
+    @Parameters(index = "0", arity = "0..1", paramLabel = "PATTERN", description = "A property name pattern; when specified must match the proeprty name as it is exposed by the database metadata.")
+    String matches
+
+    @Option(names = ["-w", "--output-width"], description = "Output table width")
+    int width = 80
+
     @Inject//dagger
     DescribeDriverCommand() {}
 

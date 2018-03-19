@@ -32,25 +32,51 @@ class DescribeCommandService extends AbstractDbCommandService{
         Connection connection = dataSource.getConnection()
         try {
           DatabaseMetaData dbMeta = connection.metaData
-          Table table = ArrayTable.create(dbMeta.properties.keySet(), ['key', 'value'])
-          dbMeta.properties.with { props ->
-            props.each { k, v ->
-              table.put(k, 'key', k)
-              def valueString = v.with {
-                switch (it) {
-                  case ResultSet:
-                    toString (it)
-                    break
-                  case Iterable:
-                    it.collect {it as String}
-                  default:
-                    it as String
-                }
+          if (cmd.matches) {
+            if (dbMeta.properties.containsKey(cmd.matches)) {//property matches
+              def propValue = dbMeta.properties[cmd.matches]
+              switch (propValue) {
+                case ResultSet:
+                  consoleService.printResultSet(propValue)
+                  break
+                case Iterable:
+                  Table table = ArrayTable.create([cmd.matches], ['Property', 'Value'])
+                  table.put(cmd.matches, 'Property', cmd.matches)
+                  table.put(cmd.matches, 'Value', propValue.collect { it as String })
+
+                  consoleService.renderTable(table, cmd.width)
+                  break
+                default:
+                  Table table = ArrayTable.create([cmd.matches], ['Property', 'Value'])
+                  table.put(cmd.matches, 'Property', cmd.matches)
+                  table.put(cmd.matches, 'Value', propValue as String)
+
+                  consoleService.renderTable(table, cmd.width)
               }
-              table.put(k, 'value', valueString)
+
             }
+          } else {
+            Table table = ArrayTable.create(dbMeta.properties.keySet(), ['key', 'value'])
+            dbMeta.properties.with { props ->
+              props.each { k, v ->
+                table.put(k, 'key', k)
+                def valueString = v.with {
+                  switch (it) {
+                    case ResultSet:
+                      toString(it)
+                      break
+                    case Iterable:
+                      it.collect { it as String }
+                      break
+                    default:
+                      it as String
+                  }
+                }
+                table.put(k, 'value', valueString)
+              }
+            }
+            consoleService.renderTable(table)
           }
-          consoleService.renderTable(table)
         } finally {
           connection.close()
         }
@@ -99,7 +125,7 @@ class DescribeCommandService extends AbstractDbCommandService{
           return table
         }
 
-        consoleService.renderTable(table)
+        consoleService.renderTable(table, cmd.width)
       } finally {
         connection.close()
       }
