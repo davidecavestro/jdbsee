@@ -35,20 +35,14 @@ image:https://img.shields.io/twitter/follow/davide_cavestro.svg?style=social[Fol
 image:https://img.shields.io/twitter/follow/jdbsee.svg?style=social[Follow @jdbsee, link={uri-twitter-jdbsee}]
 endif::[]
 
-A simple jdbc CLI tool
+A minimalistic jdbc CLI tool
 
 toc::[]
 
 :imagesdir: docs/images
 
-This is the POC for a command line tool providing access to relational
-databases.
+Jdbsee CLI is a command line tool for databases operations over JDBC.
 
-
-# Project status
-
-The project has no official releases yet, though it is stable enough
-to run queries using drivers from local jars.
 
 # Features
 
@@ -60,13 +54,15 @@ for later reuse.
 
 The JDBC drivers can be automatically downloaded or loaded local jars.
 
+For more info please see the link:docs/index.adoc[documentation].
+
 
 # Usage
 
 
 Invoke the distributable binary passing appropriate commands and params
 
-image::jdbsee.Demo.png[Jdbsee help message]
+image::jdbsee_zsh.png[Jdbsee help message]
 
 
 # Examples
