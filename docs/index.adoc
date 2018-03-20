@@ -159,9 +159,11 @@ lead to license issues.
 
 from the `dropins` folder::
 
-copy the jar files with your jdbc drivers within the application
-distribution subfolder named `dropins` and their contents
-will be scanned.
+copy the jar files with your jdbc drivers within the `dropins`
+folder and their contents will be scanned. +
+The folders scanned for additional jars are the application
+distribution subfolder named `dropins` and the `${HOME}/.jdbsee/dropins`
+folder (within user home).
 
 
 downloading as dependency::
