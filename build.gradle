@@ -14,7 +14,9 @@ plugins {
   // see plugin: https://docs.gradle.org/current/userguide/buildDashboard_plugin.html
   id 'build-dashboard'
   id 'com.github.kt3k.coveralls' version '2.6.3'
+
   id 'pl.allegro.tech.build.axion-release' version '1.9.0'
+  id "nebula.ospackage" version "4.8.0"
 }
 
 
@@ -26,6 +28,7 @@ group = 'com.github.davidecavestro.jdbsee'
 project.version = scmVersion.version
 
 mainClassName = 'com.github.davidecavestro.jdbsee.jdbcli.CliApplication'
+description = 'A minimalistic CLI for jdbc operations'
 
 repositories {
   mavenCentral()
@@ -157,6 +160,20 @@ startScripts.with {
     windowsScript.text = windowsScript.text.replaceFirst('(?<=DEFAULT_JVM_OPTS=)(.*)(?=\r\n)',
         '$1 "-Dtcproxy.config.url=file:%~dp0../conf/proxy.properties"')
   }
+}
+
+
+task distDeb(type: Deb, dependsOn: 'assembleDist') {
+  group = "Distribution"
+  description = "Prepare package for Debian an derivatives"
+  packageName = 'jdbsee'
+  release = 1
+
+  into '/usr/share/jdbsee'
+
+  with project.distributions.main.getContents()
+
+  link('/usr/bin/jdbsee', '/usr/share/jdbsee/bin/jdbsee')
 }
 
 jacocoTestReport {
