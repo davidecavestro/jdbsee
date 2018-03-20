@@ -62,7 +62,7 @@ For more info please see the link:docs/index.adoc[documentation].
 
 Invoke the distributable binary passing appropriate commands and params
 
-image::jdbsee_zsh.png[Jdbsee help message]
+image::jdbsee.Demo.png[Jdbsee help message]
 
 
 # Examples

@@ -2,7 +2,7 @@
 A jdbc CLI tool
 toc::[]
 
-:imagesdir: docs/images
+:imagesdir: images
 
 
 # Introduction
@@ -64,7 +64,7 @@ Provides info about database and jdbc driver
 
 Invoke the distributable binary passing appropriate commands and params
 
-image::jdbsee.Demo.png[Jdbsee help message]
+image::jdbsee_zsh.png[Jdbsee help message]
 
 
 ## `run` command
