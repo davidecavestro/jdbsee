@@ -50,8 +50,7 @@ Jdbsee CLI supports executing SQL queries from command line and
 exporting retrieved data.
 
 Database connection settings and related credentials can be persisted
-for later reuse.
-
+for later reuse. +
 The JDBC drivers can be automatically downloaded or loaded local jars.
 
 For more info please see the link:docs/index.adoc[documentation].
