@@ -23,7 +23,8 @@ import javax.inject.Inject;
     },
     optionListHeading = "\n@|bold OPTIONS|@\n",
     commandListHeading= "\n@|bold COMMANDS|@\n",
-    subcommands = {RunCommand.class, DriverCommand.class, AliasCommand.class, DescribeCommand.class})
+    subcommands = {RunCommand.class, DriverCommand.class, AliasCommand.class, DescribeCommand.class},
+    versionProvider = PropertiesVersionProvider.class)
 public class MainCommand implements Runnable {
   @Option(names = {"-V", "--version"}, versionHelp = true, description = "Print version info")
   boolean versionRequested;

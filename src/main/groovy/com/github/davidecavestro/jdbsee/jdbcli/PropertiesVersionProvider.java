@@ -4,10 +4,16 @@ import java.net.URL;
 import java.util.Properties;
 import picocli.CommandLine.IVersionProvider;
 
+import javax.inject.Inject;
+
 /**
  * Provides version info from resource "/version.txt" within the jar.
  */
 public class PropertiesVersionProvider implements IVersionProvider {
+
+  @Inject
+  public PropertiesVersionProvider(){}
+
   public String[] getVersion() throws Exception {
     final URL url = getClass().getResource("/version.txt");
     if (url == null) {

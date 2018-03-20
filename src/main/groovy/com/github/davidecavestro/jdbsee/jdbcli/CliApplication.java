@@ -10,11 +10,7 @@ import javax.inject.Singleton;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-@Command(versionProvider = PropertiesVersionProvider.class)
 public class CliApplication implements Runnable {
-
-  @Option(names = {"-V", "--version"}, versionHelp = true, description = "Print version info and exit")
-  boolean versionRequested;
 
   public void run() {
     CommandLine.usage(this, System.err);
@@ -70,6 +66,8 @@ class AppIFactory implements IFactory {
 @Component(modules = { AppModule.class})
 interface AppComponent {
   MainCommand getMainCommand();
+  void inject (PropertiesVersionProvider versionProvider);
+
   void inject (DriverCommand command);
   void inject (DriverCommand.DriverCreateCommand command);
   void inject (DriverCommand.DriverDeleteCommand command);
