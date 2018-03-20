@@ -1,6 +1,8 @@
 package com.github.davidecavestro.jdbsee.jdbcli
 
 import com.github.davidecavestro.jdbsee.jdbcli.config.JdbsAliasDao
+import com.github.davidecavestro.jdbsee.jdbcli.config.JdbsDep
+import com.github.davidecavestro.jdbsee.jdbcli.config.JdbsJar
 import org.jboss.shrinkwrap.resolver.api.maven.Maven
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -54,6 +56,21 @@ abstract class AbstractDbCommandService {
       if (jars) {
         alljars.addAll(jars)
       }
+      def alldeps = []
+      if (deps) {
+        alldeps.addAll(deps)
+      }
+
+      if (aliasDetails) {
+        //consider alias deps and jars for resolution
+        aliasDetails.driverDetails?.jars?.each { JdbsJar jar->
+          alljars << jar.file
+        }
+        aliasDetails.driverDetails?.deps?.each { JdbsDep dep->
+          alldeps << dep.gav
+        }
+      }
+
       configService.getDropinsDirs().each {File dropinsDir->
         LOG.debug('Looking for dropins at {}', dropinsDir)
         if (dropinsDir && dropinsDir.exists()) {
@@ -61,9 +78,9 @@ abstract class AbstractDbCommandService {
         }
       }
       alljars.flatten()
-      if (alljars || deps) {
-        LOG.debug('Loading jars {} and deps {}', alljars, deps)
-        withDynamicDataSource(_driverClassName(), _driverClassMatches(), alljars, deps, createDataSource, dbCallback)
+      if (alljars || alldeps) {
+        LOG.debug('Loading jars {} and deps {}', alljars, alldeps)
+        withDynamicDataSource(_driverClassName(), _driverClassMatches(), alljars, alldeps, createDataSource, dbCallback)
       } else {//no additional jars or deps... assume the driver manager is able to find the driver
         dbCallback(new DriverManagerDataSource(
             url: _url(),
