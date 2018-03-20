@@ -68,6 +68,8 @@ interface AppComponent {
   MainCommand getMainCommand();
   void inject (PropertiesVersionProvider versionProvider);
 
+  void inject (MainCommand.HelpCommand command);
+
   void inject (DriverCommand command);
   void inject (DriverCommand.DriverCreateCommand command);
   void inject (DriverCommand.DriverDeleteCommand command);
