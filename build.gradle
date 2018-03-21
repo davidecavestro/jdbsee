@@ -163,7 +163,7 @@ startScripts.with {
 }
 
 
-task distDeb(type: Deb, dependsOn: 'assembleDist') {
+ospackage {
   group = "Distribution"
   description = "Prepare package for Debian an derivatives"
   packageName = 'jdbsee'
@@ -175,6 +175,9 @@ task distDeb(type: Deb, dependsOn: 'assembleDist') {
 
   link('/usr/bin/jdbsee', '/usr/share/jdbsee/bin/jdbsee')
 }
+
+tasks.buildDeb.dependsOn 'assembleDist'
+tasks.buildRpm.dependsOn 'assembleDist'
 
 jacocoTestReport {
     reports {
