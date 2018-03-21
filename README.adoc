@@ -40,6 +40,7 @@ A minimalistic jdbc CLI tool
 toc::[]
 
 :imagesdir: docs/images
+:icons: font
 
 Jdbsee CLI is a command line tool for databases operations over JDBC.
 
@@ -116,28 +117,33 @@ The following command generates both _main_ and _full_ distribution archives
 
 the generated archives are located into the `build/distributions` subfolder
 
-```
+----
 build/distributions/
-├── jdbsee-0.0.1-SNAPSHOT.tar
-├── jdbsee-0.0.1-SNAPSHOT.zip
-├── jdbsee-full-0.0.1-SNAPSHOT.tar
-└── jdbsee-full-0.0.1-SNAPSHOT.zip
-
-```
+├── jdbsee-x.y.z-SNAPSHOT.tar
+├── jdbsee-x.y.z-SNAPSHOT.zip
+├── jdbsee-full-x.y.z-SNAPSHOT.tar
+└── jdbsee-full-x.y.z-SNAPSHOT.zip
+----
 
 Follows an example on how to build with drivers (full distribution) and launch some queries on an in-memory h2 db
 
-```
-./gradlew installFullDist && \
-./build/install/jdbsee-full/bin/jdbsee run \
--x "create table contacts (id int primary key, name varchar(100));" \
--x "insert into contacts (id, name) values (1, 'Alice');" \
+----
+./gradlew installFullDist && \ //<1>
+./build/install/jdbsee-full/bin/jdbsee run \ //<2>
+-x "create table contacts (id int primary key, name varchar(100));" \ //<3>
+-x "insert into contacts (id, name) values (1, 'Alice');" \ //<4>
 -x "insert into contacts (id, name) values (2, 'Bob');" \
 -x "insert into contacts (id, name) values (3, 'John');" \
 -x "insert into contacts (id, name) values (4, 'Daisy');" \
-"jdbc:h2:mem:test" \
-"SELECT * FROM contacts;"
-```
+"jdbc:h2:mem:test" \ //<5>
+"SELECT * FROM contacts;" //<6>
+----
+<1> Build project
+<2> invoke the `run` command
+<3> execute create table DDL
+<4> add some data
+<5> define jdbc url
+<6> specify select query
 
 you should get
 

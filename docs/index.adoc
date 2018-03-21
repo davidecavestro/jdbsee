@@ -3,6 +3,7 @@ A jdbc CLI tool
 toc::[]
 
 :imagesdir: images
+:icons: font
 
 
 # Introduction
@@ -13,13 +14,19 @@ through jdbc drivers.
 
 # Features
 
-Jdbsee CLI supports running SQL queries on a database and exporting results in CSV, JSON or plain text tables.
+Jdbsee CLI supports running SQL queries on a database and exporting
+results in CSV, JSON or plain text tables.
 
-In order to avoid passing a lot of parameters at every command line invocation, it supports persisting db connection settings at two levels: _driver_ and _alias_.
+In order to avoid passing a lot of parameters at every command line
+invocation, it supports persisting db connection settings at two levels:
+_driver_ and _alias_.
 
-Persistent _driver_ settings are meant to reuse references to local jar paths and/or dependencies automatically resolvable from online maven repositories.
+Persistent _driver_ settings are meant to reuse references to local jar
+paths and/or dependencies automatically resolvable from online maven
+repositories.
 
-_Alias_ settings are meant to save jdbc url and db access credentials for later reuse.
+_Alias_ settings are meant to save jdbc url and db access credentials for
+later reuse.
 
 
 ## Available commands
@@ -69,9 +76,12 @@ image::jdbsee_zsh.png[Jdbsee help message]
 
 ## `run` command
 
-Execute SQL queries against a database. Database connection (driver, jdbc url and credentials) can be reused from a previously defined alias or passed explicitly.
+Execute SQL queries against a database. Database connection (driver, jdbc url
+and credentials) can be reused from a previously defined alias or passed
+explicitly.
 
-The retrieved data is printed as a plain text table or exported in CSV or JSON format.
+The retrieved data is printed as a plain text table or exported in CSV or
+JSON format.
 
 ```
 Usage: run [-hP] [-a=<alias>] [-c=<driverClassName>] [-l=<url>]
@@ -179,6 +189,14 @@ passing the `-j` switch along with the path of a jar within the
 local filesystem it will be scanned for jdbc drivers
 
 
+### Persistent settings
+
+Driver and alias settings are stored on a hypersql database backed
+by text tables. +
+This means settings are actually stored as csv files within the
+`$HOME/.jdbsee/data` folder.
+
+
 ### Output types
 
 The application supports multiple output formats:
@@ -192,8 +210,9 @@ values separated by semicolons
 JSON, JSON_PRETTY::
 json in a raw or pretty printed flavor
 
-The data is written to the standard output, while informational messages are sent to the
-standard error, so that output data can be redirected to an output file.
+The data is written to the standard output, while informational messages
+are sent to the standard error, so that output data can be redirected to
+an output file.
 
 
 # Examples
@@ -222,7 +241,8 @@ jdbsee run -u postgres -p postgres \
 
 ## Loading drivers from the `dropins` subfolder
 
-Copy your jdbc driver jars into the app distribution under the `dropins` folder, and they will be scanned for jdbc
+Copy your jdbc driver jars into the app distribution under the `dropins`
+folder, and they will be scanned for jdbc
 drivers
 
 ```
@@ -230,3 +250,39 @@ jdbsee run -u postgres -p postgres \
   -l "jdbc:postgresql://localhost:5432/test" \
   "SELECT * FROM contacts;"
 ```
+
+## Register driver/alias settings and use them
+
+
+----
+jdbsee driver create -d "com.h2database:h2:1.4.196" h2 // <1>
+
+jdbsee driver list // <2>
+┌───────────────────┬───────────────────┬───────────────────┬──────────────────┐
+│ID                 │NAME               │CLASS NAME         │CLASS SEARCH REGEX│
+├───────────────────┼───────────────────┼───────────────────┼──────────────────┤
+│0                  │h2                 │-                  │-                 │
+└───────────────────┴───────────────────┴───────────────────┴──────────────────┘
+
+alias create h2 h2memtest "jdbc:h2:mem:test" // <3>
+
+jdbsee alias list // <4>
+┌───────────────────┬───────────────────┬───────────────────┬──────────────────┐
+│ID                 │NAME               │DRIVER             │URL               │
+├───────────────────┼───────────────────┼───────────────────┼──────────────────┤
+│0                  │h2memtest          │h2                 │jdbc:h2:mem:test  │
+└───────────────────┴───────────────────┴───────────────────┴──────────────────┘
+
+jdbsee run -a h2memtest "SELECT 1 AS foo" // <5>
+┌──────────────────────────────────────────────────────────────────────────────┐
+│FOO                                                                           │
+└──────────────────────────────────────────────────────────────────────────────┘
+│1                                                                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+----
+<1> Register a driver
+<2> Check registered driver
+<3> Register an alias
+<4> Check registered alias
+<5> Run a test query using them
