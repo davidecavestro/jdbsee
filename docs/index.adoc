@@ -1,6 +1,7 @@
 = JDBSEE - CLI
 A jdbc CLI tool
-toc::[]
+
+:toc:
 
 :imagesdir: images
 :icons: font
