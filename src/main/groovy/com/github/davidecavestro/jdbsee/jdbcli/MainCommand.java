@@ -23,7 +23,14 @@ import javax.inject.Inject;
     },
     optionListHeading = "\n@|bold OPTIONS|@\n",
     commandListHeading= "\n@|bold COMMANDS|@\n",
-    subcommands = {RunCommand.class, DriverCommand.class, AliasCommand.class, DescribeCommand.class, MainCommand.HelpCommand.class},
+    subcommands = {
+        RunCommand.class,
+        DriverCommand.class,
+        AliasCommand.class,
+        DescribeCommand.class,
+        ShellCommand.class,
+        HelpCommand.class
+    },
     versionProvider = PropertiesVersionProvider.class)
 public class MainCommand implements Runnable {
   @Option(names = {"-V", "--version"}, versionHelp = true, description = "Print version info")
@@ -35,18 +42,6 @@ public class MainCommand implements Runnable {
   @Override
   public void run() {
     CommandLine.usage(this, System.out);
-  }
-
-  @Command(name = "help", description = "Print this help")
-  public static class HelpCommand implements Runnable {
-    @ParentCommand
-    private MainCommand parent;
-
-    @Inject//dagger
-    HelpCommand (){}
-
-    @Override
-    public void run () {CommandLine.usage(parent, System.out);}
   }
 
 }
