@@ -40,6 +40,7 @@ public class ConsoleService {
 
   private AsciiTableResultSetScanner ascii;
   private PrintWriter sysOut;
+  private PrintWriter sysErr;
 
   @Inject
   public ConsoleService (final AsciiTableResultSetScanner ascii) {
@@ -126,6 +127,18 @@ public class ConsoleService {
 
   public PrintStream getSysOutStream () {
     return new PrintStream (new WriterOutputStream (sysOut, Charset.defaultCharset()));
+  }
+
+  public PrintWriter getSysErr () {
+    return sysErr;
+  }
+
+  public void setSysErr (final PrintWriter sysErr) {
+    this.sysErr = sysErr;
+  }
+
+  public PrintStream getSysErrStream () {
+    return new PrintStream (new WriterOutputStream (sysErr, Charset.defaultCharset()));
   }
 
   static class CsvResultSetScanner implements ResultSetScanner<Void> {

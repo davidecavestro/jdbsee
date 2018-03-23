@@ -17,4 +17,12 @@ public class HelpCommand implements Runnable {
 
   @Override
   public void run () {CommandLine.usage(parent, consoleService.getSysOutStream ());}
+
+  public ConsoleService getConsoleService () {
+    return consoleService;
+  }
+
+  public void setConsoleService (final ConsoleService consoleService) {
+    this.consoleService = consoleService;
+  }
 }

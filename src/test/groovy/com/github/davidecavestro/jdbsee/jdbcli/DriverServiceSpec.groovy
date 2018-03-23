@@ -22,7 +22,7 @@ class DriverServiceSpec extends Specification {
 
         final StringWriter writer = new StringWriter()
         def printStream = new PrintStream(new WriterOutputStream(writer))
-        final DriverService driverService = new DriverService(driverDao: driverDao, printStream: printStream)
+        final DriverService driverService = new DriverService(driverDao: driverDao, printStream: {printStream})
 
         when: "listing all drivers"
         driverService.listDrivers()
@@ -64,7 +64,7 @@ class DriverServiceSpec extends Specification {
 
         final StringWriter writer = new StringWriter()
         def printStream = new PrintStream(new WriterOutputStream(writer))
-        final DriverService driverService = new DriverService(driverDao: driverDao, printStream: printStream)
+        final DriverService driverService = new DriverService(driverDao: driverDao, printStream: {printStream})
 
         when: "showing driver details"
         driverService.showDriver(10)
@@ -105,7 +105,7 @@ class DriverServiceSpec extends Specification {
 
         final StringWriter writer = new StringWriter()
         def printStream = new PrintStream(new WriterOutputStream(writer))
-        final DriverService driverService = new DriverService(driverDao: driverDao, printStream: printStream)
+        final DriverService driverService = new DriverService(driverDao: driverDao, printStream: {printStream})
 
         when: "showing driver details"
         driverService.showDriver(10)
@@ -129,7 +129,7 @@ class DriverServiceSpec extends Specification {
 
         final StringWriter writer = new StringWriter()
         def printStream = new PrintStream(new WriterOutputStream(writer))
-        final DriverService driverService = new DriverService(driverDao: driverDao, printStream: printStream)
+        final DriverService driverService = new DriverService(driverDao: driverDao, printStream: {printStream})
 
         when: "showing driver details"
         driverService.showDriver('foo')
@@ -153,7 +153,7 @@ class DriverServiceSpec extends Specification {
 
         final DriverService driverService = new DriverService(
             driverDao: driverDao,
-            printStream: new PrintStream(new WriterOutputStream(new StringWriter()))
+            printStream: {new PrintStream(new WriterOutputStream(new StringWriter()))}
         )
 
         when: "showing driver details"
@@ -172,7 +172,7 @@ class DriverServiceSpec extends Specification {
 
         final DriverService driverService = new DriverService(
             driverDao: driverDao,
-            printStream: new PrintStream(new WriterOutputStream(new StringWriter()))
+            printStream: {new PrintStream(new WriterOutputStream(new StringWriter()))}
         )
 
         when: "showing driver details"

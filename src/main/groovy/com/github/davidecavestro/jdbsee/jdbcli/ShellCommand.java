@@ -64,7 +64,7 @@ public class ShellCommand implements Runnable {
         }
         String line = null;
         try {
-          line = reader.readLine("jdbsee>", null, (MaskingCallback) null, null);
+          line = reader.readLine(">", null, (MaskingCallback) null, null);
         } catch (UserInterruptException e) {
           // Ignore
         } catch (EndOfFileException e) {
@@ -166,11 +166,22 @@ public class ShellCommand implements Runnable {
     @CommandLine.ParentCommand
     ShellCommand parent;
 
+    @Inject//public for dagger
+    public ConsoleService consoleService;
+
     @Inject//dagger
     public HelpCommand (){}
 
     @Override
-    public void run () {CommandLine.usage(parent, consoleService.sysOutStream);}
+    public void run () {CommandLine.usage(parent, consoleService.getSysOutStream ());}
+
+    public ConsoleService getConsoleService () {
+      return consoleService;
+    }
+
+    public void setConsoleService (final ConsoleService consoleService) {
+      this.consoleService = consoleService;
+    }
   }
 
 }

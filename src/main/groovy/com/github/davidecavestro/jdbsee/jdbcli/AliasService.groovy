@@ -12,12 +12,13 @@ class AliasService {
 
   private final static Logger LOG = LoggerFactory.getLogger (AliasService.class)
 
-
   @Inject//dagger
   ConsoleService consoleService
 
   @Inject//dagger
   public JdbsAliasDao aliasDao
+
+  def printStream = {consoleService.sysOut}
 
   @Inject//dagger
   public AliasService(){}
@@ -34,11 +35,13 @@ class AliasService {
       addRow asciiTable, it.id as String, it.name, it.driver.name, it.url
       asciiTable.addRule () // below header
     }
-    asciiTable.renderAsCollection()//FIXME autodetect screen width
-    .each {
-      printStream.println it
+    printStream().with {ps->
+      asciiTable.renderAsCollection()//FIXME autodetect screen width
+      .each {
+        ps.println it
+      }
+      flush()
     }
-    printStream.flush()
   }
 
   void showAlias (final long aliasId) {
@@ -75,18 +78,17 @@ class AliasService {
     }
 
 
-    asciiTable.renderAsCollection()//FIXME autodetect screen width
-    .each {
-      printStream.println it
+    printStream().with {ps->
+      asciiTable.renderAsCollection()//FIXME autodetect screen width
+      .each {
+        ps.println it
+      }
+      flush()
     }
-    printStream.flush()
   }
 
   //see https://github.com/vdmeer/asciitable/issues/14
   def addRow (final AsciiTable asciiTable, final Object... cell) {
     asciiTable.addRow(cell.collect {it?:'-'})
   }
-
-  protected PrintStream getPrintStream () {consoleService.sysOut}
-
 }

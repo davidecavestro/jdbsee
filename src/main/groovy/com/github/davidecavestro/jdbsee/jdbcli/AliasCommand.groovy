@@ -21,11 +21,14 @@ class AliasCommand implements Runnable {
   @Inject//public for dagger
   public JdbsAliasDao jdbsAliasDao
 
+  @Inject//public for dagger
+  public ConsoleService consoleService
+
   @Inject
   AliasCommand(){}
 
   @Override
-  void run () {CommandLine.usage(this, consoleService.sysOutStream)}
+  void run () {CommandLine.usage(this, consoleService.sysErrStream)}
 
   @Command(name = "create", description = "Create a new persistent alias")
   static class AliasCreateCommand implements Runnable {
@@ -116,6 +119,9 @@ class AliasCommand implements Runnable {
   static class HelpCommand implements Runnable {
     @ParentCommand
     private AliasCommand aliasCommand
+
+    @Inject//public for dagger
+    public ConsoleService consoleService
 
     @Inject//dagger
     HelpCommand (){}

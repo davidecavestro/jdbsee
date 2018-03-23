@@ -21,11 +21,14 @@ class DescribeCommand implements Runnable {
 //public for dagger
   public DescribeCommandService service
 
+  @Inject//public for dagger
+  public ConsoleService consoleService
+
   @Inject
   DescribeCommand() {}
 
   @Override
-  void run() { CommandLine.usage(this, consoleService.sysOutStream) }
+  void run() { CommandLine.usage(this, consoleService.sysErrStream) }
 
 
   @Command(name = "tables", description = "List all tables")
@@ -94,7 +97,7 @@ class DescribeCommand implements Runnable {
     HelpCommand() {}
 
     @Override
-    void run() { CommandLine.usage(parentCommand, consoleService.sysOutStream) }
+    void run() { CommandLine.usage(parentCommand, consoleService.sysErrStream) }
   }
 
 }

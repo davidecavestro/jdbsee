@@ -25,7 +25,7 @@ class AliasServiceSpec extends Specification {
 
         final StringWriter writer = new StringWriter()
         def printStream = new PrintStream(new WriterOutputStream(writer))
-        final AliasService aliasService = new AliasService(aliasDao: aliasDao, printStream: printStream)
+        final AliasService aliasService = new AliasService(aliasDao: aliasDao, printStream: {printStream})
 
         when: "listing all aliases"
         aliasService.listAliases()
@@ -67,7 +67,7 @@ class AliasServiceSpec extends Specification {
 
         final StringWriter writer = new StringWriter()
         def printStream = new PrintStream(new WriterOutputStream(writer))
-        final AliasService aliasService = new AliasService(aliasDao: aliasDao, printStream: printStream)
+        final AliasService aliasService = new AliasService(aliasDao: aliasDao, printStream: {printStream})
 
         when: "showing alias details"
         aliasService.showAlias(10)
@@ -101,7 +101,7 @@ class AliasServiceSpec extends Specification {
 
         final StringWriter writer = new StringWriter()
         def printStream = new PrintStream(new WriterOutputStream(writer))
-        final AliasService aliasService = new AliasService(aliasDao: aliasDao, printStream: printStream)
+        final AliasService aliasService = new AliasService(aliasDao: aliasDao, printStream: {printStream})
 
         when: "showing alias details"
         aliasService.showAlias(10)
@@ -125,7 +125,7 @@ class AliasServiceSpec extends Specification {
 
         final StringWriter writer = new StringWriter()
         def printStream = new PrintStream(new WriterOutputStream(writer))
-        final AliasService aliasService = new AliasService(aliasDao: aliasDao, printStream: printStream)
+        final AliasService aliasService = new AliasService(aliasDao: aliasDao, printStream: {printStream})
 
         when: "showing alias details"
         aliasService.showAlias('foo')
@@ -149,7 +149,7 @@ class AliasServiceSpec extends Specification {
 
         final AliasService aliasService = new AliasService(
             aliasDao: aliasDao,
-            printStream: new PrintStream(new WriterOutputStream(new StringWriter()))
+            printStream: {new PrintStream(new WriterOutputStream(new StringWriter()))}
         )
 
         when: "showing alias details"
@@ -168,7 +168,7 @@ class AliasServiceSpec extends Specification {
 
         final AliasService aliasService = new AliasService(
             aliasDao: aliasDao,
-            printStream: new PrintStream(new WriterOutputStream(new StringWriter()))
+            printStream: {new PrintStream(new WriterOutputStream(new StringWriter()))}
         )
 
         when: "showing alias details"

@@ -46,7 +46,7 @@ public class MainCommand implements Runnable {
 
   @Override
   public void run() {
-    CommandLine.usage(this, consoleService.getSysOutStream ());
+    CommandLine.usage(this, consoleService.getSysErrStream ());
   }
 
   public AppComponent getAppComponent () {

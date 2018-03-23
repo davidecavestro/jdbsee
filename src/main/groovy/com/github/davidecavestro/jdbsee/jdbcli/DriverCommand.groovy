@@ -23,11 +23,14 @@ class DriverCommand implements Runnable {
   @Inject//public for dagger
   public JdbsDriverDao jdbsDriverDao
 
+  @Inject//public for dagger
+  public ConsoleService consoleService
+
   @Inject
   DriverCommand (){}
 
   @Override
-  void run () {CommandLine.usage(this, mainCommand.sysOut)}
+  void run () {CommandLine.usage(this, consoleService.sysErr)}
 
   @Command(name = "create", description = "Register a new driver")
   static class DriverCreateCommand implements Runnable {
@@ -200,10 +203,13 @@ class DriverCommand implements Runnable {
     @ParentCommand
     private DriverCommand driverCommand
 
+    @Inject//public for dagger
+    public ConsoleService consoleService
+
     @Inject//dagger
     HelpCommand (){}
 
     @Override
-    void run () {CommandLine.usage(driverCommand, mainCommand.sysOut)}
+    void run () {CommandLine.usage(driverCommand, consoleService.sysErr)}
   }
 }

@@ -12,10 +12,13 @@ class DriverService {
 
   private final static Logger LOG = LoggerFactory.getLogger (DriverService.class)
 
-  PrintStream printStream = System.out
-
   @Inject//dagger
   public JdbsDriverDao driverDao
+
+  @Inject//dagger
+  ConsoleService consoleService
+
+  def printStream = {consoleService.sysOut}
 
   @Inject//dagger
   public DriverService(){}
@@ -32,11 +35,13 @@ class DriverService {
       addRow asciiTable, it.id as String, it.name, it.driverClass, it.driverClassExpr
       asciiTable.addRule () // below header
     }
-    asciiTable.renderAsCollection()//FIXME autodetect screen width
-    .each {
-      printStream.println it
+    printStream().with {ps->
+      asciiTable.renderAsCollection()//FIXME autodetect screen width
+      .each {
+        ps.println it
+      }
+      flush()
     }
-    printStream.flush()
   }
 
   void showDriver (final long driverId) {
@@ -83,12 +88,13 @@ class DriverService {
       asciiTable.addRule ()
     }
 
-
-    asciiTable.renderAsCollection()//FIXME autodetect screen width
-    .each {
-      printStream.println it
+    printStream().with {ps->
+      asciiTable.renderAsCollection()//FIXME autodetect screen width
+      .each {
+        ps.println it
+      }
+      flush()
     }
-    printStream.flush()
   }
 
   //see https://github.com/vdmeer/asciitable/issues/14
