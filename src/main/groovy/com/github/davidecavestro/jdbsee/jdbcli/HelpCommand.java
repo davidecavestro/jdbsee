@@ -8,11 +8,13 @@ import javax.inject.Inject;
 public class HelpCommand implements Runnable {
   @CommandLine.ParentCommand
   private MainCommand parent;
+  @Inject
+  protected ConsoleService consoleService;
 
   @Inject
 //dagger
   HelpCommand(){}
 
   @Override
-  public void run () {CommandLine.usage(parent, System.out);}
+  public void run () {CommandLine.usage(parent, consoleService.getSysOutStream ());}
 }

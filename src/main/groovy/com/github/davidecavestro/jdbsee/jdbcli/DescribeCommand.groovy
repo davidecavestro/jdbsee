@@ -25,7 +25,7 @@ class DescribeCommand implements Runnable {
   DescribeCommand() {}
 
   @Override
-  void run() { CommandLine.usage(this, System.out) }
+  void run() { CommandLine.usage(this, consoleService.sysOutStream) }
 
 
   @Command(name = "tables", description = "List all tables")
@@ -94,7 +94,7 @@ class DescribeCommand implements Runnable {
     HelpCommand() {}
 
     @Override
-    void run() { CommandLine.usage(parentCommand, System.out) }
+    void run() { CommandLine.usage(parentCommand, consoleService.sysOutStream) }
   }
 
 }

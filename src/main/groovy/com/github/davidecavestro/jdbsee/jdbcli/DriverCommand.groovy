@@ -27,7 +27,7 @@ class DriverCommand implements Runnable {
   DriverCommand (){}
 
   @Override
-  void run () {CommandLine.usage(this, System.out)}
+  void run () {CommandLine.usage(this, mainCommand.sysOut)}
 
   @Command(name = "create", description = "Register a new driver")
   static class DriverCreateCommand implements Runnable {
@@ -204,6 +204,6 @@ class DriverCommand implements Runnable {
     HelpCommand (){}
 
     @Override
-    void run () {CommandLine.usage(driverCommand, System.out)}
+    void run () {CommandLine.usage(driverCommand, mainCommand.sysOut)}
   }
 }

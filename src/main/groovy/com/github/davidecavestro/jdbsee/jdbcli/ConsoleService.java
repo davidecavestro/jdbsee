@@ -10,6 +10,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Streams;
 import com.google.common.collect.Table;
 import de.vandermeer.asciitable.AsciiTable;
+import org.apache.commons.io.output.WriterOutputStream;
 import org.jdbi.v3.core.result.NoResultsException;
 import org.jdbi.v3.core.result.ResultSetScanner;
 import org.jdbi.v3.core.statement.Query;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -37,6 +39,7 @@ public class ConsoleService {
   private final static Logger LOG = LoggerFactory.getLogger (ConsoleService.class);
 
   private AsciiTableResultSetScanner ascii;
+  private PrintWriter sysOut;
 
   @Inject
   public ConsoleService (final AsciiTableResultSetScanner ascii) {
@@ -107,7 +110,22 @@ public class ConsoleService {
   }
 
   protected PrintWriter getOutWriter (final File outputFile) throws IOException {
-    return new PrintWriter (outputFile!=null?new FileWriter (outputFile):new OutputStreamWriter (System.out));
+    return outputFile != null ?
+            new PrintWriter (new FileWriter (outputFile)) :
+            Optional.ofNullable (sysOut)
+                    .orElse (new PrintWriter(new OutputStreamWriter (System.out)));
+  }
+
+  public PrintWriter getSysOut () {
+    return sysOut;
+  }
+
+  public void setSysOut (final PrintWriter sysOut) {
+    this.sysOut = sysOut;
+  }
+
+  public PrintStream getSysOutStream () {
+    return new PrintStream (new WriterOutputStream (sysOut, Charset.defaultCharset()));
   }
 
   static class CsvResultSetScanner implements ResultSetScanner<Void> {

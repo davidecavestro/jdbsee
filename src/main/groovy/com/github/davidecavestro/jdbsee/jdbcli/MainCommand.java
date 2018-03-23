@@ -37,11 +37,23 @@ public class MainCommand implements Runnable {
   boolean versionRequested;
 
   @Inject
+  protected ConsoleService consoleService;
+
+  private AppComponent appComponent;
+
+  @Inject
   public MainCommand(){}
 
   @Override
   public void run() {
-    CommandLine.usage(this, System.out);
+    CommandLine.usage(this, consoleService.getSysOutStream ());
   }
 
+  public AppComponent getAppComponent () {
+    return appComponent;
+  }
+
+  public void setAppComponent (final AppComponent appComponent) {
+    this.appComponent = appComponent;
+  }
 }

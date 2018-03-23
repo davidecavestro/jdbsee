@@ -25,7 +25,7 @@ class AliasCommand implements Runnable {
   AliasCommand(){}
 
   @Override
-  void run () {CommandLine.usage(this, System.out)}
+  void run () {CommandLine.usage(this, consoleService.sysOutStream)}
 
   @Command(name = "create", description = "Create a new persistent alias")
   static class AliasCreateCommand implements Runnable {
@@ -121,7 +121,7 @@ class AliasCommand implements Runnable {
     HelpCommand (){}
 
     @Override
-    void run () {CommandLine.usage(aliasCommand, System.out)}
+    void run () {CommandLine.usage(aliasCommand, consoleService.sysOutStream)}
   }
 
 }

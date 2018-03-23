@@ -49,11 +49,14 @@ class RunCommand extends AbstractDbCommand {
     @ParentCommand
     private RunCommand runCommand
 
+    @Inject
+    ConsoleService consoleService
+
     @Inject//dagger
     HelpCommand (){}
 
     @Override
-    void run () {CommandLine.usage(runCommand, System.out)}
+    void run () {CommandLine.usage(runCommand, consoleService.sysOutStream)}
   }
 
 }

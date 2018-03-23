@@ -25,6 +25,7 @@ public class CliApplication implements Runnable {
     DaggerAppComponent.Builder builder = DaggerAppComponent.builder ();
     final AppComponent appComponent = builder.build ();
     final MainCommand mainCommand = appComponent.getMainCommand ();
+    mainCommand.setAppComponent (appComponent);
     final IFactory daggerFactory = new AppIFactory (appComponent);
     CommandLine commandLine = new CommandLine (mainCommand, daggerFactory);
     for (final String[] args : multiArgs) {
@@ -69,6 +70,9 @@ interface AppComponent {
   void inject (PropertiesVersionProvider versionProvider);
 
   void inject (HelpCommand command);
+  void inject (ShellCommand command);
+//  void inject (ShellCommand.QuitCommand command);
+  void inject (ShellCommand.HelpCommand command);
 
   void inject (DriverCommand command);
   void inject (DriverCommand.DriverCreateCommand command);

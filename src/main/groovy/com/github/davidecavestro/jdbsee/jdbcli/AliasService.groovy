@@ -12,7 +12,9 @@ class AliasService {
 
   private final static Logger LOG = LoggerFactory.getLogger (AliasService.class)
 
-  PrintStream printStream = System.out
+
+  @Inject//dagger
+  ConsoleService consoleService
 
   @Inject//dagger
   public JdbsAliasDao aliasDao
@@ -84,4 +86,7 @@ class AliasService {
   def addRow (final AsciiTable asciiTable, final Object... cell) {
     asciiTable.addRow(cell.collect {it?:'-'})
   }
+
+  protected PrintStream getPrintStream () {consoleService.sysOut}
+
 }
