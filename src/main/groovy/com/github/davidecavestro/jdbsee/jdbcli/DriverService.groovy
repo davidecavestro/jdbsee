@@ -16,7 +16,7 @@ class DriverService {
   public JdbsDriverDao driverDao
 
   @Inject//dagger
-  ConsoleService consoleService
+  public ConsoleService consoleService
 
   def printStream = {consoleService.sysOut}
 
@@ -40,7 +40,7 @@ class DriverService {
       .each {
         ps.println it
       }
-      flush()
+      ps.flush()
     }
   }
 
@@ -93,7 +93,7 @@ class DriverService {
       .each {
         ps.println it
       }
-      flush()
+      ps.flush()
     }
   }
 

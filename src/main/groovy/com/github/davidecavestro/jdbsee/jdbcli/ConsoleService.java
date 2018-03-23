@@ -39,8 +39,8 @@ public class ConsoleService {
   private final static Logger LOG = LoggerFactory.getLogger (ConsoleService.class);
 
   private AsciiTableResultSetScanner ascii;
-  private PrintWriter sysOut;
-  private PrintWriter sysErr;
+  private PrintWriter sysOut = new PrintWriter(System.out);
+  private PrintWriter sysErr = new PrintWriter(System.err);
 
   @Inject
   public ConsoleService (final AsciiTableResultSetScanner ascii) {

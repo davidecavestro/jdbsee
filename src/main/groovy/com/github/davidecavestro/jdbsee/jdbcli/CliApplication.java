@@ -24,8 +24,16 @@ public class CliApplication implements Runnable {
     Thread.currentThread().setContextClassLoader(MiscTools.addToClasspath());
     DaggerAppComponent.Builder builder = DaggerAppComponent.builder ();
     final AppComponent appComponent = builder.build ();
+
+    final AsciiTableResultSetScanner ascii = new AsciiTableResultSetScanner();
+    appComponent.inject (ascii);
+    final ConsoleService consoleService = new ConsoleService (ascii);
+    appComponent.inject (consoleService);
+
     final MainCommand mainCommand = appComponent.getMainCommand ();
     mainCommand.setAppComponent (appComponent);
+    mainCommand.setConsoleService (consoleService);
+
     final IFactory daggerFactory = new AppIFactory (appComponent);
     CommandLine commandLine = new CommandLine (mainCommand, daggerFactory);
     for (final String[] args : multiArgs) {
@@ -59,6 +67,7 @@ class AppIFactory implements IFactory {
     }
     //inject fields
     method.invoke (appComponent, instance);
+
     return instance;
   }
 }
@@ -68,6 +77,8 @@ class AppIFactory implements IFactory {
 interface AppComponent {
   MainCommand getMainCommand();
   void inject (PropertiesVersionProvider versionProvider);
+  void inject (ConsoleService consoleService);
+  void inject (AsciiTableResultSetScanner ascii);
 
   void inject (HelpCommand command);
   void inject (ShellCommand command);

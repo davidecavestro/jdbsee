@@ -4,6 +4,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.*;
 
 import javax.inject.Inject;
+import java.io.PrintStream;
 
 @Command(
 //    header = "@|bold NAME|@",
@@ -36,8 +37,8 @@ public class MainCommand implements Runnable {
   @Option(names = {"-V", "--version"}, versionHelp = true, description = "Print version info")
   boolean versionRequested;
 
-  @Inject
-  protected ConsoleService consoleService;
+  @Inject//public for dagger
+  public ConsoleService consoleService;
 
   private AppComponent appComponent;
 
@@ -46,7 +47,12 @@ public class MainCommand implements Runnable {
 
   @Override
   public void run() {
-    CommandLine.usage(this, consoleService.getSysErrStream ());
+    final PrintStream sysOut = consoleService.getSysOutStream ();
+    try {
+      CommandLine.usage (this, sysOut);
+    } finally {
+      sysOut.flush ();
+    }
   }
 
   public AppComponent getAppComponent () {
@@ -55,5 +61,15 @@ public class MainCommand implements Runnable {
 
   public void setAppComponent (final AppComponent appComponent) {
     this.appComponent = appComponent;
+  }
+
+  @Inject
+  public ConsoleService getConsoleService () {
+    return consoleService;
+  }
+
+  @Inject
+  public void setConsoleService (final ConsoleService consoleService) {
+    this.consoleService = consoleService;
   }
 }

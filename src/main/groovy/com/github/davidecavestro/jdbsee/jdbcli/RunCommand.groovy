@@ -50,7 +50,7 @@ class RunCommand extends AbstractDbCommand {
     private RunCommand runCommand
 
     @Inject
-    ConsoleService consoleService
+    public ConsoleService consoleService
 
     @Inject//dagger
     HelpCommand (){}

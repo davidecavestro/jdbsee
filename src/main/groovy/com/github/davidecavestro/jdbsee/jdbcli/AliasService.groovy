@@ -13,7 +13,7 @@ class AliasService {
   private final static Logger LOG = LoggerFactory.getLogger (AliasService.class)
 
   @Inject//dagger
-  ConsoleService consoleService
+  public ConsoleService consoleService
 
   @Inject//dagger
   public JdbsAliasDao aliasDao
@@ -40,7 +40,7 @@ class AliasService {
       .each {
         ps.println it
       }
-      flush()
+      ps.flush()
     }
   }
 
@@ -83,7 +83,7 @@ class AliasService {
       .each {
         ps.println it
       }
-      flush()
+      ps.flush()
     }
   }
 

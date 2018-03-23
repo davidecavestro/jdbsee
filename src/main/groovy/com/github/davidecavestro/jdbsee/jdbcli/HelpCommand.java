@@ -3,6 +3,7 @@ package com.github.davidecavestro.jdbsee.jdbcli;
 import picocli.CommandLine;
 
 import javax.inject.Inject;
+import java.io.PrintStream;
 
 @CommandLine.Command(name = "help", description = "Print this help")
 public class HelpCommand implements Runnable {
@@ -16,13 +17,23 @@ public class HelpCommand implements Runnable {
   HelpCommand(){}
 
   @Override
-  public void run () {CommandLine.usage(parent, consoleService.getSysOutStream ());}
+  public void run () {
+    final PrintStream sysOut = consoleService.getSysOutStream ();
+    try {
+      CommandLine.usage (parent, sysOut);
+    } finally {
+      sysOut.flush ();
+    }
+  }
 
+  @Inject
   public ConsoleService getConsoleService () {
     return consoleService;
   }
 
+  @Inject
   public void setConsoleService (final ConsoleService consoleService) {
     this.consoleService = consoleService;
   }
+
 }
