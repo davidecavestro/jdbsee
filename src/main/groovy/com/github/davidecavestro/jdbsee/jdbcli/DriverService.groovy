@@ -18,7 +18,7 @@ class DriverService {
   @Inject//dagger
   public ConsoleService consoleService
 
-  def printStream = {consoleService.sysOut}
+  def printStream = {ascii->consoleService.renderTable (ascii)}
 
   @Inject//dagger
   public DriverService(){}
@@ -35,13 +35,8 @@ class DriverService {
       addRow asciiTable, it.id as String, it.name, it.driverClass, it.driverClassExpr
       asciiTable.addRule () // below header
     }
-    printStream().with {ps->
-      asciiTable.renderAsCollection()//FIXME autodetect screen width
-      .each {
-        ps.println it
-      }
-      ps.flush()
-    }
+
+    printStream(asciiTable)
   }
 
   void showDriver (final long driverId) {
@@ -88,13 +83,7 @@ class DriverService {
       asciiTable.addRule ()
     }
 
-    printStream().with {ps->
-      asciiTable.renderAsCollection()//FIXME autodetect screen width
-      .each {
-        ps.println it
-      }
-      ps.flush()
-    }
+    printStream(asciiTable)
   }
 
   //see https://github.com/vdmeer/asciitable/issues/14

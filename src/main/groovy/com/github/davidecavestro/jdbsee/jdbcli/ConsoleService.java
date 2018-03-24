@@ -10,6 +10,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Streams;
 import com.google.common.collect.Table;
 import de.vandermeer.asciitable.AsciiTable;
+import groovy.lang.Closure;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.jdbi.v3.core.result.NoResultsException;
 import org.jdbi.v3.core.result.ResultSetScanner;
@@ -40,8 +41,12 @@ public class ConsoleService {
 
   private AsciiTableResultSetScanner ascii;
   private InputStream sysInStream = System.in;
-  private PrintWriter sysOut = new PrintWriter(System.out);
-  private PrintWriter sysErr = new PrintWriter(System.err);
+  private PrintWriter sysOut;
+  private PrintWriter sysErr;
+
+  public ConsoleService () {
+    //for test with partial injection
+  }
 
   @Inject
   public ConsoleService (final AsciiTableResultSetScanner ascii) {
@@ -49,73 +54,94 @@ public class ConsoleService {
   }
 
   public void renderResultSet (final Query query, final OutputType outputType, final File outputFile) throws IOException {
-    try (final PrintWriter outWriter = getOutWriter(outputFile)) {
+    withOutWriter (outputFile, new Function<PrintWriter, Void> () {
+      @Override
+      public Void apply (final PrintWriter outWriter) {
+          switch (outputType) {
+            case CSV:
+              query.scanResultSet (new CsvResultSetScanner (outWriter));
+              break;
+            case JSON:
+            case JSON_PRETTY:
+              query.scanResultSet (new ResultSetScanner<Void> () {
+                @Override
+                public Void scanResultSet (final Supplier<ResultSet> resultSetSupplier, final StatementContext ctx) throws SQLException {
+                  final ObjectMapper mapper = new ObjectMapper ();
+                  try {
+                    final ResultSet resultSet = resultSetSupplier.get ();
 
-      switch (outputType) {
-        case CSV:
-          query.scanResultSet (new CsvResultSetScanner (outWriter));
-          break;
-        case JSON:
-        case JSON_PRETTY:
-          query.scanResultSet (new ResultSetScanner<Void> () {
-            @Override
-            public Void scanResultSet (final Supplier<ResultSet> resultSetSupplier, final StatementContext ctx) throws SQLException {
-              final ObjectMapper mapper = new ObjectMapper ();
-              try {
-                final ResultSet resultSet = resultSetSupplier.get ();
+                    final ResultSetMetaData metaData = resultSet.getMetaData ();
+                    final int columnCount = metaData.getColumnCount ();
 
-                final ResultSetMetaData metaData = resultSet.getMetaData ();
-                final int columnCount = metaData.getColumnCount ();
+                    final Map<Integer, String> colNames = new LinkedHashMap<> ();
+                    for (int colPos = 1; colPos <= columnCount; colPos++) {
+                      final String colName = metaData.getColumnLabel (colPos);
+                      colNames.put (colPos, colName);
+                    }
 
-                final Map<Integer, String> colNames = new LinkedHashMap<> ();
-                for (int colPos = 1; colPos <= columnCount; colPos++) {
-                  final String colName = metaData.getColumnLabel (colPos);
-                  colNames.put (colPos, colName);
-                }
+                    try {
+                      try (final SequenceWriter writer = mapper
+                              .writer (outputType == OutputType.JSON ? null : new DefaultPrettyPrinter ())
+                              .writeValuesAsArray (outWriter)) {
 
-                try {
-                  try (final SequenceWriter writer = mapper
-                          .writer (outputType == OutputType.JSON ? null : new DefaultPrettyPrinter ())
-                          .writeValuesAsArray (outWriter)) {
-
-                    final Map row = new LinkedHashMap<> (columnCount);
-                    while (resultSet.next ()) {
-                      row.clear ();
-                      for (int colPos = 1; colPos <= columnCount; colPos++) {
-                        row.put (colNames.get (colPos), resultSet.getObject (colPos));
+                        final Map row = new LinkedHashMap<> (columnCount);
+                        while (resultSet.next ()) {
+                          row.clear ();
+                          for (int colPos = 1; colPos <= columnCount; colPos++) {
+                            row.put (colNames.get (colPos), resultSet.getObject (colPos));
+                          }
+                          writer.write (row);
+                          writer.flush ();
+                        }
                       }
-                      writer.write (row);
-                      writer.flush ();
+                    } catch (IOException e) {
+                      throw new RuntimeException (e);
+                    }
+
+                  } catch (final NoResultsException e) {
+                    if (ctx.getStatement ().getUpdateCount () >= 0) {
+                      //it was some DML/DDL
+                      LOG.warn ("No results");
+                    } else {
+                      throw e;
                     }
                   }
-                } catch (IOException e) {
-                  throw new RuntimeException (e);
+                  return null;
                 }
-
-              } catch (final NoResultsException e) {
-                if (ctx.getStatement ().getUpdateCount () >= 0) {
-                  //it was some DML/DDL
-                  LOG.warn ("No results");
-                } else {
-                  throw e;
-                }
-              }
-              return null;
-            }
-          });
-          break;
-        default:
-          query.scanResultSet (ascii).forEach (line -> outWriter.println (line));
-          break;
+              });
+              break;
+            default:
+              query.scanResultSet (ascii).forEach (line -> outWriter.println (line));
+              break;
+          }
+        return null;
       }
-    }
+    });
   }
 
-  protected PrintWriter getOutWriter (final File outputFile) throws IOException {
-    return outputFile != null ?
-            new PrintWriter (new FileWriter (outputFile)) :
-            Optional.ofNullable (sysOut)
-                    .orElse (new PrintWriter(new OutputStreamWriter (System.out)));
+  protected void withOutWriter (final File outputFile, Function<PrintWriter, Void> call) throws IOException {
+    PrintWriter writer = null;//FIXME make it final (but IDE complains)
+    boolean shouldClose = false;
+    try {
+      if (outputFile != null) {
+        writer = new PrintWriter (new FileWriter (outputFile));
+        shouldClose = true;
+      } else {
+        if (sysOut != null) {
+          writer = sysOut;
+          shouldClose = true;
+        } else {
+          writer = new PrintWriter (new OutputStreamWriter (System.out));
+          shouldClose = false;
+        }
+      }
+      call.apply (writer);
+    } finally {
+      writer.flush ();
+      if (shouldClose) {
+        writer.close ();
+      }
+    }
   }
 
   public InputStream getSysInStream () {
@@ -148,6 +174,16 @@ public class ConsoleService {
 
   public PrintStream getSysErrStream () {
     return new PrintStream (new WriterOutputStream (sysErr, Charset.defaultCharset()));
+  }
+
+  public void withSysOutStream (final Function<PrintStream, Void> call) throws IOException {
+    withOutWriter (null, new Function<PrintWriter, Void> () {
+      @Override
+      public Void apply (final PrintWriter input) {
+        final PrintStream stream = new PrintStream (new WriterOutputStream (input, Charset.defaultCharset()));
+        return call.apply (stream);
+      }
+    });
   }
 
   static class CsvResultSetScanner implements ResultSetScanner<Void> {
@@ -228,12 +264,31 @@ public class ConsoleService {
   }
 
   protected void renderStream (final Stream<String> stream) throws IOException {
-    try (final PrintWriter outWriter = getOutWriter(null)) {
-      stream.forEach((String row)->{
-        outWriter.println (row);
-      });
-      outWriter.flush();
-    }
+    withOutWriter (null, new Function<PrintWriter, Void> () {
+      @Override
+      public Void apply (final PrintWriter outWriter) {
+        stream.forEach((String row)->{
+          outWriter.println (row);
+        });
+        outWriter.flush();
+
+        return null;
+      }
+    });
+  }
+
+  public void renderTable (final AsciiTable asciiTable) throws IOException {
+    withOutWriter (null, new Function<PrintWriter, Void> () {
+      @Override
+      public Void apply (final PrintWriter outWriter) {
+        //FIXME autodetect screen width
+        asciiTable.renderAsIterator().forEachRemaining((String row)->{
+          outWriter.println (row);
+        });
+
+        return null;
+      }
+    });
   }
 
   public void renderTable (final Table<String,String,String> table, final int width) throws IOException {
@@ -249,18 +304,22 @@ public class ConsoleService {
 //    ascii.addRow (headers); // header
 //    ascii.addRule (); // below header
 
-    try (final PrintWriter outWriter = getOutWriter(null)) {
-      table.rowMap().forEach((String row, Map<String, String> colVal) -> {
-        final List<String> rowVals = new ArrayList<>(columnCount);
-        colVal.forEach((String col, String val) -> rowVals.add(val));
-        ascii.addRow(rowVals);
-        ascii.addRule ();
-      });
+    withOutWriter (null, new Function<PrintWriter, Void> () {
+      @Override
+      public Void apply (final PrintWriter outWriter) {
+        table.rowMap().forEach((String row, Map<String, String> colVal) -> {
+          final List<String> rowVals = new ArrayList<>(columnCount);
+          colVal.forEach((String col, String val) -> rowVals.add(val));
+          ascii.addRow(rowVals);
+          ascii.addRule ();
+        });
 
-      ascii.renderAsIterator(width).forEachRemaining((String row)->{
-        outWriter.println (row);
-      });
-      outWriter.flush();
-    }
+        ascii.renderAsIterator(width).forEachRemaining((String row)->{
+          outWriter.println (row);
+        });
+
+        return null;
+      }
+    });
   }
 }

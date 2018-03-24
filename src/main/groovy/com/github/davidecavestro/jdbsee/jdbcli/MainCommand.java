@@ -1,9 +1,11 @@
 package com.github.davidecavestro.jdbsee.jdbcli;
 
+import com.google.common.base.Function;
 import picocli.CommandLine;
 import picocli.CommandLine.*;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.io.PrintStream;
 
 @Command(
@@ -45,13 +47,17 @@ public class MainCommand implements Runnable {
   @Inject
   public MainCommand(){}
 
-  @Override
-  public void run() {
-    final PrintStream sysOut = consoleService.getSysOutStream ();
+  public void run () {
     try {
-      CommandLine.usage (this, sysOut);
-    } finally {
-      sysOut.flush ();
+      consoleService.withSysOutStream (new Function<PrintStream, Void> () {
+        @Override
+        public Void apply (final PrintStream input) {
+          CommandLine.usage (this, input);
+          return null;
+        }
+      });
+    } catch (final IOException e) {
+      throw new RuntimeException (e);
     }
   }
 

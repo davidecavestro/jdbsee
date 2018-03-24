@@ -129,7 +129,11 @@ class AliasCommand implements Runnable {
     HelpCommand (){}
 
     @Override
-    void run () {CommandLine.usage(aliasCommand, consoleService.sysOutStream)}
+    void run () {
+      consoleService.withSysOutStream {PrintStream outStream->
+        CommandLine.usage(aliasCommand, outStream)
+      }
+    }
   }
 
 }

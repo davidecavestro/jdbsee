@@ -21,8 +21,9 @@ class DriverServiceSpec extends Specification {
         }
 
         final StringWriter writer = new StringWriter()
-        def printStream = new PrintStream(new WriterOutputStream(writer))
-        final DriverService driverService = new DriverService(driverDao: driverDao, printStream: {printStream})
+        def printWriter = new PrintWriter(writer)
+        def consoleService = new ConsoleService (sysOut: printWriter)
+        final DriverService driverService = new DriverService(driverDao: driverDao, consoleService: consoleService)
 
         when: "listing all drivers"
         driverService.listDrivers()
@@ -63,8 +64,9 @@ class DriverServiceSpec extends Specification {
         }
 
         final StringWriter writer = new StringWriter()
-        def printStream = new PrintStream(new WriterOutputStream(writer))
-        final DriverService driverService = new DriverService(driverDao: driverDao, printStream: {printStream})
+        def printWriter = new PrintWriter(writer)
+        def consoleService = new ConsoleService (sysOut: printWriter)
+        final DriverService driverService = new DriverService(driverDao: driverDao, consoleService: consoleService)
 
         when: "showing driver details"
         driverService.showDriver(10)
@@ -104,8 +106,9 @@ class DriverServiceSpec extends Specification {
         }
 
         final StringWriter writer = new StringWriter()
-        def printStream = new PrintStream(new WriterOutputStream(writer))
-        final DriverService driverService = new DriverService(driverDao: driverDao, printStream: {printStream})
+        def printWriter = new PrintWriter(writer)
+        def consoleService = new ConsoleService (sysOut: printWriter)
+        final DriverService driverService = new DriverService(driverDao: driverDao, consoleService: consoleService)
 
         when: "showing driver details"
         driverService.showDriver(10)
@@ -128,8 +131,9 @@ class DriverServiceSpec extends Specification {
         }
 
         final StringWriter writer = new StringWriter()
-        def printStream = new PrintStream(new WriterOutputStream(writer))
-        final DriverService driverService = new DriverService(driverDao: driverDao, printStream: {printStream})
+        def printWriter = new PrintWriter(writer)
+        def consoleService = new ConsoleService (sysOut: printWriter)
+        final DriverService driverService = new DriverService(driverDao: driverDao, consoleService: consoleService)
 
         when: "showing driver details"
         driverService.showDriver('foo')
@@ -151,10 +155,10 @@ class DriverServiceSpec extends Specification {
             findDriverById(123) >> Optional.ofNullable(null)
         }
 
-        final DriverService driverService = new DriverService(
-            driverDao: driverDao,
-            printStream: {new PrintStream(new WriterOutputStream(new StringWriter()))}
-        )
+        final StringWriter writer = new StringWriter()
+        def printWriter = new PrintWriter(writer)
+        def consoleService = new ConsoleService (sysOut: printWriter)
+        final DriverService driverService = new DriverService(driverDao: driverDao, consoleService: consoleService)
 
         when: "showing driver details"
         driverService.showDriver(123)
@@ -170,10 +174,10 @@ class DriverServiceSpec extends Specification {
             findDriverByName('h2') >> Optional.ofNullable(null)
         }
 
-        final DriverService driverService = new DriverService(
-            driverDao: driverDao,
-            printStream: {new PrintStream(new WriterOutputStream(new StringWriter()))}
-        )
+        final StringWriter writer = new StringWriter()
+        def printWriter = new PrintWriter(writer)
+        def consoleService = new ConsoleService (sysOut: printWriter)
+        final DriverService driverService = new DriverService(driverDao: driverDao, consoleService: consoleService)
 
         when: "showing driver details"
         driverService.showDriver('h2')

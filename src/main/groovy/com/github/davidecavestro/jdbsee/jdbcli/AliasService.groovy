@@ -18,7 +18,7 @@ class AliasService {
   @Inject//dagger
   public JdbsAliasDao aliasDao
 
-  def printStream = {consoleService.sysOut}
+  def printStream = {ascii->consoleService.renderTable (ascii)}
 
   @Inject//dagger
   public AliasService(){}
@@ -35,13 +35,7 @@ class AliasService {
       addRow asciiTable, it.id as String, it.name, it.driver.name, it.url
       asciiTable.addRule () // below header
     }
-    printStream().with {ps->
-      asciiTable.renderAsCollection()//FIXME autodetect screen width
-      .each {
-        ps.println it
-      }
-      ps.flush()
-    }
+    printStream(asciiTable)
   }
 
   void showAlias (final long aliasId) {
@@ -77,14 +71,7 @@ class AliasService {
       asciiTable.addRule ()
     }
 
-
-    printStream().with {ps->
-      asciiTable.renderAsCollection()//FIXME autodetect screen width
-      .each {
-        ps.println it
-      }
-      ps.flush()
-    }
+    printStream(asciiTable)
   }
 
   //see https://github.com/vdmeer/asciitable/issues/14
