@@ -597,18 +597,18 @@ class CliApplicationITest {
         )
     }
 
-    @Test
-    void testShell() throws Exception {
-//        StringWriter inWriter = new StringWriter()
-//        PrintStream sysIn = new PrintStream()
-//        new WriterOutputStream(writer) << System.in
-        System.in = new ReaderInputStream(new StringReader('help\nquit\n'))
-        StringWriter outWriter = getOutput ("shell")
-//        new WriterOutputStream(writer) << System.in
-
-//        outWriter << 'help\n'
-
-        assert outWriter.toString() == '>help'
-    }
+//    @Test
+//    void testShell() throws Exception {
+////        StringWriter inWriter = new StringWriter()
+////        PrintStream sysIn = new PrintStream()
+////        new WriterOutputStream(writer) << System.in
+////        System.in = new ReaderInputStream(new StringReader('help\nquit\n'))
+//        StringWriter outWriter = getOutput ("shell")
+////        new WriterOutputStream(writer) << System.in
+//
+////        outWriter << 'help\n'
+//
+//        assert outWriter.toString() == '>help'
+//    }
 
 }
