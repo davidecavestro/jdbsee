@@ -82,7 +82,7 @@ public class ShellCommand implements Runnable {
                                 .variable (LineReader.HISTORY_FILE, historyFile)
                                 .history (history)
                                 .build ();
-                        terminal.writer ().println (AttributedString.fromAnsi (String.format ("\u001B[33m%s shell v\u001B[0m", "Jdbsee CLI", getVersion ())).toAnsi (terminal));
+                        terminal.writer ().println (AttributedString.fromAnsi (String.format ("\u001B[33m%s\u001B[0m", getVersion ())).toAnsi (terminal));
                         while (true) {
                             if (quit) {
                                 terminal.writer ().println (AttributedString.fromAnsi ("\u001B[33mbye\u001B[0m").toAnsi (terminal));

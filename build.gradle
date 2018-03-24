@@ -149,8 +149,9 @@ task generateVersionTxt {
     generated.text = """
         Version: $rootProject.version
         Buildtime: ${new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())}
-        Application-name: $rootProject.name $project.name
+        Application-name: $project.name
         """
+//    Application-name: $rootProject.name $project.name
   }
 }
 
