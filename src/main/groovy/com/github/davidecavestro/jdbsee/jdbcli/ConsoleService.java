@@ -39,6 +39,7 @@ public class ConsoleService {
   private final static Logger LOG = LoggerFactory.getLogger (ConsoleService.class);
 
   private AsciiTableResultSetScanner ascii;
+  private InputStream sysInStream = System.in;
   private PrintWriter sysOut = new PrintWriter(System.out);
   private PrintWriter sysErr = new PrintWriter(System.err);
 
@@ -115,6 +116,14 @@ public class ConsoleService {
             new PrintWriter (new FileWriter (outputFile)) :
             Optional.ofNullable (sysOut)
                     .orElse (new PrintWriter(new OutputStreamWriter (System.out)));
+  }
+
+  public InputStream getSysInStream () {
+    return sysInStream;
+  }
+
+  public void setSysInStream (final InputStream in) {
+    sysInStream = in;
   }
 
   public PrintWriter getSysOut () {

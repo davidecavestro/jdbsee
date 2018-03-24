@@ -12,7 +12,7 @@ class ConfigService {
     }
 
     File getUserFolder() {
-        new File ( System.getProperty ( 'user.dir' ), '.jdbsee' )
+        new File ( System.getProperty ( 'user.home' ), '.jdbsee' )
     }
 
     List<File> getDropinsDirs () {

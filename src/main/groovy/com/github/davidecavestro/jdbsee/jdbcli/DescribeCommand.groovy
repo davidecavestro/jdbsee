@@ -1,10 +1,12 @@
 package com.github.davidecavestro.jdbsee.jdbcli
 
+import groovy.transform.CompileStatic
 import picocli.CommandLine
 
 import javax.inject.Inject
 import static picocli.CommandLine.*
 
+@CompileStatic
 @Command(name = "describe", description = "Provides info about database and driver",
     subcommands = [
         DescribeTablesCommand,
@@ -97,7 +99,7 @@ class DescribeCommand implements Runnable {
     HelpCommand() {}
 
     @Override
-    void run() { CommandLine.usage(parentCommand, consoleService.sysErrStream) }
+    void run() { CommandLine.usage(parentCommand, parentCommand.consoleService.sysErrStream) }
   }
 
 }

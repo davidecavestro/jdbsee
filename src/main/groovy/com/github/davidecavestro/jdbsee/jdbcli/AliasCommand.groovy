@@ -1,12 +1,14 @@
 package com.github.davidecavestro.jdbsee.jdbcli
 
 import com.github.davidecavestro.jdbsee.jdbcli.config.JdbsAliasDao
+import groovy.transform.CompileStatic
 import picocli.CommandLine
 
 import javax.inject.Inject
 
 import static picocli.CommandLine.*
 
+@CompileStatic
 @Command(name = "alias", description = "Provides persistent settings for db connections",
     subcommands = [
         AliasCreateCommand, AliasDeleteCommand,

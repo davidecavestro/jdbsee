@@ -1,5 +1,6 @@
 package com.github.davidecavestro.jdbsee.jdbcli
 
+import org.apache.commons.io.input.ReaderInputStream
 import org.apache.commons.io.output.WriterOutputStream
 import org.junit.Test
 import org.spockframework.util.TeePrintStream
@@ -7,7 +8,7 @@ import org.spockframework.util.TeePrintStream
 
 class CliApplicationITest {
 
-    void checkOutput(String expected, Closure transform = {it->it}, String... args) throws Exception {
+    StringWriter getOutput(String... args) throws Exception {
         StringWriter writer = new StringWriter()
         PrintStream out = new PrintStream(new WriterOutputStream(writer))
 
@@ -16,7 +17,12 @@ class CliApplicationITest {
         //run
         CliApplication.main(args)
 
-        def actualData = transform(writer.toString().trim())
+        return writer
+    }
+
+
+    void checkOutput(String expected, Closure transform = {it->it}, String... args) throws Exception {
+        def actualData = transform(getOutput(transform, args).toString().trim())
         def expectedData = expected.stripIndent().trim()
 
         assert actualData == expectedData
@@ -591,5 +597,18 @@ class CliApplicationITest {
         )
     }
 
+    @Test
+    void testShell() throws Exception {
+//        StringWriter inWriter = new StringWriter()
+//        PrintStream sysIn = new PrintStream()
+//        new WriterOutputStream(writer) << System.in
+        System.in = new ReaderInputStream(new StringReader('help\nquit\n'))
+        StringWriter outWriter = getOutput ("shell")
+//        new WriterOutputStream(writer) << System.in
+
+//        outWriter << 'help\n'
+
+        assert outWriter.toString() == '>help'
+    }
 
 }

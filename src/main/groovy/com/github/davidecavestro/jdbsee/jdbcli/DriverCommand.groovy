@@ -1,12 +1,14 @@
 package com.github.davidecavestro.jdbsee.jdbcli
 
 import com.github.davidecavestro.jdbsee.jdbcli.config.JdbsDriverDao
+import groovy.transform.CompileStatic
 import picocli.CommandLine
 
 import javax.inject.Inject
 
 import static picocli.CommandLine.*
 
+@CompileStatic
 @Command(name = "driver", description = "Provides persistent settings for drivers",
     subcommands = [
         DriverCreateCommand, DriverDeleteCommand,
@@ -30,7 +32,7 @@ class DriverCommand implements Runnable {
   DriverCommand (){}
 
   @Override
-  void run () {CommandLine.usage(this, consoleService.sysErr)}
+  void run () {CommandLine.usage(this, consoleService.sysErrStream)}
 
   @Command(name = "create", description = "Register a new driver")
   static class DriverCreateCommand implements Runnable {
@@ -210,6 +212,6 @@ class DriverCommand implements Runnable {
     HelpCommand (){}
 
     @Override
-    void run () {CommandLine.usage(driverCommand, consoleService.sysErr)}
+    void run () {CommandLine.usage(driverCommand, driverCommand.consoleService.sysErrStream)}
   }
 }

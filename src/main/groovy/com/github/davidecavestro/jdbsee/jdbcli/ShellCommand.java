@@ -7,14 +7,17 @@ import com.google.common.collect.Maps;
 import org.jline.builtins.Completers;
 import org.jline.builtins.Completers.TreeCompleter;
 import org.jline.reader.*;
+import org.jline.reader.impl.history.DefaultHistory;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.utils.AttributedString;
+import org.jline.utils.ShutdownHooks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import javax.inject.Inject;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +41,9 @@ public class ShellCommand implements Runnable {
   @Inject
   protected ConsoleService consoleService;
 
+  @Inject
+  protected ConfigService configService;
+
     @Inject//dagger
   ShellCommand(){}
 
@@ -46,20 +52,32 @@ public class ShellCommand implements Runnable {
     try {
       TerminalBuilder builder = TerminalBuilder.builder();
 
-      Terminal terminal = builder.build();
-      consoleService.setSysOut (terminal.writer ());
+      Terminal terminal = builder.streams (consoleService.getSysInStream (), consoleService.getSysOutStream ()).build();
+      consoleService.setSysErr (terminal.writer ());
 
       final AppComponent appComponent = parent.getAppComponent ();
       final CommandLine.IFactory daggerFactory = new AppIFactory (appComponent);
       final Completer completer = new TreeCompleter (retrieveNodes (newCommandLine (daggerFactory)));
+      final File historyFile = new File (configService.getUserDataDir (), "shell-history");
+
+      final DefaultHistory history = new DefaultHistory ();
+      ShutdownHooks.add (new ShutdownHooks.Task () {
+        @Override
+        public void run () throws Exception {
+          history.save ();
+        }
+      });
       LineReader reader = LineReaderBuilder.builder()
           .terminal(terminal)
           .completer(completer)
 //          .parser(parser)
+          .variable(LineReader.HISTORY_FILE, historyFile)
+          .history(history)
           .build();
       while (true) {
         if (quit) {
           terminal.writer().println(AttributedString.fromAnsi("\u001B[33mbye\u001B[0m").toAnsi(terminal));
+          terminal.writer().flush ();
           break;
         }
         String line = null;
