@@ -22,7 +22,7 @@ class CliApplicationITest {
 
 
     void checkOutput(String expected, Closure transform = {it->it}, String... args) throws Exception {
-        def actualData = transform(getOutput(transform, args).toString().trim())
+        def actualData = transform(getOutput(args).toString().trim())
         def expectedData = expected.stripIndent().trim()
 
         assert actualData == expectedData
