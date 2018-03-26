@@ -34,6 +34,11 @@ later reuse.
 
 This is the set of available commands and related sub-commands:
 
+`shell`::
+Provides an interactive shell with command completion to execute
+commands within the application. +
+Provides an additional `quit` command to exit.
+
 `run`::
 Execute SQL queries
 

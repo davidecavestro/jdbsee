@@ -35,7 +35,7 @@ image:https://img.shields.io/twitter/follow/davide_cavestro.svg?style=social[Fol
 image:https://img.shields.io/twitter/follow/jdbsee.svg?style=social[Follow @jdbsee, link={uri-twitter-jdbsee}]
 endif::[]
 
-A simple jdbc CLI tool
+A simple jdbc CLI tool with batch and interactive mode
 
 toc::[]
 
@@ -50,9 +50,12 @@ Jdbsee CLI is a command line tool for databases operations over JDBC.
 Jdbsee CLI supports executing SQL queries from command line and
 exporting retrieved data.
 
-The JDBC drivers can be automatically downloaded or loaded local jars. +
+The JDBC drivers can be automatically downloaded or loaded from
+jars on filesystem. +
 Database connection settings and related credentials can be persisted
 for later reuse.
+
+The user interface supports both batch and interactive shell mode.
 
 For more info please see the link:docs/index.adoc[documentation].
 
