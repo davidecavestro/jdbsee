@@ -16,23 +16,16 @@ import org.slf4j.LoggerFactory
 import picocli.CommandLine
 
 import javax.inject.Inject
-import java.io.File
-import java.io.IOException
-import java.io.PrintStream
-import java.util.ArrayList
-import java.util.Arrays
-import java.util.List
-import java.util.Map
 
 import static org.jline.builtins.Completers.TreeCompleter.node
 
-//@CompileStatic
+@CompileStatic
 @CommandLine.Command(
   name = "shell",
   description = "Start the command shell",
   subcommands = [ShellCommand.HelpCommand.class]
 )
-class ShellCommand implements Runnable {
+class ShellCommand implements CliCommand {
 
   private final static Logger LOG = LoggerFactory.getLogger (ShellCommand.class)
 
@@ -76,7 +69,7 @@ class ShellCommand implements Runnable {
 
             final AppComponent appComponent = parent.getAppComponent ()
             final CommandLine.IFactory daggerFactory = new AppIFactory (appComponent)
-            final Completer completer = new TreeCompleter (retrieveNodes (newCommandLine (daggerFactory)))
+            final Completer completer = new TreeCompleter (retrieveNodes (createCommandLine (daggerFactory)))
             final File historyFile = new File (configService.getUserDataDir (), "shell-history")
 
             final DefaultHistory history = new DefaultHistory ()
@@ -105,11 +98,11 @@ $bannerTxt
 
 """.toString()
 
-                if (monochrome) {
+                if (ShellCommand.this.monochrome) {//FIXME wthout FQN groovy complains at runtime!
                   return text
                 } else {//coloured banner
                   return AttributedString.fromAnsi(
-                    String.format("\u001B[33m%s\u001B[0m",
+                    String.format("\u001B[36m%s\u001B[0m",
                       text
                     )
                   ).toAnsi(terminal)
@@ -119,7 +112,7 @@ $bannerTxt
             }
             while (true) {
               if (quit) {
-                terminal.writer ().println (AttributedString.fromAnsi ("\u001B[36mbye\u001B[0m").toAnsi (terminal))
+                terminal.writer ().println (AttributedString.fromAnsi ("\u001B[33mbye\u001B[0m").toAnsi (terminal))
                 terminal.writer ().flush ()
                 break
               }
@@ -144,7 +137,7 @@ $bannerTxt
               pl.words().with {def words->
                 if (words && words.first()) {// possible commands detected
                   try {
-                    newCommandLine (daggerFactory).parseWithHandler (new CommandLine.RunLast (), System.err, pl.words ().toArray (new String[0]))
+                      ShellCommand.this.createCommandLine (daggerFactory).parseWithHandler (new CommandLine.RunLast (), System.err, pl.words ().toArray (new String[0]))
                   } catch (final Exception e) {
                     e.printStackTrace (System.err)
                     terminal.writer ().println ("")
@@ -173,7 +166,7 @@ $bannerTxt
     return monochrome?
             text:
             AttributedString.fromAnsi(
-              """\u001B[33m${text}\u001B[0m""".toString()
+              """\u001B[32m${text}\u001B[0m""".toString()
             ).toAnsi(terminal)
   }
 
@@ -185,38 +178,40 @@ $bannerTxt
     return String.format ("%s (%s)", versionProvider.getVersionProp(), versionProvider.getBuildtimeProp())
   }
 
-  protected CommandLine newCommandLine (final CommandLine.IFactory daggerFactory) {
+  protected CommandLine createCommandLine (final CommandLine.IFactory daggerFactory) {
     final CommandLine commandLine = new CommandLine (parent, daggerFactory)
 
-    for (final Map.Entry<String, CommandLine> entry : Maps.filterEntries (commandLine.getSubcommands (), new Predicate<Map.Entry<String, CommandLine>> () {
-        @Override
-        boolean apply (final Map.Entry<String, CommandLine> input) {
-            return !input.getKey ().equals ("shell")//skip shell command
-        }
-    }).entrySet ()) {
-        commandLine.addSubcommand (entry.getKey (), entry.getValue ())
-    }
+//    commandLine.subcommands.findAll {String k, CommandLine v -> k!='shell'}
+//    for (final Map.Entry<String, CommandLine> entry : Maps.filterEntries (commandLine.getSubcommands (), new Predicate<Map.Entry<String, CommandLine>> () {
+//        @Override
+//        boolean apply (final Map.Entry<String, CommandLine> input) {
+//            return !input.getKey ().equals ("shell")//skip shell command
+//        }
+//    }).entrySet ()) {
+//        commandLine.addSubcommand (entry.getKey (), entry.getValue ())
+//    }
+
 
     //register quit command at top level, only within shell
-    final QuitCommand quitCommand = new QuitCommand ()
-    quitCommand.setParent (this)
-    commandLine.addSubcommand ("quit", quitCommand)
-
     final ExitCommand exitCommand = new ExitCommand ()
     exitCommand.setParent (this)
     commandLine.addSubcommand ("exit", exitCommand)
+
+    final QuitCommand quitCommand = new QuitCommand ()
+    quitCommand.setParent (this)
+    commandLine.addSubcommand ("quit", quitCommand)
 
     return commandLine
   }
 
   protected List<TreeCompleter.Node> retrieveNodes (final CommandLine commandLine) {
-
     final List<TreeCompleter.Node> result = new ArrayList<> ()
+
     final Map<String, CommandLine> subcommands = commandLine.getSubcommands ()
 
-    for (final Map.Entry<String, CommandLine> entry : subcommands.entrySet ()) {
-          final String name = entry.getKey ()
-      final CommandLine subCommandLine = entry.getValue ()
+    final List<String> sortedCmds = new ArrayList<>(subcommands.keySet())
+    sortedCmds.sort().each {final String name->
+      final CommandLine subCommandLine = subcommands[name]
 
       final List nodes = new ArrayList<> ()
       nodes.add (name)
@@ -285,19 +280,7 @@ $bannerTxt
     }
 
     @Override
-    void run () {
-      try {
-        consoleService.withSysOutStream (new Function<PrintStream, Void> () {
-          @Override
-          Void apply (final PrintStream input) {
-            CommandLine.usage (parent, input)
-            return null
-          }
-        })
-      } catch (final IOException e) {
-        throw new RuntimeException (e)
-      }
-    }
+    void run () {consoleService.usage (parent)}
 
     ConsoleService getConsoleService () {
       return consoleService

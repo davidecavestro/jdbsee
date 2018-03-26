@@ -16,7 +16,7 @@ import static picocli.CommandLine.*
         HelpCommand
     ]
 )
-class AliasCommand implements Runnable {
+class AliasCommand implements CliCommand {
   @ParentCommand
   private MainCommand mainCommand
 
@@ -30,7 +30,9 @@ class AliasCommand implements Runnable {
   AliasCommand(){}
 
   @Override
-  void run () {CommandLine.usage(this, consoleService.sysErrStream)}
+  void run () {
+    consoleService.usage(this)
+  }
 
   @Command(name = "create", description = "Create a new persistent alias")
   static class AliasCreateCommand implements Runnable {

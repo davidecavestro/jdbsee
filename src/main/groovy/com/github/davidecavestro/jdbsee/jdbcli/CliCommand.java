@@ -1,4 +1,7 @@
 package com.github.davidecavestro.jdbsee.jdbcli;
 
-public class CliCommand {
+/**
+ * Marker interface for CLI commands
+ */
+public interface CliCommand extends Runnable{
 }

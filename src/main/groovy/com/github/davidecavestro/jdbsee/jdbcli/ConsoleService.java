@@ -18,6 +18,7 @@ import org.jdbi.v3.core.statement.Query;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -129,7 +130,7 @@ public class ConsoleService {
       } else {
         if (sysOut != null) {
           writer = sysOut;
-          shouldClose = true;
+          shouldClose = false;
         } else {
           writer = new PrintWriter (new OutputStreamWriter (System.out));
           shouldClose = false;
@@ -144,6 +145,20 @@ public class ConsoleService {
     }
   }
 
+  protected void withErrWriter (final File outputFile, Function<PrintWriter, Void> call) throws IOException {
+    PrintWriter writer = null;//FIXME make it final (but IDE complains)
+    try {
+      if (sysErr != null) {
+        writer = sysErr;
+      } else {
+        writer = new PrintWriter (new OutputStreamWriter (System.err));
+      }
+
+      call.apply (writer);
+    } finally {
+      writer.flush ();
+    }
+  }
   public InputStream getSysInStream () {
     return sysInStream;
   }
@@ -164,6 +179,16 @@ public class ConsoleService {
     return new PrintStream (new WriterOutputStream (sysOut, Charset.defaultCharset()));
   }
 
+  public void withSysOutStream (final Function<PrintStream, Void> call) throws IOException {
+    withOutWriter (null, new Function<PrintWriter, Void> () {
+      @Override
+      public Void apply (final PrintWriter input) {
+        final PrintStream stream = new PrintStream (new WriterOutputStream (input, Charset.defaultCharset()));
+        return call.apply (stream);
+      }
+    });
+  }
+
   public PrintWriter getSysErr () {
     return sysErr;
   }
@@ -176,14 +201,29 @@ public class ConsoleService {
     return new PrintStream (new WriterOutputStream (sysErr, Charset.defaultCharset()));
   }
 
-  public void withSysOutStream (final Function<PrintStream, Void> call) throws IOException {
-    withOutWriter (null, new Function<PrintWriter, Void> () {
-      @Override
-      public Void apply (final PrintWriter input) {
-        final PrintStream stream = new PrintStream (new WriterOutputStream (input, Charset.defaultCharset()));
-        return call.apply (stream);
-      }
-    });
+  public void withSysErrStream (final Function<PrintStream, Void> call) throws IOException {
+//    withErrWriter (null, new Function<PrintWriter, Void> () {
+//      @Override
+//      public Void apply (final PrintWriter input) {
+//        final PrintStream stream = new PrintStream (new WriterOutputStream (input, Charset.defaultCharset()));
+//        return call.apply (stream);
+//      }
+//    });
+    call.apply (System.err);
+  }
+
+  public void usage (final CliCommand command) {
+    try {
+      withSysErrStream (new Function<PrintStream, Void> () {
+        @Override
+        public Void apply (final PrintStream stream) {
+          CommandLine.usage(command, stream);
+          return null;
+        }
+      });
+    } catch (IOException e) {
+      throw new RuntimeException (e);
+    }
   }
 
   static class CsvResultSetScanner implements ResultSetScanner<Void> {

@@ -2,7 +2,7 @@ package com.github.davidecavestro.jdbsee.jdbcli
 
 import picocli.CommandLine
 
-abstract class AbstractDbCommand implements Runnable {
+abstract class AbstractDbCommand implements CliCommand {
   @CommandLine.Option(names = ["-a", "--alias"], description = "Database alias, to reuse previously persisted settings")
   String alias
 

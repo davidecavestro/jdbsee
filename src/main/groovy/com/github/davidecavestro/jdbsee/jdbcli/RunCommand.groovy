@@ -56,7 +56,7 @@ class RunCommand extends AbstractDbCommand {
     HelpCommand (){}
 
     @Override
-    void run () {CommandLine.usage(runCommand, consoleService.sysErrStream)}
+    void run () {consoleService.usage(runCommand)}
   }
 
 }

@@ -18,7 +18,7 @@ import static picocli.CommandLine.*
         HelpCommand
     ]
 )
-class DriverCommand implements Runnable {
+class DriverCommand implements CliCommand {
   @ParentCommand
   private MainCommand mainCommand
 
@@ -32,7 +32,7 @@ class DriverCommand implements Runnable {
   DriverCommand (){}
 
   @Override
-  void run () {CommandLine.usage(this, consoleService.sysErrStream)}
+  void run () {consoleService.usage(this)}
 
   @Command(name = "create", description = "Register a new driver")
   static class DriverCreateCommand implements Runnable {
@@ -212,6 +212,6 @@ class DriverCommand implements Runnable {
     HelpCommand (){}
 
     @Override
-    void run () {CommandLine.usage(driverCommand, driverCommand.consoleService.sysErrStream)}
+    void run () {consoleService.usage(driverCommand)}
   }
 }

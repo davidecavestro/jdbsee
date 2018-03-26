@@ -15,7 +15,7 @@ import static picocli.CommandLine.*
         HelpCommand
     ]
 )
-class DescribeCommand implements Runnable {
+class DescribeCommand implements CliCommand {
   @ParentCommand
   private MainCommand mainCommand
 
@@ -30,7 +30,7 @@ class DescribeCommand implements Runnable {
   DescribeCommand() {}
 
   @Override
-  void run() { CommandLine.usage(this, consoleService.sysErrStream) }
+  void run() { consoleService.usage(this) }
 
 
   @Command(name = "tables", description = "List all tables")
@@ -91,7 +91,7 @@ class DescribeCommand implements Runnable {
   }
 
   @Command(name = "help", description = "Print this help")
-  static class HelpCommand implements Runnable {
+  static class HelpCommand implements CliCommand {
     @ParentCommand
     private DescribeCommand parentCommand
 
@@ -99,7 +99,7 @@ class DescribeCommand implements Runnable {
     HelpCommand() {}
 
     @Override
-    void run() { CommandLine.usage(parentCommand, parentCommand.consoleService.sysErrStream) }
+    void run() { parentCommand.consoleService.usage(parentCommand) }
   }
 
 }

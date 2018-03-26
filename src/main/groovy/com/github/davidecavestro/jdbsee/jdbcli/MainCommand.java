@@ -18,7 +18,7 @@ import java.io.PrintStream;
     descriptionHeading = "@|bold DESCRIPTION|@",
     description = {
         "\n",
-        "Jdbsee is a small command line tool providing utilities to access databases through JDBC drivers."+
+        "Jdbsee is a CLI tool providing both batch and interactive db access through JDBC drivers."+
         "\n",
         "Drivers can be downloaded on demand, automatically or explicitly loaded from local filesystem."+
         "\n",
@@ -35,7 +35,7 @@ import java.io.PrintStream;
         HelpCommand.class
     },
     versionProvider = PropertiesVersionProvider.class)
-public class MainCommand implements Runnable {
+public class MainCommand implements CliCommand {
   @Option(names = {"-V", "--version"}, versionHelp = true, description = "Print version info")
   boolean versionRequested;
 
@@ -48,17 +48,7 @@ public class MainCommand implements Runnable {
   public MainCommand(){}
 
   public void run () {
-    try {
-      consoleService.withSysOutStream (new Function<PrintStream, Void> () {
-        @Override
-        public Void apply (final PrintStream input) {
-          CommandLine.usage (this, input);
-          return null;
-        }
-      });
-    } catch (final IOException e) {
-      throw new RuntimeException (e);
-    }
+    consoleService.usage (this);
   }
 
   public AppComponent getAppComponent () {
