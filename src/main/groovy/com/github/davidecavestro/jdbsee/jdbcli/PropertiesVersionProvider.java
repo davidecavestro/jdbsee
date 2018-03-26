@@ -39,8 +39,8 @@ public class PropertiesVersionProvider implements IVersionProvider {
     }
 
     return new String[] {
-      String.format ("%s version \"%s\" ", getApplicationNameProp()),
-      String.format ("Built: %s", getVersionProp(), getBuildtimeProp())
+      String.format ("%s version \"%s\" ", getApplicationNameProp(), getVersionProp()),
+      String.format ("Built: %s", getBuildtimeProp())
     };
   }
 

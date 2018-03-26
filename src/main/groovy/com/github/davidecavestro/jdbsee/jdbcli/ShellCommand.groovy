@@ -26,11 +26,11 @@ import java.util.Map
 
 import static org.jline.builtins.Completers.TreeCompleter.node
 
-@CompileStatic
+//@CompileStatic
 @CommandLine.Command(
   name = "shell",
   description = "Start the command shell",
-  subcommands = {ShellCommand.HelpCommand.class}
+  subcommands = [ShellCommand.HelpCommand.class]
 )
 class ShellCommand implements Runnable {
 
@@ -91,9 +91,14 @@ class ShellCommand implements Runnable {
                 .build ()
             if (!noBanner) {//banner enabled
               def stream = getClass().getResourceAsStream("/banner_shell.txt")
-
+              String version = getVersion ()
               final String banner = stream.text.with {String bannerTxt->
-                String text = bannerTxt + getVersion()
+                String text =
+"""
+$bannerTxt
+
+$version
+""".toString()
                 if (monochrome) {
                   return text
                 } else {//coloured banner
