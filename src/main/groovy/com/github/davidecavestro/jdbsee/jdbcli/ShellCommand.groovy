@@ -44,6 +44,8 @@ class ShellCommand implements Runnable {
   boolean noBanner
   @CommandLine.Option(names = ["-m", "--monochrome"], description = "Don't produce coloured output")
   boolean monochrome
+//  @CommandLine.Option(names = ["-t", "--theme"], description = "Theme for Ansi coloured output. On between [dark, mono]. Choose mono for monochromatic output.")
+//  Theme theme = Theme.dark
 
   @Inject
   protected ConsoleService consoleService
@@ -67,8 +69,10 @@ class ShellCommand implements Runnable {
           try {
             final TerminalBuilder builder = TerminalBuilder.builder ()
 
-            final Terminal terminal = builder.streams (consoleService.getSysInStream (), sysOut).build ()
+            final Terminal terminal = builder.build ()
+
             consoleService.setSysErr (terminal.writer ())
+            consoleService.setSysOut (terminal.writer ())
 
             final AppComponent appComponent = parent.getAppComponent ()
             final CommandLine.IFactory daggerFactory = new AppIFactory (appComponent)
@@ -100,6 +104,7 @@ $bannerTxt
     $version
 
 """.toString()
+
                 if (monochrome) {
                   return text
                 } else {//coloured banner
@@ -114,7 +119,7 @@ $bannerTxt
             }
             while (true) {
               if (quit) {
-                terminal.writer ().println (AttributedString.fromAnsi ("\u001B[33mbye\u001B[0m").toAnsi (terminal))
+                terminal.writer ().println (AttributedString.fromAnsi ("\u001B[36mbye\u001B[0m").toAnsi (terminal))
                 terminal.writer ().flush ()
                 break
               }
@@ -136,12 +141,18 @@ $bannerTxt
 
               ParsedLine pl = reader.getParser ().parse (line, 0)
 
-              try {
-                newCommandLine (daggerFactory).parseWithHandler (new CommandLine.RunLast (), System.err, pl.words ().toArray (new String[0]))
-              } catch (final Exception e) {
-                e.printStackTrace (System.err)
-                terminal.writer ().println ("")
-                terminal.flush ()
+              pl.words().with {def words->
+                if (words && words.first()) {// possible commands detected
+                  try {
+                    newCommandLine (daggerFactory).parseWithHandler (new CommandLine.RunLast (), System.err, pl.words ().toArray (new String[0]))
+                  } catch (final Exception e) {
+                    e.printStackTrace (System.err)
+                    terminal.writer ().println ("")
+                    terminal.flush ()
+                  }
+                } else {
+                  // simple ENTER, go straight
+                }
               }
             }
           } catch (Exception e) {
@@ -157,6 +168,15 @@ $bannerTxt
     //    CommandLine commandLine = new CommandLine (parent, daggerFactory);
   }
 
+  //TODO use picocli styles
+  protected String coloured(final Terminal terminal, final String text) {
+    return monochrome?
+            text:
+            AttributedString.fromAnsi(
+              """\u001B[33m${text}\u001B[0m""".toString()
+            ).toAnsi(terminal)
+  }
+
   protected String getLongVersion () throws Exception {
     return String.format ("Jdbsee CLI shell %s (%s)", versionProvider.getVersionProp(), versionProvider.getBuildtimeProp())
   }
@@ -165,7 +185,7 @@ $bannerTxt
     return String.format ("%s (%s)", versionProvider.getVersionProp(), versionProvider.getBuildtimeProp())
   }
 
-  private CommandLine newCommandLine (final CommandLine.IFactory daggerFactory) {
+  protected CommandLine newCommandLine (final CommandLine.IFactory daggerFactory) {
     final CommandLine commandLine = new CommandLine (parent, daggerFactory)
 
     for (final Map.Entry<String, CommandLine> entry : Maps.filterEntries (commandLine.getSubcommands (), new Predicate<Map.Entry<String, CommandLine>> () {
@@ -288,4 +308,38 @@ $bannerTxt
     }
   }
 
+//  static enum Theme {
+//    dark ([
+//          (Style.plain): '37',
+//          (Style.strong): '32',
+//          (Style.em): '36',
+//          (Style.head): '33',
+//          (Style.foot): '33'
+//      ]),
+//    mono ();
+//
+//    Map<Style,String> styles
+//    boolean monochrome
+//
+//    Theme () {monochrome=true}
+//    Theme (Map<Style,String> styles) {this.styles=styles}
+//
+//    String text (final Terminal terminal, final Style style,  final String text) {
+//      if (monochrome) {
+//        return text
+//      } else {//coloured banner
+//        switch (style) {
+//          plain:
+//            return text
+//          default:
+//            return AttributedString.fromAnsi(
+//                  """\u001B[${styles[style]}m$text\u001B[0m""".toString()
+//            ).toAnsi(terminal)
+//        }
+//      }
+//    }
+//  }
+//  static enum Style {
+//    plain, strong, em, head, foot;
+//  }
 }
