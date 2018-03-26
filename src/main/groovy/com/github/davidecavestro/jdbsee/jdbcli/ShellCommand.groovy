@@ -63,11 +63,11 @@ class ShellCommand implements Runnable {
     try {
       consoleService.withSysOutStream (new Function<PrintStream, Void> () {
         @Override
-        Void apply (final PrintStream input) {
+        Void apply (final PrintStream sysOut) {
           try {
             final TerminalBuilder builder = TerminalBuilder.builder ()
 
-            final Terminal terminal = builder.streams (consoleService.getSysInStream (), input).build ()
+            final Terminal terminal = builder.streams (consoleService.getSysInStream (), sysOut).build ()
             consoleService.setSysErr (terminal.writer ())
 
             final AppComponent appComponent = parent.getAppComponent ()
@@ -97,7 +97,8 @@ class ShellCommand implements Runnable {
 """
 $bannerTxt
 
-$version
+    $version
+
 """.toString()
                 if (monochrome) {
                   return text
@@ -181,6 +182,10 @@ $version
     quitCommand.setParent (this)
     commandLine.addSubcommand ("quit", quitCommand)
 
+    final ExitCommand exitCommand = new ExitCommand ()
+    exitCommand.setParent (this)
+    commandLine.addSubcommand ("exit", exitCommand)
+
     return commandLine
   }
 
@@ -227,6 +232,25 @@ $version
         quit = true
   }
 
+  @CommandLine.Command(name = "exit", description = "Quit shell")
+  static class ExitCommand implements Runnable {
+    private ShellCommand parent
+
+    ExitCommand () {}
+
+    @Override
+    void run () {
+      parent.quit ()
+    }
+
+    ShellCommand getParent () {
+      return parent
+    }
+
+    void setParent (final ShellCommand parent) {
+      this.parent = parent
+    }
+  }
 
   @CommandLine.Command(name = "help", description = "Print this help")
   static class HelpCommand implements Runnable {
