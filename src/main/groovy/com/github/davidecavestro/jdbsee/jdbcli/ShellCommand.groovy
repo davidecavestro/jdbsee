@@ -1,11 +1,11 @@
 package com.github.davidecavestro.jdbsee.jdbcli
 
 import com.google.common.base.Function
-import com.google.common.base.Predicate
-import com.google.common.collect.Maps
 import groovy.transform.CompileStatic
 import org.jline.builtins.Completers.TreeCompleter
+import org.jline.builtins.SortedTreeCompleter
 import org.jline.reader.*
+import org.jline.reader.impl.LineReaderImpl
 import org.jline.reader.impl.history.DefaultHistory
 import org.jline.terminal.Terminal
 import org.jline.terminal.TerminalBuilder
@@ -69,7 +69,7 @@ class ShellCommand implements CliCommand {
 
             final AppComponent appComponent = parent.getAppComponent ()
             final CommandLine.IFactory daggerFactory = new AppIFactory (appComponent)
-            final Completer completer = new TreeCompleter (retrieveNodes (createCommandLine (daggerFactory)))
+            final Completer completer = new SortedTreeCompleter (retrieveNodes (createCommandLine (daggerFactory)))
             final File historyFile = new File (configService.getUserDataDir (), "shell-history")
 
             final DefaultHistory history = new DefaultHistory ()
@@ -79,7 +79,7 @@ class ShellCommand implements CliCommand {
                 history.save ()
               }
             })
-            final LineReader reader = LineReaderBuilder.builder ()
+            final LineReader reader = LineaReaderAdapter.Builder.builder ()
                 .terminal (terminal)
                 .completer (completer)
 //              .parser(parser)
@@ -98,15 +98,7 @@ $bannerTxt
 
 """.toString()
 
-                if (ShellCommand.this.monochrome) {//FIXME wthout FQN groovy complains at runtime!
-                  return text
-                } else {//coloured banner
-                  return AttributedString.fromAnsi(
-                    String.format("\u001B[36m%s\u001B[0m",
-                      text
-                    )
-                  ).toAnsi(terminal)
-                }
+                return ShellCommand.this.coloured(terminal, text)//TODO find why groovyc generates a classcast here without FQN... really 8-)
               }
               terminal.writer().println(banner)
             }

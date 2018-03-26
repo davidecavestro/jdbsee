@@ -132,9 +132,7 @@ class AliasCommand implements CliCommand {
 
     @Override
     void run () {
-      consoleService.withSysOutStream {PrintStream outStream->
-        CommandLine.usage(aliasCommand, outStream)
-      }
+      consoleService.usage(aliasCommand)
     }
   }
 
