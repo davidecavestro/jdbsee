@@ -149,7 +149,7 @@ task generateVersionTxt {
     generated.text = """
         Version: $rootProject.version
         Buildtime: ${new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())}
-        Application-name: $project.name
+        Application-name: $rootProject.name
         """
 //    Application-name: $rootProject.name $project.name
   }
@@ -181,6 +181,8 @@ ospackage {
 
 tasks.buildDeb.dependsOn 'assembleDist'
 tasks.buildRpm.dependsOn 'assembleDist'
+
+tasks.build.dependsOn 'buildDeb', 'buildRpm'
 
 jacocoTestReport {
     reports {
