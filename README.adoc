@@ -159,6 +159,7 @@ Follows an example on how to build with drivers (full distribution) and launch s
 -x "insert into contacts (id, name) values (2, 'Bob');" \
 -x "insert into contacts (id, name) values (3, 'John');" \
 -x "insert into contacts (id, name) values (4, 'Daisy');" \
+-d "com.h2database:h2:1.4.196" \
 -l "jdbc:h2:mem:test" \ //<5>
 "SELECT * FROM contacts;" //<6>
 ----
