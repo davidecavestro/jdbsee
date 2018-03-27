@@ -80,6 +80,22 @@ Invoke the distributable binary passing appropriate commands and params
 image::jdbsee_zsh.png[Jdbsee help message]
 
 
+## `shell` command
+
+Open the interactive shell and execute multiple commands within the
+running application:
+
+  * type `jdbsee shell` to open the interactive shell
+  * hit `TAB` to get a list of available commands
+  * use `left`/`right` arrows or `TAB` to navigate through th elist
+  of available commands
+  * type some chars to filter available commands by name
+  * hit `ENTER` to automatically type the selected command, then `ENTER`
+  again to execute it or `TAB` for further hints
+
+image::jdbsee_shell.png[Jdbsee shell message]
+
+
 ## `run` command
 
 Execute SQL queries against a database. Database connection (driver, jdbc url

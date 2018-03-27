@@ -62,6 +62,22 @@ For more info please see the link:docs/index.adoc[documentation].
 
 # Usage
 
+## Interactive mode
+
+Open the interactive shell and execute multiple commands within the
+application:
+
+  * type `jdbsee shell` to open the interactive shell
+  * hit `TAB` to get a list of available commands
+  * use `left`/`right` arrows or `TAB` to navigate through available
+  commands, or type some chars to filter by name
+  * hit `ENTER` to automatically type the selected command, then `ENTER`
+  again to execute it or `TAB` for further hints
+
+image::jdbsee_shell.png[Jdbsee shell message]
+
+
+## Batch mode
 
 Invoke the `jdbsee` executable passing appropriate commands and params.
 `jdbsee help` provides the main help. `jdbsee COMMAND help` provides
@@ -168,4 +184,13 @@ you should get
 │4                                      │Daisy                                 │
 └───────────────────────────────────────┴──────────────────────────────────────┘
 
+```
+
+# How to release
+
+```
+./gradlew release \
+-Prelease.versionIncrementer=incrementMinor \
+-Prelease.dryRun  \
+-Prelease.customUsername="..." -Prelease.customPassword="..."
 ```
