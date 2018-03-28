@@ -5,6 +5,7 @@ import groovy.transform.CompileStatic
 import org.jline.builtins.Completers.TreeCompleter
 import org.jline.builtins.SortedTreeCompleter
 import org.jline.reader.*
+import org.jline.reader.impl.DefaultParser
 import org.jline.reader.impl.LineReaderImpl
 import org.jline.reader.impl.history.DefaultHistory
 import org.jline.terminal.Terminal
@@ -79,10 +80,11 @@ class ShellCommand implements CliCommand {
                 history.save ()
               }
             })
+            final DefaultParser parser = new DefaultParser(eofOnEscapedNewLine:true)
             final LineReader reader = LineaReaderAdapter.Builder.builder ()
                 .terminal (terminal)
                 .completer (completer)
-//              .parser(parser)
+                .parser(parser)
                 .variable (LineReader.HISTORY_FILE, historyFile)
                 .history (history)
                 .build ()
