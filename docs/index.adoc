@@ -34,17 +34,21 @@ later reuse.
 
 This is the set of available commands and related sub-commands:
 
-`shell`::
-Provides an interactive shell with command completion to execute
-commands within the application. +
-Provides an additional `quit` command to exit.
+<<shell-command,`shell`>>::
+Provides an interactive shell with command completion to execute the
+whole set of commands within the application.
 
-`run`::
-Execute SQL queries
+  * `quit` or `exit` quit the application
+  * `help` print command help
+
+<<run-command,`run`>>::
+Executes SQL queries on previously defined db alias or passing db settings
+as options.
 
 `driver`::
 Provides persistent settings related to jdbc drivers.
 Keeps references to local jars, maven-style dependencies and driver class name.
+
   * `create` register new driver settings
   * `list` list registered driver settings
   * `show` show details about driver settings
@@ -54,6 +58,7 @@ Keeps references to local jars, maven-style dependencies and driver class name.
 `alias`::
 Provides persistent settings related to database connection.
 Keeps reference to driver settings, jdbc url and credentials.
+
   * `create` register a new persistent alias to database connection
   * `list` list registered db aliases
   * `show` show details about persistent driver settings
@@ -65,7 +70,8 @@ Keeps reference to driver settings, jdbc url and credentials.
   * `help` print command help
 
 `describe`::
-Provides info about database and jdbc driver
+Provides info about database and jdbc driver.
+
   * `tables` list all tables
   * `views` list all views
   * `driver` show driver info
@@ -191,11 +197,11 @@ lead to license issues.
 
 from the `dropins` folder::
 
-copy the jar files with your jdbc drivers within the `dropins`
-folder and their contents will be scanned. +
+copy within the `dropins` folder some jar files containing the
+jdbc drivers and their contents will be scanned. +
 The folders scanned for additional jars are the application
-distribution subfolder named `dropins` and the `${HOME}/.jdbsee/dropins`
-folder (within user home).
+distribution subfolder named `dropins` and the
+`${HOME}/.jdbsee/dropins` folder (within user home).
 
 
 downloading as dependency::
@@ -223,13 +229,13 @@ This means settings are actually stored as csv files within the
 
 The application supports multiple output formats:
 
-TABLE::
+`TABLE`::
 rows formatted as a plain text table
 
-CSV::
+`CSV`::
 values separated by semicolons
 
-JSON, JSON_PRETTY::
+`JSON`, `JSON_PRETTY`::
 json in a raw or pretty printed flavor
 
 The data is written to the standard output, while informational messages
