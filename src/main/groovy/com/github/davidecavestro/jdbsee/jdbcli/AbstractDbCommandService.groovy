@@ -244,7 +244,7 @@ abstract class AbstractDbCommandService {
 
   int getWidth(final AbstractDbCommand abstractDbCommand) {
     def width = abstractDbCommand.width
-    return width>0?:computeWidth()
+    return width>0?width:computeWidth()
   }
 
   protected int computeWidth () {
