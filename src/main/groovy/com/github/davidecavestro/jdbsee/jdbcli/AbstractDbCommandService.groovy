@@ -4,6 +4,8 @@ import com.github.davidecavestro.jdbsee.jdbcli.config.JdbsAliasDao
 import com.github.davidecavestro.jdbsee.jdbcli.config.JdbsDep
 import com.github.davidecavestro.jdbsee.jdbcli.config.JdbsJar
 import org.jboss.shrinkwrap.resolver.api.maven.Maven
+import org.jline.terminal.Terminal
+import org.jline.terminal.TerminalBuilder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -18,6 +20,7 @@ import java.util.jar.JarFile
 abstract class AbstractDbCommandService {
 
   private final static Logger LOG = LoggerFactory.getLogger (AbstractDbCommandService.class)
+  private static final int DEFAULT_WIDTH = 80;
 
   @Inject
   public ConfigService configService
@@ -238,4 +241,21 @@ abstract class AbstractDbCommandService {
       }
     }
   }
+
+  int getWidth(final AbstractDbCommand abstractDbCommand) {
+    def width = abstractDbCommand.width
+    return width>0?:computeWidth()
+  }
+
+  protected int computeWidth () {
+    try {
+      final Terminal term = TerminalBuilder.builder().build();
+
+      return Math.max (DEFAULT_WIDTH, term.getWidth());
+    } catch (Exception e) {
+      return DEFAULT_WIDTH;
+    }
+  }
+
+
 }

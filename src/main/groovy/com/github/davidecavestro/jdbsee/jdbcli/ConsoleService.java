@@ -7,10 +7,8 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvParser;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.google.common.base.Function;
-import com.google.common.collect.Streams;
 import com.google.common.collect.Table;
 import de.vandermeer.asciitable.AsciiTable;
-import groovy.lang.Closure;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.jdbi.v3.core.result.NoResultsException;
 import org.jdbi.v3.core.result.ResultSetScanner;
@@ -20,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.*;
 import java.nio.charset.Charset;
@@ -29,12 +26,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
-
-import static com.google.common.collect.Iterators.concat;
-import static com.google.common.collect.Iterators.transform;
 
 public class ConsoleService {
 

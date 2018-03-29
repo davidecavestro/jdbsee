@@ -44,14 +44,14 @@ class DescribeCommandService extends AbstractDbCommandService{
                   table.put(cmd.matches, 'Property', cmd.matches)
                   table.put(cmd.matches, 'Value', propValue.collect { it as String })
 
-                  consoleService.renderTable(table, cmd.width)
+                  consoleService.renderTable(table, getWidth (cmd))
                   break
                 default:
                   Table table = ArrayTable.create([cmd.matches], ['Property', 'Value'])
                   table.put(cmd.matches, 'Property', cmd.matches)
                   table.put(cmd.matches, 'Value', propValue as String)
 
-                  consoleService.renderTable(table, cmd.width)
+                  consoleService.renderTable(table, getWidth (cmd))
               }
 
             }
@@ -75,7 +75,7 @@ class DescribeCommandService extends AbstractDbCommandService{
                 table.put(k, 'value', valueString)
               }
             }
-            consoleService.renderTable(table, cmd.width)
+            consoleService.renderTable(table, getWidth (cmd))
           }
         } finally {
           connection.close()
@@ -125,7 +125,7 @@ class DescribeCommandService extends AbstractDbCommandService{
           return table
         }
 
-        consoleService.renderTable(table, 80)
+        consoleService.renderTable(table, getWidth(cmd))
       } finally {
         connection.close()
       }

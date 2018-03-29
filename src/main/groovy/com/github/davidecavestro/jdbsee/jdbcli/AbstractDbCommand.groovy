@@ -30,4 +30,6 @@ abstract class AbstractDbCommand implements CliCommand {
   @CommandLine.Option(names = ["-m", "--driver-class-match"], description = "Regex used to detect driver class by name. Defaults to '(.*)Driver(.*)'")
   String driverClassMatches = '(.*)Driver(.*)'
 
+  @CommandLine.Option(names = ["-w", "--output-width"], description = "Output table width")
+  int width = -1
 }
