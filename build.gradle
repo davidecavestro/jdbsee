@@ -168,7 +168,7 @@ startScripts.with {
 
 ospackage {
   group = "Distribution"
-  description = "Prepare package for Debian an derivatives"
+  description = "Jdbsee CLI is a command line tool for databases operations over JDBC"
   packageName = 'jdbsee'
   release = 1
 
