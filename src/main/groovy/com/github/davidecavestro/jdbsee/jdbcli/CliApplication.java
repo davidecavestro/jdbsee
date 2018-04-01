@@ -85,6 +85,10 @@ interface AppComponent {
 //  void inject (ShellCommand.QuitCommand command);
   void inject (ShellCommand.HelpCommand command);
 
+  void inject (ConnectCommand command);
+  //  void inject (ShellCommand.QuitCommand command);
+  void inject (ConnectCommand.HelpCommand command);
+
   void inject (DriverCommand command);
   void inject (DriverCommand.DriverCreateCommand command);
   void inject (DriverCommand.DriverDeleteCommand command);

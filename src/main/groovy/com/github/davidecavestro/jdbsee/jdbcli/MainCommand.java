@@ -32,6 +32,7 @@ import java.io.PrintStream;
         AliasCommand.class,
         DescribeCommand.class,
         ShellCommand.class,
+        ConnectCommand.class,
         HelpCommand.class
     },
     versionProvider = PropertiesVersionProvider.class)

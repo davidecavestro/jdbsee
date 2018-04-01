@@ -179,6 +179,12 @@ ospackage {
   link('/usr/bin/jdbsee', '/usr/share/jdbsee/bin/jdbsee')
 }
 
+buildRpm {
+  arch = 'NOARCH'
+  os = 'LINUX'
+  type = 'BINARY'
+}
+
 tasks.buildDeb.dependsOn 'assembleDist'
 tasks.buildRpm.dependsOn 'assembleDist'
 
