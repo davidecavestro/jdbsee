@@ -118,7 +118,7 @@ class ConnectCommandService extends AbstractDbCommandService{
                       default:
                         final Statement stmt = connection.createStatement()
                         try {
-                          if (line.trim().startsWith('SELECT')) {
+                          if (line.trim().toUpperCase().startsWith('SELECT')) {
                             final ResultSet rs = stmt.executeQuery(line)
                             try {
                               shellService.printResultSet(rs)
