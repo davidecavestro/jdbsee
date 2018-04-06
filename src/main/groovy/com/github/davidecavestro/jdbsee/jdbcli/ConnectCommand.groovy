@@ -20,8 +20,8 @@ class ConnectCommand extends AbstractDbCommand {
   @CommandLine.ParentCommand
   MainCommand parent
 
-  @Inject
-  protected ConnectCommandService connectCommandService
+  @Inject//public for dagger
+  public ConnectCommandService connectCommandService
 
   @Inject //dagger
   ConnectCommand() {

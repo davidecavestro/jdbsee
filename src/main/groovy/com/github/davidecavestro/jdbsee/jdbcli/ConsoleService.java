@@ -219,6 +219,13 @@ public class ConsoleService {
     }
   }
 
+  public void printRowsAffected(final int rows) throws IOException {
+    withOutWriter(null, outWriter -> {
+      outWriter.println(String.format("%s rows affected", rows));
+      return null;
+    });
+  }
+
   static class CsvResultSetScanner implements ResultSetScanner<Void> {
     private final PrintWriter outWriter;
 

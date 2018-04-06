@@ -20,6 +20,9 @@ import javax.sql.DataSource
 import java.security.MessageDigest
 import java.sql.Connection
 import java.sql.DatabaseMetaData
+import java.sql.ResultSet
+import java.sql.Statement
+
 import static org.jline.builtins.Completers.TreeCompleter.node
 
 //@CompileStatic
@@ -27,13 +30,13 @@ class ConnectCommandService extends AbstractDbCommandService{
 
   private final static Logger LOG = LoggerFactory.getLogger (ConnectCommandService.class)
 
-  @Inject
-  protected ConfigService configService
-  @Inject
-  protected ShellService shellService
+  @Inject//public for dagger
+  public ConfigService configService
+  @Inject//public for dagger
+  public ShellService shellService
 
   @Inject
-  ConnectCommandService(){}
+  public ConnectCommandService(){}
 
   void run (final ConnectCommand cmd) {
     shellService.withSysOutStream { final PrintStream sysOut->
@@ -45,7 +48,7 @@ class ConnectCommandService extends AbstractDbCommandService{
         shellService.setSysStreams (terminal.writer ())
 
         doRun (cmd) { DataSource dataSource ->
-          Connection connection = dataSource.getConnection()
+          final Connection connection = dataSource.getConnection()
           try {
             def sessionName // display name
             def sessionUID // db config identifier
@@ -74,6 +77,9 @@ class ConnectCommandService extends AbstractDbCommandService{
                 .variable (LineReader.HISTORY_FILE, historyFile)
                 .history (history)
                 .build ()
+
+//            //autocommit false by default
+//            connection.autoCommit = false
 
             boolean quit = false
 
@@ -110,7 +116,22 @@ class ConnectCommandService extends AbstractDbCommandService{
                         quit = true
                         break
                       default:
-                        shellService.printResultSet(propValue)
+                        final Statement stmt = connection.createStatement()
+                        try {
+                          if (line.trim().startsWith('SELECT')) {
+                            final ResultSet rs = stmt.executeQuery(line)
+                            try {
+                              shellService.printResultSet(rs)
+                            } finally {//TODO use withCloseable with groovy 2.5
+                              rs.close()
+                            }
+                          } else {
+                            final int numRows = stmt.executeUpdate(line)
+                            shellService.printRowsAffected(numRows)
+                          }
+                        } finally {//TODO use withCloseable with groovy 2.5
+                          stmt.close()
+                        }
                     }
                   } catch (final Exception e) {
                     e.printStackTrace (System.err)

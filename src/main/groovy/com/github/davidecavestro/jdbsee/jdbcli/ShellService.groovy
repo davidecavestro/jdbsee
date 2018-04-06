@@ -10,8 +10,8 @@ import java.sql.ResultSet
 import java.sql.SQLException;
 
 class ShellService {
-  @Inject
-  protected ConsoleService consoleService
+  @Inject //public for dagger
+  public ConsoleService consoleService
 
   @Inject //dagger
   ShellService(){}
@@ -20,9 +20,9 @@ class ShellService {
     reader.readLine (prompt, null, (MaskingCallback) null, null)
   }
 
-  def setSysStreams(final PrintWriter printWriter) {
-    consoleService.setSysErr (terminal.writer ())
-    consoleService.setSysOut (terminal.writer ())
+  def setSysStreams(final PrintWriter writer) {
+    consoleService.setSysErr (writer)
+    consoleService.setSysOut (writer)
   }
 
 
@@ -40,4 +40,7 @@ class ShellService {
     consoleService.printResultSet(resultSet)
   }
 
+  void printRowsAffected(int rows) {
+    consoleService.printRowsAffected(rows)
+  }
 }
