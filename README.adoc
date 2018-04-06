@@ -82,6 +82,17 @@ application:
 image::jdbsee_shell.png[Jdbsee shell message]
 
 
+In order to execute multiple queries within the same sql session:
+
+  * use the `jdbsee connect` command to open the interactive sql session
+  (i.e. `jdbsee connect -d "com.h2database:h2:1.4.196" -l "jdbc:h2:mem:test"`)
+  * type your query and hit ENTER for every query
+  * use `up`/`down` arrows to navigate into the history
+  * type `quit` and hit `ENTER` to exit
+
+image::jdbsee_connect.png[Jdbsee connect message]
+
+
 ## Batch mode
 
 Invoke the `jdbsee` executable passing appropriate commands and params.
