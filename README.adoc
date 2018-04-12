@@ -40,14 +40,14 @@ image:https://img.shields.io/github/commits-since/davidecavestro/jdbsee/latest.s
 
 endif::[]
 
-A simple jdbc CLI tool with batch and interactive mode
+A CLI swiss-army knife for jdbc with batch and interactive mode
 
 toc::[]
 
 :imagesdir: docs/images
 :icons: font
 
-Jdbsee CLI is a command line tool for databases operations over JDBC.
+Jdbsee is tool providing database access from command line using JDBC.
 
 
 # Features
