@@ -9,6 +9,9 @@ import groovy.transform.CompileStatic;
 
 import javax.inject.Inject
 
+/**
+ * Persists {@link JdbsDriver driver} settings.
+ */
 @CompileStatic
 class JdbsDriverDao {
 

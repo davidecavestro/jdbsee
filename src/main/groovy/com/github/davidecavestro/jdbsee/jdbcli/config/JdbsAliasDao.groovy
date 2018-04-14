@@ -7,6 +7,9 @@ import groovy.transform.CompileStatic
 
 import javax.inject.Inject
 
+/**
+ * Persists {@link JdbsAlias alias} settings.
+ */
 @CompileStatic
 class JdbsAliasDao {
 

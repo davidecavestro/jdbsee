@@ -2,6 +2,9 @@ package com.github.davidecavestro.jdbsee.jdbcli
 
 import picocli.CommandLine
 
+/**
+ * Extend to reuse the same options between commands needing access to a configured db.
+ */
 abstract class AbstractDbCommand implements CliCommand {
   @CommandLine.Option(names = ["-a", "--alias"], description = "Database alias, to reuse previously persisted settings")
   String alias

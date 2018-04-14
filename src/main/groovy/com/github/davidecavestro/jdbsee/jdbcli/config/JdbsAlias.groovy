@@ -2,7 +2,9 @@ package com.github.davidecavestro.jdbsee.jdbcli.config
 
 import groovy.transform.EqualsAndHashCode;
 
-
+/**
+ * Domain model for db alias settings.
+ */
 @EqualsAndHashCode
 class JdbsAlias {
     Long id

@@ -16,6 +16,9 @@ import java.sql.Driver
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 
+/**
+ * Resolves db-access command options providing a connection to the relevant db.
+ */
 //@CompileStatic
 abstract class AbstractDbCommandService {
 
