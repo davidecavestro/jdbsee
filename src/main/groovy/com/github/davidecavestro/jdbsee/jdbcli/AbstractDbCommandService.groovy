@@ -98,6 +98,9 @@ abstract class AbstractDbCommandService {
     }
   }
 
+  /**
+   * Creates and test a new datasource opening  a connection
+   */
   protected void withDynamicDataSource(
       final String driverClassName,
       final String driverClassMatches,
@@ -105,7 +108,6 @@ abstract class AbstractDbCommandService {
       final List<String> deps,
       final Closure<DataSource> createDataSource,
       final Closure<Void> callback) {
-    //creates and test a new datasource opening  a connection
     Closure<DataSource> testDataSource = {Driver driver->
       def tmpDataSource = createDataSource(driver)
       try {
@@ -122,6 +124,16 @@ abstract class AbstractDbCommandService {
     }
   }
 
+  /**
+   * Run callback on the datasource  obtained from specified params.
+   *
+   * @param driverClassName the driver class (optional)
+   * @param driverClassMatches an expression for driver class name matching (optional)
+   * @param jars jars to search for driver loading
+   * @param deps deps to solve for driver loading
+   * @param testDataSource tests connections from datasource
+   * @param callback called passing the datasource
+   */
   protected void withDeps(
           final String driverClassName,
           final String driverClassMatches,
@@ -164,28 +176,11 @@ abstract class AbstractDbCommandService {
         if (url.file.endsWith('jar')) {
           LOG.debug('Registering {}', url)
           def sysloader = ClassLoader.getSystemClassLoader()
-
-
-//          if (sysloader instanceof URLClassLoader) {
-//            //java < 9, reflection
-//            final Class sysclass = URLClassLoader.class
-//
-//            Method method = sysclass.getDeclaredMethod("addURL", [URL] as Class[])
-//            method.setAccessible(true)
-//            method.invoke(sysloader, url)
-//
-//            try {
-//              result = testDataSource()
-//            } catch (Throwable e) {// seems safe to ignore here :-/
-//              LOG.trace('Caught exception {}', e)
-//            }
-//          } else {//java >= 9
             try {
               result = registerDriverClass(driverClassName, driverClassMatches, new File(url.file), new URLClassLoader([url] as URL[], sysloader), testDataSource);
             } catch (Throwable e) {// seems safe to ignore here :-/
               LOG.trace('Caught exception {}', e)
             }
-//          }
         }
         return result
       } as DataSource
@@ -219,23 +214,6 @@ abstract class AbstractDbCommandService {
 
               return testDataSource(driver)
             }
-//            final Class<?> clazz = Class.forName(classFQN, true, driversLoader)
-//            if (Driver.class.isAssignableFrom(clazz)) {
-//              //found a driver
-//              try
-//              {
-//                MiscTools.loadDriver(classFQN, jar.absolutePath)
-////                Class.forName(classFQN, true, MiscTools.addToClasspath(jar.absolutePath))
-//              }
-//              catch (ClassNotFoundException | IllegalArgumentException | SecurityException e)
-//              {
-//                LOG.warn("Error loading {}", classFQN, e);
-//              }
-////              clazz.getDeclaredConstructor().newInstance()
-//              LOG.debug('Trying to activate driver class {}', clazz.name)
-//              //returning the first configured datasource
-//              return testDataSource()
-//            }
           } catch (NoClassDefFoundError | Exception ignore) {
             // Safe to ignore, as this is a hack to force loading naive drivers
             LOG.trace('Cannot load class', ignore)
