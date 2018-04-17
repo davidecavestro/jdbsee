@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
 import javax.sql.DataSource
-import java.lang.reflect.Method
 import java.sql.Driver
 import java.util.jar.JarEntry
 import java.util.jar.JarFile

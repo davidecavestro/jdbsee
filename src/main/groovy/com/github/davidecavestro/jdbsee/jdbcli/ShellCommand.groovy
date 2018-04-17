@@ -6,7 +6,6 @@ import org.jline.builtins.Completers.TreeCompleter
 import org.jline.builtins.SortedTreeCompleter
 import org.jline.reader.*
 import org.jline.reader.impl.DefaultParser
-import org.jline.reader.impl.LineReaderImpl
 import org.jline.reader.impl.history.DefaultHistory
 import org.jline.terminal.Terminal
 import org.jline.terminal.TerminalBuilder
@@ -38,8 +37,6 @@ class ShellCommand implements CliCommand {
   boolean noBanner
   @CommandLine.Option(names = ["-m", "--monochrome"], description = "Don't produce coloured output")
   boolean monochrome
-//  @CommandLine.Option(names = ["-t", "--theme"], description = "Theme for Ansi coloured output. On between [dark, mono]. Choose mono for monochromatic output.")
-//  Theme theme = Theme.dark
 
   @Inject
   protected ConsoleService consoleService
@@ -152,7 +149,6 @@ $bannerTxt
     } catch (final IOException e) {
       throw new RuntimeException (e)
     }
-    //    CommandLine commandLine = new CommandLine (parent, daggerFactory);
   }
 
   //TODO use picocli styles
@@ -174,17 +170,6 @@ $bannerTxt
 
   protected CommandLine createCommandLine (final CommandLine.IFactory daggerFactory) {
     final CommandLine commandLine = new CommandLine (parent, daggerFactory)
-
-//    commandLine.subcommands.findAll {String k, CommandLine v -> k!='shell'}
-//    for (final Map.Entry<String, CommandLine> entry : Maps.filterEntries (commandLine.getSubcommands (), new Predicate<Map.Entry<String, CommandLine>> () {
-//        @Override
-//        boolean apply (final Map.Entry<String, CommandLine> input) {
-//            return !input.getKey ().equals ("shell")//skip shell command
-//        }
-//    }).entrySet ()) {
-//        commandLine.addSubcommand (entry.getKey (), entry.getValue ())
-//    }
-
 
     //register quit command at top level, only within shell
     final ExitCommand exitCommand = new ExitCommand ()
@@ -284,39 +269,4 @@ $bannerTxt
       this.consoleService = consoleService
     }
   }
-
-//  static enum Theme {
-//    dark ([
-//          (Style.plain): '37',
-//          (Style.strong): '32',
-//          (Style.em): '36',
-//          (Style.head): '33',
-//          (Style.foot): '33'
-//      ]),
-//    mono ();
-//
-//    Map<Style,String> styles
-//    boolean monochrome
-//
-//    Theme () {monochrome=true}
-//    Theme (Map<Style,String> styles) {this.styles=styles}
-//
-//    String text (final Terminal terminal, final Style style,  final String text) {
-//      if (monochrome) {
-//        return text
-//      } else {//coloured banner
-//        switch (style) {
-//          plain:
-//            return text
-//          default:
-//            return AttributedString.fromAnsi(
-//                  """\u001B[${styles[style]}m$text\u001B[0m""".toString()
-//            ).toAnsi(terminal)
-//        }
-//      }
-//    }
-//  }
-//  static enum Style {
-//    plain, strong, em, head, foot;
-//  }
 }

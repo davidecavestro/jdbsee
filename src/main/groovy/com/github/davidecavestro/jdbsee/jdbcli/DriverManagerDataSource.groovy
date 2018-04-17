@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory
 import javax.sql.DataSource
 import java.sql.Connection
 import java.sql.Driver
-import java.sql.DriverManager
 import java.sql.SQLException
 import java.util.logging.Logger
 

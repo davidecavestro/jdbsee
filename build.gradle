@@ -20,10 +20,6 @@ plugins {
 }
 
 
-//apply plugin: 'java'
-//apply plugin: 'application'
-//
-
 group = 'com.github.davidecavestro.jdbsee'
 project.version = scmVersion.version
 
@@ -45,7 +41,7 @@ compileGroovy {
 configurations{
   drivers
 }
-// Add Dagger dependencies
+
 dependencies {
   apt 'com.google.dagger:dagger-compiler:2.14.1'
   compile 'com.google.dagger:dagger:2.14.1'
@@ -55,15 +51,12 @@ dependencies {
 
   compile 'org.reflections:reflections:0.9.11'
 
-//  compile 'com.github.davidmoten:rxjava2-jdbc:0.1-RC32'
   compile 'info.picocli:picocli:2.2.1'
   compile 'de.vandermeer:asciitable:0.3.2'
   compile 'de.vandermeer:skb-interfaces:0.0.2'
 
   compile 'org.jdbi:jdbi3-core:3.0.1'
   compile 'org.jdbi:jdbi3-sqlobject:3.0.1'
-
-//  compile 'org.apache.tomcat:tomcat-jdbc:9.0.4'
 
   compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.9.4'
   compile 'org.slf4j:jul-to-slf4j:1.7.25'
@@ -92,7 +85,6 @@ dependencies {
 
   testCompile 'junit:junit:4.12'
   testCompile 'commons-io:commons-io:2.6'
-//  testRuntime 'com.h2database:h2:1.4.196'
 
 
   //drivers distribution
@@ -165,7 +157,7 @@ startScripts.with {
   }
 }
 
-
+//FIXME set files owner
 ospackage {
   group = "Distribution"
   description = "Jdbsee CLI is a command line tool for databases operations over JDBC"
